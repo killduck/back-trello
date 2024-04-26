@@ -38,37 +38,43 @@ python -m venv .venv
 
 - Активация виртуального окружение
 Windows
-* Bash:
+    * Bash:
 ```
-source venv/Scripts/activate
+source .venv/Scripts/activate
 ```
-* Windows Shell:
+    * Windows Shell:
 ```
 .venv\Scripts\Activate.ps1
 ```
 MacOS/Unix
-* Bash/Zsh:
+    * Bash/Zsh:
 ```
 source .venv/bin/activate
 ```
 
 ### Команды для Django:
-- Установка зависимостей из файла requirements.txt если версиия
+- Сохранение зависимостей(установленных пакетов) в файл requirements.txt
+Команда подается из директории back-group31
+```
+pip freeze > requirements.txt
+```
+- Установка зависимостей из файла requirements.txt
 ```
 pip install -r requirements.txt
 ```
 
 - Запуск встроенного сервера Django
+Команда подается из директории trello
 ```
 python manage.py runserver
 ```
 
 - Работа с миграциями
-* Проверяем модели и таблицы в БД, подготавливаем скрипты миграций
+Проверяем модели и таблицы в БД, подготавливаем скрипты миграций
 ```
 python manage.py makemigrations
 ```
-* Запускаем миграции
+Запускаем миграции
 ```
 python manage.py migrate
 ```

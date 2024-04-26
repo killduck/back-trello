@@ -3,4 +3,4 @@ from rest_framework.response import Response
 
 @api_view(['GET', 'POST'])
 def test(request):
-    return Response('Ура получилось')
+    return Response('Ура получилось!!!')
