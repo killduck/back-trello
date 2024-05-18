@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django_seed import Seed
 
-from trello.management.seed import columns_cards_db as db
+from trello.management.seed import trello_fake_db as db
 
 
 class Command(BaseCommand):
