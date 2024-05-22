@@ -16,9 +16,10 @@ class CardSerializer(serializers.ModelSerializer):
             "column",
         )
 
+
 class ColumnSerializer(serializers.ModelSerializer):
 
-    cards = CardSerializer(many=True)
+    cards = CardSerializer(many=True, required=False)
 
     class Meta:
         model = Column
@@ -30,27 +31,26 @@ class ColumnSerializer(serializers.ModelSerializer):
             "cards",
         )
 
-    def create(self, validated_data):  # перопределяем метод для записи
-        # Уберем список карточек из словаря validated_data и сохраним его
-        cards = validated_data.pop('cards')
+    # перопределяем метод для записи
+    def create(self, validated_data):
 
+        if 'cards' not in self.initial_data:
+            # Cоздаём запись если колонка создается без карточек
+            column = Column.objects.create(**validated_data)
+            return column
+
+
+        # Уберем список карточек из словаря validated_data и сохраним его cards_data
+        cards_data = validated_data.pop('cards')
+
+        # Создадим новую колонку пока без карточек
         column = Column.objects.create(**validated_data)
 
+        # Получаем каждую карточку из списка и создаем новую запись
+        for card in cards_data:
+            Card.objects.create(column=column, **card)
 
-        # Создадим новую колонку пока без достижений, тк данных нам достаточно
-        column = Column.objects.create(**validated_data)
-        print('validated_data=>',validated_data, 'cards=>', cards)
-
-        # Получаем каждую карточку из списка
-        for card in cards:
-            print('Карточка=>', card)
-            # Создаем новую запись или получим существующий экземпляр из БД
-            current_card, status = Card.objects.get_or_create(**card)
-
-            # Card.objects.create(card=current_card, cat=cat)
-
-
-        return column
+        return column  # бинго
 
 
 class PersonSerializer(serializers.ModelSerializer):
