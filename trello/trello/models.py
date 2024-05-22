@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class Columns(models.Model):
+class Column(models.Model):
     """Модель для колонок."""
 
     name = models.CharField(
@@ -29,7 +29,7 @@ class Columns(models.Model):
         return self.name
 
 
-class Cards(models.Model):
+class Card(models.Model):
     """Модель для карточек задач."""
 
     name = models.CharField(
@@ -50,7 +50,7 @@ class Cards(models.Model):
         help_text="Введите номер позиции карточки",
     )
     column = models.ForeignKey(
-        "Columns",
+        "Column",
         on_delete=models.SET_NULL,
         blank=True,
         null=True,

@@ -1,13 +1,13 @@
 from django.contrib import admin
 
 from .models import (
-    Cards,
-    Columns,
+    Card,
+    Column,
     Person,
 )
 
 
-@admin.register(Columns)
+@admin.register(Column)
 class ColumnsAdmin(admin.ModelAdmin):
     list_display = (
         "id",
@@ -18,7 +18,7 @@ class ColumnsAdmin(admin.ModelAdmin):
     list_filter = ("name",)
 
 
-@admin.register(Cards)
+@admin.register(Card)
 class ColumnsAdmin(admin.ModelAdmin):
     list_display = (
         "id",
