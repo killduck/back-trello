@@ -1,13 +1,13 @@
 from django.db import models
 
 
-class Columns(models.Model):
+class Column(models.Model):
     """Модель для колонок."""
 
     name = models.CharField(
         max_length=50,
         verbose_name="Наименование колонки",
-        help_text="Введите наименование категории",
+        help_text="Введите наименование колонки",
     )
     order = models.IntegerField(
         verbose_name="Номер позиции колонки",
@@ -29,7 +29,7 @@ class Columns(models.Model):
         return self.name
 
 
-class Cards(models.Model):
+class Card(models.Model):
     """Модель для карточек задач."""
 
     name = models.CharField(
@@ -49,7 +49,7 @@ class Cards(models.Model):
         help_text="Введите номер позиции карточки",
     )
     column = models.ForeignKey(
-        "Columns",
+        "Column",
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
@@ -97,8 +97,8 @@ class Person(models.Model):
     )
 
     class Meta:
-        verbose_name = "Никнейм"
-        verbose_name_plural = "никнеймы"
+        verbose_name = "Участник"
+        verbose_name_plural = "участники"
         ordering = [
             "nick_name",
         ]
