@@ -34,17 +34,21 @@ class ColumnSerializer(serializers.ModelSerializer):
         # Уберем список карточек из словаря validated_data и сохраним его
         cards = validated_data.pop('cards')
 
+        column = Column.objects.create(**validated_data)
+
+
         # Создадим новую колонку пока без достижений, тк данных нам достаточно
         column = Column.objects.create(**validated_data)
-        # print('validated_data=>',validated_data, 'cards=>', cards)
+        print('validated_data=>',validated_data, 'cards=>', cards)
 
         # Получаем каждую карточку из списка
-        # for card in cards:
-        #     print('Карточка=>', card)
-            # Создадим новую запись или получим существующий экземпляр из БД
-            # current_card, status = Card.objects.get_or_create(**card)
+        for card in cards:
+            print('Карточка=>', card)
+            # Создаем новую запись или получим существующий экземпляр из БД
+            current_card, status = Card.objects.get_or_create(**card)
 
             # Card.objects.create(card=current_card, cat=cat)
+
 
         return column
 
