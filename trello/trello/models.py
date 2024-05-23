@@ -43,6 +43,7 @@ class Card(models.Model):
         related_name="cards",
         verbose_name="Автор",
         help_text="Введите автора",
+        # null=True,
     )
     order = models.IntegerField(
         verbose_name="Номер позиции карточки",
@@ -70,7 +71,7 @@ class Card(models.Model):
 
 
 class Person(models.Model):
-    """Модель для польователей."""
+    """Модель для пользователей."""
 
     first_name = models.CharField(
         max_length=50,

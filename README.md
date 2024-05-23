@@ -104,6 +104,11 @@ python manage.py makemigrations trello
 python manage.py migrate
 ```
 
+Засеять БазуДанных фейковыми данными для теста:
+```
+python manage.py seeds
+```
+
 - Создание Супер Пользователя для доступа к Админке Django:
   Команда
 
