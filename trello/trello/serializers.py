@@ -39,7 +39,6 @@ class ColumnSerializer(serializers.ModelSerializer):
             column = Column.objects.create(**validated_data)
             return column
 
-
         # Уберем список карточек из словаря validated_data и сохраним его cards_data
         cards_data = validated_data.pop('cards')
 

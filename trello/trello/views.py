@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from .models import Card, Column, Person
 from .serializers import CardSerializer, ColumnSerializer, PersonSerializer
 
+
 @api_view(["GET", "POST", "PUT"])
 def test(request):
     return Response(
@@ -43,6 +44,7 @@ def test(request):
             },
         ]
     )
+
 
 @api_view(["GET",])
 def columns(request):
