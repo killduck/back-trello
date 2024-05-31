@@ -11,11 +11,11 @@ class Column(models.Model):
     )
     order = models.IntegerField(
         verbose_name="Номер позиции колонки",
-        help_text="Введите номер позиции",
-        unique=True,
-        error_messages={
-            "unique": "Номер позиции повторяется",
-        },
+        help_text="Номер позиции",
+        # unique=True,
+        # error_messages={
+        #     "unique": "Номер позиции повторяется",
+        # },
         null=True,
     )
 
