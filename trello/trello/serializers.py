@@ -31,7 +31,7 @@ class ColumnSerializer(serializers.ModelSerializer):
             "cards",
         )
 
-    # перопределяем метод для записи
+    # переопределяем метод для записи
     def create(self, validated_data):
 
         if 'cards' not in self.initial_data:

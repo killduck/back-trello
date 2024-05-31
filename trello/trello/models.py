@@ -16,6 +16,7 @@ class Column(models.Model):
         error_messages={
             "unique": "Номер позиции повторяется",
         },
+        null=True,
     )
 
     class Meta:
