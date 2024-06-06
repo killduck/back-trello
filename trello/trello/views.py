@@ -14,22 +14,42 @@ def columns(request):
     return Response(serializer.data)
 
 
-@api_view(["POST"])
-def create_columns(request):
-    columns_db = Column.objects.all()
+# Версия Леонида, коментируем до лучших времен
+# @api_view(["POST"])
+# def create_columns(request):
+#     columns_db = Column.objects.all()
 
-    if len(columns_db) < len(request.data):
-        # проверяем и готовим данные для колонки перед записью в БД
-        new_data = check_new_column(request, columns_db)
-        # добавляем колонку в БД
+#     if len(columns_db) < len(request.data):
+#         # проверяем и готовим данные для колонки перед записью в БД
+#         new_data = check_new_column(request, columns_db)
+#         # добавляем колонку в БД
+#         Column.objects.create(
+#             id=new_data["id"],
+#             name=new_data["name"],
+#             order=new_data["order"],
+#         )
+#         print("добавлена колонка в БД")
+#     else:
+#         print("если что-то сюда прилетит, то будем разбираться")
+
+#     queryset = Column.objects.all()
+#     serializer = ColumnSerializer(queryset, many=True)
+#     return Response(serializer.data)
+
+
+# Версия Андрея, как временное решение - но вроде рабочее
+@api_view(["GET", "POST"])
+def create_columns(request):
+    print('create_columns=>', request.data)
+    try:
         Column.objects.create(
-            id=new_data["id"],
-            name=new_data["name"],
-            order=new_data["order"],
+            name=request.data["name"],
+            order=request.data["order"],
         )
         print("добавлена колонка в БД")
-    else:
-        print("если что-то сюда прилетит, то будем разбираться")
+    except:
+        print("писец колонка не добавлена")
+
 
     queryset = Column.objects.all()
     serializer = ColumnSerializer(queryset, many=True)
