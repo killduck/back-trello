@@ -26,8 +26,8 @@ class Column(models.Model):
             "order",
         ]
 
-    def __str__(self):
-        return self.name
+    # def __str__(self):
+    #     return self.name
 
 
 class Card(models.Model):

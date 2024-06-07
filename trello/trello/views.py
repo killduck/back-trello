@@ -39,21 +39,29 @@ def columns(request):
 
 # Версия Андрея, как временное решение - но вроде рабочее, но с нюансами :)
 @api_view(["GET", "POST"])
-def create_columns(request):
-    print('create_columns=>', request.data)
-    try:
-        Column.objects.create(
-            name=request.data["name"],
-            order=request.data["order"],
-        )
-        print("добавлена колонка в БД")
-    except:
-        print("писец колонка не добавлена")
+def create_column(request):
 
+    # TODO добавить параметры idWorkSpace: 1, idDashboard: 1
 
-    queryset = Column.objects.all()
-    serializer = ColumnSerializer(queryset, many=True)
+    lastColumnOrder = Column.objects.all().last()
+
+    # lastColumnOrder = lastColumnOrder.pop()
+    serializer = ColumnSerializer(lastColumnOrder, many=True)
     return Response(serializer.data)
+
+    # print("create_columns=>", request.data)
+    # try:
+    #     Column.objects.create(
+    #         name=request.data["name"],
+    #         order=request.data["order"],
+    #     )
+    #     print("добавлена колонка в БД")
+    # except:
+    #     print("писец колонка не добавлена")
+
+    # queryset = Column.objects.all()
+    # serializer = ColumnSerializer(queryset, many=True)
+    # return Response(serializer.data)
 
 
 @api_view(["POST"])
@@ -101,7 +109,12 @@ def delete_columns(request):
 #     return Response(serializer.data)
 
 
-@api_view(["GET", "POST",])
+@api_view(
+    [
+        "GET",
+        "POST",
+    ]
+)
 def cards(request):
     if request.method == "POST":
         serializer = CardSerializer(data=request.data)
