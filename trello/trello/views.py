@@ -37,7 +37,7 @@ def columns(request):
 #     return Response(serializer.data)
 
 
-# Версия Андрея, как временное решение - но вроде рабочее
+# Версия Андрея, как временное решение - но вроде рабочее, но с нюансами :)
 @api_view(["GET", "POST"])
 def create_columns(request):
     print('create_columns=>', request.data)
