@@ -6,8 +6,10 @@ from . import views
 
 urlpatterns = [
     path("columns/", views.columns, name="columns"),
-    path("edite-columns/", views.edite_columns, name="edite-columns"),
-    path("columns/edite/", views.columns_edite, name="columns-edite"),
+    path("swap-columns/", views.swap_columns, name="swap-columns"),
+    path("create-columns/", views.create_columns, name="create-columns"),
+    path("delete-columns/", views.delete_columns, name="delete-columns"),
+    # path("columns/edite/", views.columns_edite, name="columns-edite"),
     path("cards/", views.cards, name="cards"),
     # path('test/', views.test, name='test'),
     path("admin/", admin.site.urls),
