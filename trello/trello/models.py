@@ -1,18 +1,6 @@
 from django.db import models
 
 
-<<<<<<< HEAD
-class News(models.Model):
-    title = models.TextField()
-    content = models.TextField()
-    short_content = models.TextField()
-    category = models.ForeignKey("Category", on_delete=models.DO_NOTHING, default=1)
-
-
-class Category(models.Model):
-    title = models.TextField()
-
-=======
 class Column(models.Model):
     """Модель для колонок."""
 
@@ -119,4 +107,3 @@ class Person(models.Model):
 
     def __str__(self):
         return self.nick_name
->>>>>>> 1368d09ec135a790b18d4581f04f32ad9fc9dcff
