@@ -39,7 +39,7 @@ def create_column(request):
     try:
         new_add_column = Column.objects.create(
             name=request.data["nameNewColumn"],
-            order= last_column_order.order + 1,
+            order= last_column_order.order + 1 if last_column_order else 0,
         )
         print("добавлена колонка в БД")
         serializer = ColumnSerializer(new_add_column)
