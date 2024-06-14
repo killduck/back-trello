@@ -1,6 +1,58 @@
 from django.db import models
 
 
+# class WorkSpace(models.Model):
+#     """Модель для рабочих пространств."""
+
+#     name = models.CharField(
+#         max_length=50,
+#         verbose_name="Наименование колонки",
+#         help_text="Введите наименование колонки",
+#     )
+#     order = models.IntegerField(
+#         verbose_name="Номер позиции колонки",
+#         help_text="Номер позиции",
+#         # unique=True,
+#         # error_messages={
+#         #     "unique": "Номер позиции повторяется",
+#         # },
+#         null=True,
+#     )
+
+#     class Meta:
+#         verbose_name = "Колонку"
+#         verbose_name_plural = "колонки"
+#         ordering = [
+#             "order",
+#         ]
+
+#     def __str__(self):
+#         return self.name
+
+
+class Dashboard(models.Model):
+    """Модель для досок."""
+
+    name = models.CharField(
+        max_length=50,
+        verbose_name="Наименование доски",
+        help_text="Введите наименование доски",
+    )
+    img = models.CharField(
+        verbose_name="Картинка доски(фон)",
+    )
+
+    # class Meta:
+    #     verbose_name = "Колонку"
+    #     verbose_name_plural = "колонки"
+    #     ordering = [
+    #         "order",
+    #     ]
+
+    def __str__(self):
+        return self.name
+
+
 class Column(models.Model):
     """Модель для колонок."""
 
@@ -17,6 +69,15 @@ class Column(models.Model):
         #     "unique": "Номер позиции повторяется",
         # },
         null=True,
+    )
+
+    dashboard = models.ForeignKey(
+        "Dashboard",
+        on_delete=models.CASCADE,
+        related_name="column",
+        # verbose_name="Автор",
+        # help_text="Введите автора",
+        # null=True,
     )
 
     class Meta:

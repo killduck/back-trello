@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from .models import Card, Column, Person
+from .models import Card, Column, Person, Dashboard
 from .serializers import CardSerializer, ColumnSerializer, PersonSerializer
 from .views_functions.column_functions import change_order_columns
 
@@ -10,6 +10,13 @@ from .views_functions.column_functions import change_order_columns
 @api_view(["GET"])
 def columns(request):
     queryset = Column.objects.all()
+    serializer = ColumnSerializer(queryset, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+def dashboards(request):
+    queryset = Dashboard.objects.all()
     serializer = ColumnSerializer(queryset, many=True)
     return Response(serializer.data)
 
@@ -39,27 +46,25 @@ def create_column(request):
     try:
         new_add_column = Column.objects.create(
             name=request.data["nameNewColumn"],
-            order= last_column_order.order + 1 if last_column_order else 0,
+            order=last_column_order.order + 1 if last_column_order else 0,
         )
         print("добавлена колонка в БД")
         serializer = ColumnSerializer(new_add_column)
         return Response(serializer.data)
     except:
-       return Response(False, status=status.HTTP_404_NOT_FOUND)
-
+        return Response(False, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(["POST"])
 def delete_column(request):
 
-    id_column_deleted = request.data['id_column']
+    id_column_deleted = request.data["id_column"]
 
     try:
         Column.objects.filter(id=id_column_deleted).delete()
         return Response(True, status=status.HTTP_200_OK)
     except:
         return Response(False, status=status.HTTP_404_NOT_FOUND)
-
 
 
 # @api_view(["GET", "POST",])

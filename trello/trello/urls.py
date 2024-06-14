@@ -6,6 +6,7 @@ from . import views
 
 urlpatterns = [
     path("columns/", views.columns, name="columns"),
+    path("dashboards/", views.dashboards, name="dashboards"),
     path("swap-columns/", views.swap_columns, name="swap-columns"),
     path("create-column/", views.create_column, name="create-column"),
     path("delete-column/", views.delete_column, name="delete-column"),

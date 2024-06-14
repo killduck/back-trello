@@ -1,18 +1,22 @@
-from trello.models import Column, Card, Person
+from trello.models import Column, Card, Person, Dashboard
 
 tables = [
     {
+        "table_name": Dashboard,
+        "table_dada": [
+            {"id": 1, "name": "backlog", "img": ""},
+            {"id": 2, "name": "in progress", "img": ""},
+        ],
+    },
+    {
         "table_name": Column,
         "table_dada": [
-            {
-                "id": 1,
-                "name": "backlog",
-                "order": 0,
-            },
+            {"id": 1, "name": "backlog", "order": 0, "dashboard": Dashboard(id=1)},
             {
                 "id": 2,
                 "name": "in progress",
                 "order": 1,
+                "dashboard": Dashboard(id=2),
             },
         ],
     },
