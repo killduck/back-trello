@@ -4,7 +4,7 @@ from rest_framework.response import Response
 
 from .models import Card, Column, Person
 from .serializers import CardSerializer, ColumnSerializer, PersonSerializer
-from .views_functions.column_functions import change_order_columns, check_new_column
+from .views_functions.column_functions import change_order_columns
 
 
 @api_view(["GET"])
@@ -14,60 +14,10 @@ def columns(request):
     return Response(serializer.data)
 
 
-# Версия Леонида, коментируем до лучших времен
-# @api_view(["POST"])
-# def create_columns(request):
-#     columns_db = Column.objects.all()
-
-#     if len(columns_db) < len(request.data):
-#         # проверяем и готовим данные для колонки перед записью в БД
-#         new_data = check_new_column(request, columns_db)
-#         # добавляем колонку в БД
-#         Column.objects.create(
-#             id=new_data["id"],
-#             name=new_data["name"],
-#             order=new_data["order"],
-#         )
-#         print("добавлена колонка в БД")
-#     else:
-#         print("если что-то сюда прилетит, то будем разбираться")
-
-#     queryset = Column.objects.all()
-#     serializer = ColumnSerializer(queryset, many=True)
-#     return Response(serializer.data)
-
-
-# Версия Андрея, как временное решение - но вроде рабочее, но с нюансами :)
-@api_view(["GET", "POST"])
-def create_column(request):
-
-    # TODO добавить параметры idWorkSpace: 1, idDashboard: 1
-
-    lastColumnOrder = Column.objects.all().last()
-
-    # lastColumnOrder = lastColumnOrder.pop()
-    serializer = ColumnSerializer(lastColumnOrder, many=True)
-    return Response(serializer.data)
-
-    # print("create_columns=>", request.data)
-    # try:
-    #     Column.objects.create(
-    #         name=request.data["name"],
-    #         order=request.data["order"],
-    #     )
-    #     print("добавлена колонка в БД")
-    # except:
-    #     print("писец колонка не добавлена")
-
-    # queryset = Column.objects.all()
-    # serializer = ColumnSerializer(queryset, many=True)
-    # return Response(serializer.data)
-
-
 @api_view(["POST"])
 def swap_columns(request):
     columns_db = Column.objects.all()
-    # print(request.data)
+
     if len(columns_db) == len(request.data):
         change_order_columns(request, columns_db)
         print("обновили порядок колонок в БД")
@@ -79,19 +29,37 @@ def swap_columns(request):
     return Response(serializer.data)
 
 
+@api_view(["GET", "POST"])
+def create_column(request):
+
+    # TODO добавить параметры idWorkSpace: 1, idDashboard: 1
+
+    last_column_order = Column.objects.all().last()
+
+    try:
+        new_add_column = Column.objects.create(
+            name=request.data["nameNewColumn"],
+            order= last_column_order.order + 1,
+        )
+        print("добавлена колонка в БД")
+        serializer = ColumnSerializer(new_add_column)
+        return Response(serializer.data)
+    except:
+       return Response(False, status=status.HTTP_404_NOT_FOUND)
+
+
+
 @api_view(["POST"])
-def delete_columns(request):
-    columns_db = Column.objects.all()
+def delete_column(request):
 
-    if len(columns_db) > len(request.data):
-        # тут нужен код для удаления колонки !!!
-        print("была удаленна колонка и нужно обновить БД")
-    else:
-        print("если что-то сюда прилетит, то будем разбираться")
+    id_column_deleted = request.data['id_column']
 
-    queryset = Column.objects.all()
-    serializer = ColumnSerializer(queryset, many=True)
-    return Response(serializer.data)
+    try:
+        Column.objects.filter(id=id_column_deleted).delete()
+        return Response(True, status=status.HTTP_200_OK)
+    except:
+        return Response(False, status=status.HTTP_404_NOT_FOUND)
+
 
 
 # @api_view(["GET", "POST",])
@@ -109,12 +77,7 @@ def delete_columns(request):
 #     return Response(serializer.data)
 
 
-@api_view(
-    [
-        "GET",
-        "POST",
-    ]
-)
+@api_view(["GET", "POST"])
 def cards(request):
     if request.method == "POST":
         serializer = CardSerializer(data=request.data)
