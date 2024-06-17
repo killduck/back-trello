@@ -42,12 +42,9 @@ class Dashboard(models.Model):
         verbose_name="Картинка доски(фон)",
     )
 
-    # class Meta:
-    #     verbose_name = "Колонку"
-    #     verbose_name_plural = "колонки"
-    #     ordering = [
-    #         "order",
-    #     ]
+    class Meta:
+        verbose_name = "Колонку"
+        verbose_name_plural = "колонки"
 
     def __str__(self):
         return self.name

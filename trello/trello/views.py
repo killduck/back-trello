@@ -38,15 +38,16 @@ def swap_columns(request):
 
 @api_view(["GET", "POST"])
 def create_column(request):
-
+    print('create_column(request)=>', request.data)
     # TODO добавить параметры idWorkSpace: 1, idDashboard: 1
 
     last_column_order = Column.objects.all().last()
 
     try:
         new_add_column = Column.objects.create(
-            name=request.data["nameNewColumn"],
+            name=request.data['nameNewColumn'],
             order=last_column_order.order + 1 if last_column_order else 0,
+            dashboard_id = request.data['idDashboard'],
         )
         print("добавлена колонка в БД")
         serializer = ColumnSerializer(new_add_column)

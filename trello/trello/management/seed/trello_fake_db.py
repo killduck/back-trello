@@ -4,19 +4,25 @@ tables = [
     {
         "table_name": Dashboard,
         "table_dada": [
-            {"id": 1, "name": "backlog", "img": ""},
-            {"id": 2, "name": "in progress", "img": ""},
+            {"id": 1, "name": "diplom", "img": ""},
+            {"id": 2, "name": "test_dashboard", "img": ""},
         ],
     },
     {
         "table_name": Column,
         "table_dada": [
-            {"id": 1, "name": "backlog", "order": 0, "dashboard": Dashboard(id=1)},
+            {
+                "id": 1,
+                "name":
+                "backlog",
+                "order": 0,
+                "dashboard": Dashboard(id=1)
+            },
             {
                 "id": 2,
                 "name": "in progress",
                 "order": 1,
-                "dashboard": Dashboard(id=2),
+                "dashboard": Dashboard(id=1),
             },
         ],
     },
