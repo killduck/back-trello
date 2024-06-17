@@ -1,6 +1,6 @@
+
 from django.core.management.base import BaseCommand
 from django_seed import Seed
-
 from trello.management.seed import trello_fake_db as db
 
 
@@ -17,9 +17,9 @@ class Command(BaseCommand):
                         TableClearing(table['table_name'])
                     flag = self._write_data_to_table(table['table_name'], table['table_dada'])
                 if flag:
-                    print('seedsAnswer: Files are uploaded to the DB.')
+                    print('seeds_(answer): Файлы добавлены в БД.')
                 else:
-                    print('seedsAnswer: Files loading error.')
+                    print('seeds_(answer): Ошибка работы в файлами.')
             else:
                 self._table_type_error()
 
@@ -27,14 +27,15 @@ class Command(BaseCommand):
             print(err)
 
     def _table_type_error(self):
-        if list != type(self._tables):
-            print(f'seedsAnswer: file _tables: {self._tables}, is not "list". it`s: {type(self._tables)}.')
+        if list is not type(self._tables):
+            print(f'seeds_(answer): file _tables: {self._tables}, is not "list". it`s: {type(self._tables)}.')
         elif len(self._tables) == 0:
-            print(f'seedsAnswer: the file _tables: {self._tables} is a list, but it is empty.')
+            print(f'seeds_(answer): the file _tables: {self._tables} is a list, but it is empty.')
         else:
-            print('seedsAnswer: wtf...')
+            print('seeds_(answer): wtf...')
 
-    def _write_data_to_table(self, table_name, table_dada):
+    @staticmethod
+    def _write_data_to_table(table_name, table_dada):
         seeder = Seed.seeder()
         for data_element in table_dada:
             seeder.add_entity(table_name, 1, data_element)
