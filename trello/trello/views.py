@@ -61,14 +61,38 @@ def create_column(request):
 
     try:
         new_add_column = Column.objects.create(
-            name=request.data['nameNewColumn'],
-            order=last_column_order.order + 1 if last_column_order else 0,
+            name = request.data['nameNewColumn'],
+            order = last_column_order.order + 1 if last_column_order else 0,
             dashboard_id = request.data['idDashboard'],
         )
         print("добавлена колонка в БД")
         serializer = ColumnSerializer(new_add_column)
         return Response(serializer.data)
     except:
+        return Response(False, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(["GET", "POST"])
+def create_card(request):
+    print('request=>', request.data)
+
+    card_column = request.data['column']
+
+    last_card_in_column = Card.objects.filter(column=card_column).last()
+    print(last_card_in_column)
+
+    try:
+        new_add_card = Card.objects.create(
+            name = request.data['name'],
+            author_id = request.data['author'],
+            order = last_card_in_column.order + 1 if last_card_in_column else 0,
+            column_id = request.data['column'],
+        )
+        print("добавлена карточка в БД")
+        serializer = CardSerializer(new_add_card)
+        return Response(serializer.data)
+    except:
+        print("если что-то сюда прилетит, то будем разбираться")
         return Response(False, status=status.HTTP_404_NOT_FOUND)
 
 
