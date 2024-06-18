@@ -3,13 +3,14 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from .models import Card, Column, Person, Dashboard
-from .serializers import CardSerializer, ColumnSerializer, PersonSerializer
+from .serializers import CardSerializer, ColumnSerializer, PersonSerializer, DashboardSerializer
 from .views_functions.column_functions import change_order_columns
 
 
-@api_view(["GET"])
+@api_view(["GET", "POST"])
 def columns(request):
-    queryset = Column.objects.all()
+    dashboard_id = request.data['dashboardId']
+    queryset = Column.objects.all().filter(dashboard=dashboard_id)
     serializer = ColumnSerializer(queryset, many=True)
     return Response(serializer.data)
 
@@ -17,7 +18,7 @@ def columns(request):
 @api_view(["GET"])
 def dashboards(request):
     queryset = Dashboard.objects.all()
-    serializer = ColumnSerializer(queryset, many=True)
+    serializer = DashboardSerializer(queryset, many=True)
     return Response(serializer.data)
 
 

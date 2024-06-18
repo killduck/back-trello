@@ -43,8 +43,8 @@ class Dashboard(models.Model):
     )
 
     class Meta:
-        verbose_name = "Колонку"
-        verbose_name_plural = "колонки"
+        verbose_name = "Дашборд"
+        verbose_name_plural = "дашборды"
 
     def __str__(self):
         return self.name
@@ -72,8 +72,8 @@ class Column(models.Model):
         "Dashboard",
         on_delete=models.CASCADE,
         related_name="column",
-        # verbose_name="Автор",
-        # help_text="Введите автора",
+        # verbose_name="Дашборд",
+        # help_text="Введите Дашборд к которому относится колонка",
         # null=True,
     )
 
