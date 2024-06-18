@@ -24,6 +24,18 @@ tables = [
                 "order": 1,
                 "dashboard": Dashboard(id=1),
             },
+            {
+                "id": 3,
+                "name": "test_1",
+                "order": 1,
+                "dashboard": Dashboard(id=2),
+            },
+            {
+                "id": 4,
+                "name": "test_2",
+                "order": 0,
+                "dashboard": Dashboard(id=2),
+            },
         ],
     },
     {
@@ -73,6 +85,20 @@ tables = [
                 "order": 1,
                 "column": Column(id=2),
             },
+            # {
+            #     "id": 4,
+            #     "name": "Task 1",
+            #     "author": Person(id=1),
+            #     "order": 0,
+            #     "column": Column(id=3),
+            # },
+            # {
+            #     "id": 5,
+            #     "name": "Task 2",
+            #     "author": Person(id=3),
+            #     "order": 1,
+            #     "column": Column(id=4),
+            # },
         ],
     },
 ]
