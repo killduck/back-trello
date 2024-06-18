@@ -1,4 +1,4 @@
-
+# sorry!, функция во вьюхе больше не используется
 def change_order_columns(request, columns_db):
     # очистка в таблице Column полей "order" для перезаписи
     for column_db in columns_db:
@@ -13,6 +13,7 @@ def change_order_columns(request, columns_db):
                 column_db.save(update_fields=["order"])
 
 
+# sorry!, функция во вьюхе больше не используется
 def check_new_column(request, columns_db):
     ids = []
     orders = []

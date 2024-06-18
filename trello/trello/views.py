@@ -9,14 +9,18 @@ from .views_functions.column_functions import change_order_columns
 
 @api_view(["GET", "POST"])
 def columns(request):
+
     dashboard_id = request.data['dashboardId']
+
     queryset = Column.objects.all().filter(dashboard=dashboard_id)
     serializer = ColumnSerializer(queryset, many=True)
+
     return Response(serializer.data)
 
 
 @api_view(["GET"])
 def dashboards(request):
+
     queryset = Dashboard.objects.all()
     serializer = DashboardSerializer(queryset, many=True)
     return Response(serializer.data)
@@ -24,25 +28,36 @@ def dashboards(request):
 
 @api_view(["POST"])
 def swap_columns(request):
-    columns_db = Column.objects.all()
 
-    if len(columns_db) == len(request.data):
-        change_order_columns(request, columns_db)
-        print("обновили порядок колонок в БД")
-    else:
+    dashboard_id = request.data['dashboardId']
+
+    # columns_db = Column.objects.filter(dashboard=dashboard_id)
+    # if len(columns_db) == len(request.data):
+    #     change_order_columns(request, columns_db)
+    #     print("обновили порядок колонок в БД")
+    # else:
+    #     print("если что-то сюда прилетит, то будем разбираться")
+
+    try:
+        for column in request.data['columns']:
+            Column.objects.filter(id=column['id']).update(order=column['order'])
+            print("обновили порядок колонок в БД")
+    except:
         print("если что-то сюда прилетит, то будем разбираться")
 
-    queryset = Column.objects.all()
+
+    queryset = Column.objects.filter(dashboard=dashboard_id)
     serializer = ColumnSerializer(queryset, many=True)
     return Response(serializer.data)
 
 
 @api_view(["GET", "POST"])
 def create_column(request):
-    print('create_column(request)=>', request.data)
-    # TODO добавить параметры idWorkSpace: 1, idDashboard: 1
+    # TODO добавить параметры idWorkSpace: 1
 
-    last_column_order = Column.objects.all().last()
+    dashboard_columns = request.data['idDashboard']
+
+    last_column_order = Column.objects.filter(dashboard=dashboard_columns).last()
 
     try:
         new_add_column = Column.objects.create(
@@ -67,21 +82,6 @@ def delete_column(request):
         return Response(True, status=status.HTTP_200_OK)
     except:
         return Response(False, status=status.HTTP_404_NOT_FOUND)
-
-
-# @api_view(["GET", "POST",])
-# def columns_edite(request):
-#     if request.method == "POST":
-#         serializer = ColumnSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-#     queryset = Column.objects.all()
-#     print(queryset)
-#     serializer = ColumnSerializer(queryset, many=True)
-#     print(serializer)
-#     return Response(serializer.data)
 
 
 @api_view(["GET", "POST"])

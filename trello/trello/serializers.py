@@ -32,26 +32,6 @@ class ColumnSerializer(serializers.ModelSerializer):
             "cards",
         )
 
-    # переопределяем метод для записи
-    def create(self, validated_data):
-
-        if 'cards' not in self.initial_data:
-            # Cоздаём запись если колонка создается без карточек
-            column = Column.objects.create(**validated_data)
-            return column
-
-        # Уберем список карточек из словаря validated_data и сохраним его cards_data
-        cards_data = validated_data.pop('cards')
-
-        # Создадим новую колонку пока без карточек
-        column = Column.objects.create(**validated_data)
-
-        # Получаем каждую карточку из списка и создаем новую запись
-        for card in cards_data:
-            Card.objects.create(column=column, **card)
-
-        return column  # бинго
-
 
 class PersonSerializer(serializers.ModelSerializer):
 
@@ -79,3 +59,41 @@ class DashboardSerializer(serializers.ModelSerializer):
             "img",
             'column'
         )
+
+
+
+# Пробный вариант сериализатора - пока нигде не применяем
+class TestColumnSerializer(serializers.ModelSerializer):
+
+    cards = CardSerializer(many=True, required=False)
+
+    class Meta:
+        model = Column
+
+        fields = (
+            "id",
+            "name",
+            "order",
+            'dashboard',
+            "cards",
+        )
+
+    # переопределяем метод для записи
+    def create(self, validated_data):
+
+        if 'cards' not in self.initial_data:
+            # Cоздаём запись если колонка создается без карточек
+            column = Column.objects.create(**validated_data)
+            return column
+
+        # Уберем список карточек из словаря validated_data и сохраним его cards_data
+        cards_data = validated_data.pop('cards')
+
+        # Создадим новую колонку пока без карточек
+        column = Column.objects.create(**validated_data)
+
+        # Получаем каждую карточку из списка и создаем новую запись
+        for card in cards_data:
+            Card.objects.create(column=column, **card)
+
+        return column
