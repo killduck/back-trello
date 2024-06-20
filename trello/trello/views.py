@@ -56,11 +56,13 @@ def swap_cards(request):
         print("если что-то сюда прилетит, то будем разбираться")
         return Response(False, status=status.HTTP_404_NOT_FOUND)
 
+    dashboard_id = request.data['dashboardId']
 
-    # queryset = Column.objects.filter(dashboard=dashboard_id)
-    # serializer = ColumnSerializer(queryset, many=True)
-    # return Response(serializer.data)
-    return Response(True)
+    list_column = Column.objects.filter(dashboard=dashboard_id)
+
+    queryset = Card.objects.filter(column_id__in=list_column)
+    serializer = CardSerializer(queryset, many=True)
+    return Response(serializer.data)
 
 
 @api_view(["GET", "POST"])
