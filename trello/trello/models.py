@@ -38,7 +38,9 @@ class Dashboard(models.Model):
         verbose_name="Наименование доски",
         help_text="Введите наименование доски",
     )
-    img = models.CharField(
+    img = models.ImageField(
+        max_length=200,
+        null=True,
         verbose_name="Картинка доски(фон)",
     )
 

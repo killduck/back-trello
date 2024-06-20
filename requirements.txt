@@ -5,6 +5,7 @@ django-seed==0.3.1
 djangorestframework==3.15.1
 Faker==25.2.0
 Markdown==3.6
+pillow==10.3.0
 psycopg2-binary==2.9.9
 python-dateutil==2.9.0.post0
 six==1.16.0
