@@ -3,14 +3,19 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from .models import Card, Column, Person, Dashboard
-from .serializers import CardSerializer, ColumnSerializer, PersonSerializer, DashboardSerializer
+from .serializers import (
+    CardSerializer,
+    ColumnSerializer,
+    PersonSerializer,
+    DashboardSerializer,
+)
 from .views_functions.column_functions import change_order_columns
 
 
 @api_view(["GET", "POST"])
 def columns(request):
 
-    dashboard_id = request.data['dashboardId']
+    dashboard_id = request.data["dashboardId"]
 
     queryset = Column.objects.all().filter(dashboard=dashboard_id)
     serializer = ColumnSerializer(queryset, many=True)
@@ -27,18 +32,22 @@ def dashboards(request):
 
 
 @api_view(["POST"])
+def login(request):
+    return Response(request.data)
+
+
+@api_view(["POST"])
 def swap_columns(request):
 
-    dashboard_id = request.data['dashboardId']
+    dashboard_id = request.data["dashboardId"]
 
     try:
-        for column in request.data['columns']:
-            Column.objects.filter(id=column['id']).update(order=column['order'])
+        for column in request.data["columns"]:
+            Column.objects.filter(id=column["id"]).update(order=column["order"])
         print("обновили порядок колонок в БД")
     except:
         print("если что-то сюда прилетит, то будем разбираться")
         return Response(False, status=status.HTTP_404_NOT_FOUND)
-
 
     queryset = Column.objects.filter(dashboard=dashboard_id)
     serializer = ColumnSerializer(queryset, many=True)
@@ -49,14 +58,16 @@ def swap_columns(request):
 def swap_cards(request):
 
     try:
-        for card in request.data['order_cards']:
-            Card.objects.filter(id=card['id']).update(order=card['order'], column=card['column'])
+        for card in request.data["order_cards"]:
+            Card.objects.filter(id=card["id"]).update(
+                order=card["order"], column=card["column"]
+            )
         print("обновили порядок карточек в БД")
     except:
         print("если что-то сюда прилетит, то будем разбираться")
         return Response(False, status=status.HTTP_404_NOT_FOUND)
 
-    dashboard_id = request.data['dashboardId']
+    dashboard_id = request.data["dashboardId"]
 
     list_column = Column.objects.filter(dashboard=dashboard_id)
 
@@ -69,18 +80,21 @@ def swap_cards(request):
 def create_column(request):
     # TODO добавить параметры idWorkSpace: 1
 
-    dashboard_columns = request.data['idDashboard']
+    dashboard_columns = request.data["idDashboard"]
 
     last_column_order = Column.objects.filter(dashboard=dashboard_columns).last()
 
+    if last_column_order:
+        order = last_column_order.order + 1
+    else:
+        order = 0
+
     try:
         new_add_column = Column.objects.create(
-            name = request.data['nameNewColumn'],
-            order = last_column_order.order + 1 if last_column_order else 0,
-            dashboard_id = request.data['idDashboard'],
+            name=request.data["nameNewColumn"],
+            order=order,
+            dashboard_id=request.data["idDashboard"],
         )
-        print("добавлена колонка в БД")
-
     except:
         return Response(False, status=status.HTTP_404_NOT_FOUND)
 
@@ -91,21 +105,24 @@ def create_column(request):
 @api_view(["GET", "POST"])
 def create_card(request):
 
-    card_column = request.data['column']
+    card_column = request.data["column"]
 
     last_card_in_column = Card.objects.filter(column=card_column).last()
-    print(last_card_in_column)
+
+    if last_card_in_column:
+        order = last_card_in_column.order + 1
+    else:
+        order = 0
 
     try:
         new_add_card = Card.objects.create(
-            name = request.data['name'],
-            author_id = request.data['author'],
-            order = last_card_in_column.order + 1 if last_card_in_column else 0,
-            column_id = request.data['column'],
+            name=request.data["name"],
+            author_id=request.data["author"],
+            order=order,
+            column_id=request.data["column"],
         )
-        print("добавлена карточка в БД")
+
     except:
-        print("если что-то сюда прилетит, то будем разбираться")
         return Response(False, status=status.HTTP_404_NOT_FOUND)
 
     serializer = CardSerializer(new_add_card)
