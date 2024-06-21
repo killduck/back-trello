@@ -1,34 +1,21 @@
-
 from trello.models import Column, Card, Person, Dashboard
 
 tables = [
     {
         "table_name": Dashboard,
         "table_dada": [
-            {"id": 1, "name": "board_1", "img": "photo_sand_large.webp"},
-            {"id": 2, "name": "board_2", "img": "photo_sand_small.webp"},
+            {"id": 1, "name": "backlog", "img": ""},
+            {"id": 2, "name": "in progress", "img": ""},
         ],
     },
     {
         "table_name": Column,
         "table_dada": [
-            {
-                "id": 1,
-                "name": "backlog",
-                "order": 0,
-                "dashboard": Dashboard(id=1),
-
-            },
+            {"id": 1, "name": "backlog", "order": 0, "dashboard": Dashboard(id=1)},
             {
                 "id": 2,
                 "name": "in progress",
                 "order": 1,
-                "dashboard": Dashboard(id=1),
-            },
-            {
-                "id": 3,
-                "name": "test_2",
-                "order": 0,
                 "dashboard": Dashboard(id=2),
             },
         ],
@@ -63,36 +50,22 @@ tables = [
                 "id": 1,
                 "name": "Максим es lint",
                 "author": Person(id=3),
-                "order": 2,
+                "order": 3,
                 "column": Column(id=1),
             },
             {
                 "id": 2,
                 "name": "Лёня хреначит реакт компоненты",
                 "author": Person(id=1),
-                "order": 1,
+                "order": 2,
                 "column": Column(id=1),
             },
             {
                 "id": 3,
                 "name": "Кнопки меню",
                 "author": Person(id=2),
-                "order": 0,
-                "column": Column(id=2),
-            },
-            {
-                "id": 4,
-                "name": "Card_1",
-                "author": Person(id=1),
-                "order": 0,
-                "column": Column(id=3),
-            },
-            {
-                "id": 5,
-                "name": "Card_1",
-                "author": Person(id=2),
                 "order": 1,
-                "column": Column(id=3),
+                "column": Column(id=2),
             },
         ],
     },
