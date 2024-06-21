@@ -104,6 +104,11 @@ python manage.py makemigrations trello
 python manage.py migrate
 ```
 
+Очистка таблиц БД:
+```
+python manage.py clear_DB
+```
+
 Засеять БазуДанных фейковыми данными для теста:
 ```
 python manage.py seeds
