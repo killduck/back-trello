@@ -38,16 +38,15 @@ class Dashboard(models.Model):
         verbose_name="Наименование доски",
         help_text="Введите наименование доски",
     )
-    img = models.CharField(
+    img = models.ImageField(
+        max_length=200,
+        null=True,
         verbose_name="Картинка доски(фон)",
     )
 
-    # class Meta:
-    #     verbose_name = "Колонку"
-    #     verbose_name_plural = "колонки"
-    #     ordering = [
-    #         "order",
-    #     ]
+    class Meta:
+        verbose_name = "Дашборд"
+        verbose_name_plural = "дашборды"
 
     def __str__(self):
         return self.name
@@ -75,8 +74,8 @@ class Column(models.Model):
         "Dashboard",
         on_delete=models.CASCADE,
         related_name="column",
-        # verbose_name="Автор",
-        # help_text="Введите автора",
+        # verbose_name="Дашборд",
+        # help_text="Введите Дашборд к которому относится колонка",
         # null=True,
     )
 
