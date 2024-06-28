@@ -1,8 +1,19 @@
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import (
+    api_view,
+    authentication_classes,
+    permission_classes,
+)
 from rest_framework.response import Response
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
 
-from .models import Card, Column, Person, Dashboard
+from rest_framework.authtoken.models import Token
+
+# from django.contrib.auth.models import User
+
+
+from .models import Card, Column, Person, Dashboard, User
 from .serializers import (
     CardSerializer,
     ColumnSerializer,
@@ -10,6 +21,35 @@ from .serializers import (
     DashboardSerializer,
 )
 from .views_functions.column_functions import change_order_columns
+
+
+@api_view(["GET"])
+# @authentication_classes([SessionAuthentication, BasicAuthentication])
+# @permission_classes([IsAuthenticated])
+def test_api(request, format=None):
+
+    # data = Token.objects.get(key=token).user
+
+    # content = {
+    #     "user": str(request.user),  # `django.contrib.auth.User` instance.
+    #     "auth": str(request.auth),  # None
+    # }
+    token = request.headers["Token"]
+
+    user = Token.objects.get(key=token).user
+
+    return Response(user.username)
+
+
+# выдача токена
+@api_view(["GET"])
+def create_token(request):
+
+    users = User.objects.get(id=1)
+
+    token = Token.objects.create(user=users)
+
+    return Response(token.key)
 
 
 @api_view(["GET", "POST"])
