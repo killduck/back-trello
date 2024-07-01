@@ -10,8 +10,6 @@ from rest_framework.permissions import IsAuthenticated
 
 from rest_framework.authtoken.models import Token
 
-# from django.contrib.auth.models import User
-
 
 from .models import Card, Column, Person, Dashboard, User
 from .serializers import (
@@ -20,7 +18,7 @@ from .serializers import (
     PersonSerializer,
     DashboardSerializer,
 )
-from .views_functions.column_functions import change_order_columns
+
 
 
 @api_view(["GET"])

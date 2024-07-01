@@ -1,8 +1,8 @@
+from django.contrib.auth.models import AbstractUser
+from django.core.validators import RegexValidator
 from django.db import models
 
-from django.contrib.auth import get_user_model
 
-User = get_user_model()
 # class WorkSpace(models.Model):
 #     """Модель для рабочих пространств."""
 
@@ -65,10 +65,6 @@ class Column(models.Model):
     order = models.IntegerField(
         verbose_name="Номер позиции колонки",
         help_text="Номер позиции",
-        # unique=True,
-        # error_messages={
-        #     "unique": "Номер позиции повторяется",
-        # },
         null=True,
     )
 
@@ -169,3 +165,68 @@ class Person(models.Model):
 
     def __str__(self):
         return self.nick_name
+
+
+class User(AbstractUser):
+    """Переопределяем стандартную модель User."""
+
+    username = models.CharField(
+        db_index=True,
+        max_length=150,
+        unique=True,
+        error_messages={
+            'unique': 'Пользователь с таким логином уже существует.',
+        },
+        validators=[
+            RegexValidator(
+                regex=r'^[-a-zA-Z0-9_]+$',
+                message='Не допустимое имя'
+            )
+        ],
+        verbose_name='Логин',
+        help_text='Введите логин пользователя',
+    )
+    email = models.EmailField(
+        max_length=200,
+        unique=True,
+        error_messages={
+            'unique': 'Пользователь с таким e-mail уже существует.',
+        },
+        verbose_name='Email',
+        help_text='Введите email пользователя',
+    )
+    first_name = models.CharField(
+        max_length=200,
+        verbose_name='Имя',
+        help_text='Введите имя пользователя',
+    )
+    last_name = models.CharField(
+        max_length=200,
+        verbose_name='Фамилия',
+        help_text='Введите фамилию пользователя',
+    )
+    is_active = models.BooleanField(
+        default=True
+    )
+    is_staff = models.BooleanField(
+        default=False
+    )
+    is_superuser = models.BooleanField(
+        default=False
+    )
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = [
+        'username',
+        'first_name',
+        'last_name',
+        'password'
+    ]
+
+    class Meta:
+        ordering = ('id',)
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
+
+    def __str__(self):
+        return self.username

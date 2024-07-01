@@ -1,9 +1,11 @@
+from django.conf import settings
 from django.contrib import admin
 
 from .models import (
     Card,
     Column,
     Person,
+    User
 )
 
 
@@ -40,3 +42,21 @@ class PersonAdmin(admin.ModelAdmin):
         "nick_name",
     )
     search_fields = ("nick_name",)
+
+
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'username',
+        'email',
+        'first_name',
+        'last_name',
+        'password'
+    )
+    search_fields = (
+        'username',
+        'last_name',
+        'email',
+    )
+    empty_value_display = settings.EMPTY_VALUE_DISPLAY

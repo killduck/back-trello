@@ -141,3 +141,10 @@ CORS_ORIGIN_ALLOW_ALL = True
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+# Переопределить параметр AUTH_USER_MODEL, который по умолчанию принимает значение 'auth.User'.
+AUTH_USER_MODEL = 'trello.User'
+
+# Общие настройки для админок
+EMPTY_VALUE_DISPLAY = '-пусто-'
