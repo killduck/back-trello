@@ -4,11 +4,12 @@ from rest_framework.decorators import (
     authentication_classes,
     permission_classes,
 )
-from rest_framework.response import Response
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.response import Response
 
 
 from .models import Card, Column, Dashboard, User
@@ -20,10 +21,28 @@ from .serializers import (
 
 
 
+class CustomAuthToken(ObtainAuthToken):
+    """Кастомный вьюсета для получения Token."""
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data,
+                                           context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({
+            'token': token.key,
+            'user_id': user.pk,
+            'user_name': user.username,
+            'user_email': user.email,
+            'another': 'Можно еще, что-нибудь вернуть - кроме денег!!! :)'
+        })
+
+
 @api_view(["GET"])
 # @authentication_classes([SessionAuthentication, BasicAuthentication])
-# @permission_classes([IsAuthenticated])
-def test_api(request, format=None):
+@permission_classes([IsAuthenticated])
+def test_api(request):
 
     # data = Token.objects.get(key=token).user
 
@@ -31,7 +50,7 @@ def test_api(request, format=None):
     #     "user": str(request.user),  # `django.contrib.auth.User` instance.
     #     "auth": str(request.auth),  # None
     # }
-    token = request.headers["Token"]
+    token = request.headers['Authorization'][6:]
 
     user = Token.objects.get(key=token).user
 
@@ -63,6 +82,7 @@ def columns(request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def dashboards(request):
+    print('dashboards(request)>>>',request.headers['Authorization'][6:])
     queryset = Dashboard.objects.all()
     serializer = DashboardSerializer(queryset, many=True)
     return Response(serializer.data)

@@ -6,7 +6,8 @@ from . import views
 
 
 urlpatterns = [
-    path('login/', obtain_auth_token, name="login"),
+    # path('login/', obtain_auth_token, name="login"),
+     path('login/', views.CustomAuthToken.as_view(), name="login"),
     path("dashboards/", views.dashboards, name="dashboards"),
     path("columns/", views.columns, name="columns"),
     path("cards/", views.cards, name="cards"),
