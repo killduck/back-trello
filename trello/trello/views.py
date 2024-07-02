@@ -61,8 +61,8 @@ def columns(request):
 
 
 @api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def dashboards(request):
-
     queryset = Dashboard.objects.all()
     serializer = DashboardSerializer(queryset, many=True)
     return Response(serializer.data)
