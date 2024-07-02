@@ -120,6 +120,10 @@ python manage.py seeds
 ```
 python manage.py createsuperuser
 ```
+_или_
+```
+python manage.py createsuperuser --email admin@mail.ru --username admin --first_name No --last_name Name --password 12345
+```
 
 Поочередно ответьте на запросы:
 
@@ -143,3 +147,11 @@ http://127.0.0.1:8000/admin
 ```
 
 и в форму регистрации введите данные созданные для Супер Пользователя
+
+
+- Изменить пароль Пользователя:
+
+```
+python manage.py changepassword "указать email"
+```
+укажите буквенно-цифровой пароль не менее 8 символов

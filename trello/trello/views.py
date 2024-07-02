@@ -6,16 +6,15 @@ from rest_framework.decorators import (
 )
 from rest_framework.response import Response
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from rest_framework.authtoken.models import Token
 
 
-from .models import Card, Column, Person, Dashboard, User
+from .models import Card, Column, Dashboard, User
 from .serializers import (
     CardSerializer,
     ColumnSerializer,
-    PersonSerializer,
     DashboardSerializer,
 )
 
@@ -40,7 +39,7 @@ def test_api(request, format=None):
 
 
 # выдача токена
-@api_view(["GET"])
+@api_view(["GET", "POST"])
 def create_token(request):
 
     users = User.objects.get(id=1)
@@ -68,10 +67,6 @@ def dashboards(request):
     serializer = DashboardSerializer(queryset, many=True)
     return Response(serializer.data)
 
-
-@api_view(["POST"])
-def login(request):
-    return Response(request.data)
 
 
 @api_view(["POST"])

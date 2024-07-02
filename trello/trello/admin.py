@@ -4,7 +4,6 @@ from django.contrib import admin
 from .models import (
     Card,
     Column,
-    Person,
     User
 )
 
@@ -15,9 +14,13 @@ class ColumnAdmin(admin.ModelAdmin):
         "id",
         "name",
         "order",
+        "dashboard"
     )
-    search_fields = ("name",)
-    list_filter = ("name",)
+    search_fields = (
+        "name",
+        "dashboard"
+    )
+    list_filter = ("dashboard",)
 
 
 @admin.register(Card)
@@ -30,33 +33,28 @@ class CardAdmin(admin.ModelAdmin):
         "column",
     )
     search_fields = ("name",)
-    list_filter = ("author", "column")
-
-
-@admin.register(Person)
-class PersonAdmin(admin.ModelAdmin):
-    list_display = (
-        "id",
-        "first_name",
-        "last_name",
-        "nick_name",
+    list_filter = (
+        "author",
+        "column",
     )
-    search_fields = ("nick_name",)
 
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = (
-        'id',
-        'username',
-        'email',
-        'first_name',
-        'last_name',
-        'password'
+        "id",
+        "username",
+        "email",
+        "first_name",
+        "last_name",
+        "password",
+        "is_active",
+        "is_staff",
+        "is_superuser"
     )
     search_fields = (
-        'username',
-        'last_name',
-        'email',
+        "username",
+        "last_name",
+        "email",
     )
     empty_value_display = settings.EMPTY_VALUE_DISPLAY

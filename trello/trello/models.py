@@ -3,6 +3,78 @@ from django.core.validators import RegexValidator
 from django.db import models
 
 
+# Cправочные материалы по API для компонентов системы аутентификации Django https://docs.djangoproject.com/en/5.0/ref/contrib/auth/
+class User(AbstractUser):
+    """Переопределяем стандартную модель User."""
+
+    username = models.CharField(
+        db_index=True,
+        max_length=150,
+        unique=True,
+        error_messages={
+            'unique': 'Пользователь с таким логином уже существует.',
+        },
+        validators=[
+            RegexValidator(
+                regex=r'^[-a-zA-Z0-9_]+$',
+                message='Не допустимое имя'
+            )
+        ],
+        verbose_name='Логин',
+        help_text='Введите логин пользователя',
+    )
+    email = models.EmailField(
+        max_length=200,
+        unique=True,
+        error_messages={
+            'unique': 'Пользователь с таким e-mail уже существует.',
+        },
+        verbose_name='Email',
+        help_text='Введите email пользователя',
+    )
+    first_name = models.CharField(
+        max_length=200,
+        verbose_name='Имя',
+        help_text='Введите имя пользователя',
+    )
+    last_name = models.CharField(
+        max_length=200,
+        verbose_name='Фамилия',
+        help_text='Введите фамилию пользователя',
+    )
+    #  Помечает учетную запись пользователя как активную. Django рекомендуеn установить этот флаг равным False вместо удаления учетных записей.
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name="Запись активна",
+    )
+    # Позволяет этому пользователю получить доступ к сайту администратора.
+    is_staff = models.BooleanField(
+        default=False,
+        verbose_name="права Админа",
+    )
+    # Рассматривает пользователя как имеющего все разрешения, не назначая ему никаких разрешений в частности.
+    is_superuser = models.BooleanField(
+        default=False,
+        verbose_name="права СуперПользователя",
+    )
+
+    USERNAME_FIELD = 'email'  # уазываем, что входим по email, а не по username
+    REQUIRED_FIELDS = [
+        'username',
+        'first_name',
+        'last_name',
+        'password'
+    ]
+
+    class Meta:
+        ordering = ('id',)
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
+
+    def __str__(self):
+        return self.username
+
+
 # class WorkSpace(models.Model):
 #     """Модель для рабочих пространств."""
 
@@ -72,8 +144,8 @@ class Column(models.Model):
         "Dashboard",
         on_delete=models.CASCADE,
         related_name="column",
-        # verbose_name="Дашборд",
-        # help_text="Введите Дашборд к которому относится колонка",
+        verbose_name="Дашборд",
+        help_text="Введите Дашборд к которому относится колонка",
         # null=True,
     )
 
@@ -97,7 +169,7 @@ class Card(models.Model):
         help_text="Введите наименование карточки",
     )
     author = models.ForeignKey(
-        "Person",
+        "User",
         on_delete=models.CASCADE,
         related_name="cards",
         verbose_name="Автор",
@@ -129,104 +201,39 @@ class Card(models.Model):
         return self.name
 
 
-class Person(models.Model):
-    """Модель для пользователей."""
+# class Person(models.Model):
+#     """Модель для пользователей."""
 
-    first_name = models.CharField(
-        max_length=50,
-        blank=True,
-        null=True,
-        verbose_name="Имя",
-        help_text="Введите Имя",
-    )
-    last_name = models.CharField(
-        max_length=50,
-        blank=True,
-        null=True,
-        verbose_name="Фамилия",
-        help_text="Введите Фамилию",
-    )
-    nick_name = models.CharField(
-        max_length=50,
-        unique=True,
-        error_messages={
-            "unique": "Такой Никнейм уже есть",
-        },
-        verbose_name="Никнейм",
-        help_text="Введите Никнейм",
-    )
+#     first_name = models.CharField(
+#         max_length=50,
+#         blank=True,
+#         null=True,
+#         verbose_name="Имя",
+#         help_text="Введите Имя",
+#     )
+#     last_name = models.CharField(
+#         max_length=50,
+#         blank=True,
+#         null=True,
+#         verbose_name="Фамилия",
+#         help_text="Введите Фамилию",
+#     )
+#     nick_name = models.CharField(
+#         max_length=50,
+#         unique=True,
+#         error_messages={
+#             "unique": "Такой Никнейм уже есть",
+#         },
+#         verbose_name="Никнейм",
+#         help_text="Введите Никнейм",
+#     )
 
-    class Meta:
-        verbose_name = "Участник"
-        verbose_name_plural = "участники"
-        ordering = [
-            "nick_name",
-        ]
+#     class Meta:
+#         verbose_name = "Участник"
+#         verbose_name_plural = "участники"
+#         ordering = [
+#             "nick_name",
+#         ]
 
-    def __str__(self):
-        return self.nick_name
-
-
-class User(AbstractUser):
-    """Переопределяем стандартную модель User."""
-
-    username = models.CharField(
-        db_index=True,
-        max_length=150,
-        unique=True,
-        error_messages={
-            'unique': 'Пользователь с таким логином уже существует.',
-        },
-        validators=[
-            RegexValidator(
-                regex=r'^[-a-zA-Z0-9_]+$',
-                message='Не допустимое имя'
-            )
-        ],
-        verbose_name='Логин',
-        help_text='Введите логин пользователя',
-    )
-    email = models.EmailField(
-        max_length=200,
-        unique=True,
-        error_messages={
-            'unique': 'Пользователь с таким e-mail уже существует.',
-        },
-        verbose_name='Email',
-        help_text='Введите email пользователя',
-    )
-    first_name = models.CharField(
-        max_length=200,
-        verbose_name='Имя',
-        help_text='Введите имя пользователя',
-    )
-    last_name = models.CharField(
-        max_length=200,
-        verbose_name='Фамилия',
-        help_text='Введите фамилию пользователя',
-    )
-    is_active = models.BooleanField(
-        default=True
-    )
-    is_staff = models.BooleanField(
-        default=False
-    )
-    is_superuser = models.BooleanField(
-        default=False
-    )
-
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = [
-        'username',
-        'first_name',
-        'last_name',
-        'password'
-    ]
-
-    class Meta:
-        ordering = ('id',)
-        verbose_name = 'Пользователь'
-        verbose_name_plural = 'Пользователи'
-
-    def __str__(self):
-        return self.username
+#     def __str__(self):
+#         return self.nick_name
