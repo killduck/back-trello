@@ -20,7 +20,7 @@ from .serializers import (
 )
 
 
-
+# Кастомный, что была вожможность возвращать в Респонсе не только Token
 class CustomAuthToken(ObtainAuthToken):
     """Кастомный вьюсета для получения Token."""
 
@@ -37,6 +37,15 @@ class CustomAuthToken(ObtainAuthToken):
             'user_email': user.email,
             'another': 'Можно еще, что-нибудь вернуть - кроме денег!!! :)'
         })
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def token_destroy(request):
+    print(request.headers['Authorization'])
+    token = request.headers['Authorization'][6:]
+    Token.objects.get(key=token).delete()
+    return Response('Токен удален')
 
 
 @api_view(["GET"])
@@ -69,6 +78,7 @@ def create_token(request):
 
 
 @api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
 def columns(request):
 
     dashboard_id = request.data["dashboardId"]
@@ -90,6 +100,7 @@ def dashboards(request):
 
 
 @api_view(["POST"])
+@permission_classes([IsAuthenticated])
 def swap_columns(request):
 
     dashboard_id = request.data["dashboardId"]
@@ -108,6 +119,7 @@ def swap_columns(request):
 
 
 @api_view(["POST"])
+@permission_classes([IsAuthenticated])
 def swap_cards(request):
 
     try:
@@ -130,6 +142,7 @@ def swap_cards(request):
 
 
 @api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
 def create_column(request):
     # TODO добавить параметры idWorkSpace: 1
 
@@ -156,6 +169,7 @@ def create_column(request):
 
 
 @api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
 def create_card(request):
 
     card_column = request.data["column"]
@@ -183,6 +197,7 @@ def create_card(request):
 
 
 @api_view(["POST"])
+@permission_classes([IsAuthenticated])
 def delete_column(request):
 
     id_column_deleted = request.data["id_column"]
