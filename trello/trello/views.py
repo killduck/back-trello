@@ -12,7 +12,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
 
-from .models import Card, Column, Dashboard, User
+from .models import Card, Column, Dashboard
 from .serializers import (
     CardSerializer,
     ColumnSerializer,
@@ -25,18 +25,32 @@ class CustomAuthToken(ObtainAuthToken):
     """Кастомный вьюсета для получения Token."""
 
     def post(self, request, *args, **kwargs):
+        print('request>>>', request.data)
+
+        username = request.data.get('username', None)
+        password = request.data.get('password', None)
+
+        if username is None or password is None:
+            return Response(
+                {'error': 'Нужен и логин, и пароль'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         serializer = self.serializer_class(data=request.data,
                                            context={'request': request})
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
-        return Response({
-            'token': token.key,
-            'user_id': user.pk,
-            'user_name': user.username,
-            'user_email': user.email,
-            'another': 'Можно еще, что-нибудь вернуть - кроме денег!!! :)'
-        })
+        return Response(
+            {
+                'token': token.key,
+                'user_id': user.pk,
+                'user_name': user.username,
+                'user_email': user.email,
+                'success': 'Можно еще, что-нибудь вернуть - кроме денег!!! :)'
+            },
+            status=status.HTTP_200_OK
+        )
 
 
 @api_view(["GET"])
@@ -45,7 +59,12 @@ def token_destroy(request):
     print(request.headers['Authorization'])
     token = request.headers['Authorization'][6:]
     Token.objects.get(key=token).delete()
-    return Response('Токен удален')
+    return Response(
+        {
+            'success': 'Токен удален'
+        },
+        status=status.HTTP_200_OK
+    )
 
 
 @api_view(["GET"])
@@ -66,18 +85,8 @@ def test_api(request):
     return Response(user.username)
 
 
-# выдача токена
 @api_view(["GET", "POST"])
-def create_token(request):
-
-    users = User.objects.get(id=1)
-
-    token = Token.objects.create(user=users)
-
-    return Response(token.key)
-
-
-@api_view(["GET", "POST"])
+# @permission_classes([AllowAny])
 @permission_classes([IsAuthenticated])
 def columns(request):
 
@@ -90,9 +99,10 @@ def columns(request):
 
 
 @api_view(["GET"])
+# @permission_classes([AllowAny])
 @permission_classes([IsAuthenticated])
 def dashboards(request):
-    print('dashboards(request)>>>',request.headers['Authorization'][6:])
+    # print('dashboards(request)>>>',request.headers['Authorization'][6:])
     queryset = Dashboard.objects.all()
     serializer = DashboardSerializer(queryset, many=True)
     return Response(serializer.data)
@@ -100,6 +110,7 @@ def dashboards(request):
 
 
 @api_view(["POST"])
+# @permission_classes([AllowAny])
 @permission_classes([IsAuthenticated])
 def swap_columns(request):
 
@@ -119,6 +130,7 @@ def swap_columns(request):
 
 
 @api_view(["POST"])
+# @permission_classes([AllowAny])
 @permission_classes([IsAuthenticated])
 def swap_cards(request):
 
@@ -211,6 +223,7 @@ def delete_column(request):
 
 
 @api_view(["GET", "POST"])
+@permission_classes([AllowAny])
 def cards(request):
     if request.method == "POST":
         serializer = CardSerializer(data=request.data)

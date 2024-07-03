@@ -16,7 +16,6 @@ urlpatterns = [
     path("create-card/", views.create_card, name="create-card"),
     path("delete-column/", views.delete_column, name="delete-column"),
     path("test-api/", views.test_api, name="test-api"),
-    path("create-token/", views.create_token, name="create-token"),
     # path("columns/edite/", views.columns_edite, name="columns-edite"),
     # path('test/', views.test, name='test'),
     path("admin/", admin.site.urls),
