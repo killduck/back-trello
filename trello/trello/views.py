@@ -20,7 +20,7 @@ from .serializers import (
 )
 
 
-# Кастомный, что была вожможность возвращать в Респонсе не только Token
+# Кастомное представление, что была вожможность возвращать в Response не только Token
 class CustomAuthToken(ObtainAuthToken):
     """Кастомный вьюсета для получения Token."""
 

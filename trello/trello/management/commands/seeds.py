@@ -51,7 +51,6 @@ class Command(BaseCommand):
         if table_name.__name__ == "User":
             for user in table_dada:
                 password_from_db = make_password(user['password'], salt=None, hasher='default')
-                print('last_login>>>', user['last_login'], 'type>>>', type(user['last_login']))
                 User.objects.filter(id=user["id"]).update(password=password_from_db)
         return True
 
