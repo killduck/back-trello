@@ -30,18 +30,29 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "rest_framework.authtoken",
     "corsheaders",  # Подключаем библиотеку/приложение django-cors-headers
     "trello",
     "django_seed",
-    "rest_framework.authtoken",
 ]
 
+# REST_FRAMEWORK = {
+#     "DEFAULT_AUTHENTICATION_CLASSES": [
+#         "rest_framework.authentication.BasicAuthentication",
+#         "rest_framework.authentication.SessionAuthentication",
+#     ]
+# }
+
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.BasicAuthentication",
-        "rest_framework.authentication.SessionAuthentication",
+    # Разрешение на уровне проекта - все запросы только для авторизированным
+    # 'DEFAULT_PERMISSION_CLASSES': [
+    #     'rest_framework.permissions.IsAuthenticated',
+    # ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
     ]
 }
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -118,13 +129,17 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+# LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "ru-ru"
 
-TIME_ZONE = "UTC"
+# TIME_ZONE = "UTC"
+TIME_ZONE = "Europe/Moscow"
+
+USE_L10N = True
 
 USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False  # при True глючит загрузка seedов модели User
 
 
 # Static files (CSS, JavaScript, Images)
@@ -141,3 +156,10 @@ CORS_ORIGIN_ALLOW_ALL = True
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+# Переопределить параметр AUTH_USER_MODEL, который по умолчанию принимает значение 'auth.User'.
+AUTH_USER_MODEL = 'trello.User'
+
+# Общие настройки для админок
+EMPTY_VALUE_DISPLAY = '-пусто-'

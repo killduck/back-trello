@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Card, Column, Dashboard, Person
+from .models import Card, Column, Dashboard
 
 
 class CardSerializer(serializers.ModelSerializer):
@@ -33,17 +33,17 @@ class ColumnSerializer(serializers.ModelSerializer):
         )
 
 
-class PersonSerializer(serializers.ModelSerializer):
+# class PersonSerializer(serializers.ModelSerializer):
 
-    class Meta:
-        model = Person
+#     class Meta:
+#         model = Person
 
-        fields = (
-            "id",
-            "first_name",
-            "last_name",
-            "nick_name",
-        )
+#         fields = (
+#             "id",
+#             "first_name",
+#             "last_name",
+#             "nick_name",
+#         )
 
 
 class DashboardSerializer(serializers.ModelSerializer):

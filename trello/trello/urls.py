@@ -5,7 +5,8 @@ from . import views
 
 
 urlpatterns = [
-    path("login/", views.login, name="login"),
+    path('login/', views.CustomAuthToken.as_view(), name="token-create"),
+    path('logout/', views.token_destroy, name="token-destroy"),
     path("dashboards/", views.dashboards, name="dashboards"),
     path("columns/", views.columns, name="columns"),
     path("cards/", views.cards, name="cards"),
@@ -15,7 +16,6 @@ urlpatterns = [
     path("create-card/", views.create_card, name="create-card"),
     path("delete-column/", views.delete_column, name="delete-column"),
     path("test-api/", views.test_api, name="test-api"),
-    path("create-token/", views.create_token, name="create-token"),
     # path("columns/edite/", views.columns_edite, name="columns-edite"),
     # path('test/', views.test, name='test'),
     path("admin/", admin.site.urls),

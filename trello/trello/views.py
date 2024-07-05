@@ -4,29 +4,73 @@ from rest_framework.decorators import (
     authentication_classes,
     permission_classes,
 )
-from rest_framework.response import Response
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-from rest_framework.permissions import IsAuthenticated
 
 from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.response import Response
 
-# from django.contrib.auth.models import User
 
-
-from .models import Card, Column, Person, Dashboard, User
+from .models import Card, Column, Dashboard
 from .serializers import (
     CardSerializer,
     ColumnSerializer,
-    PersonSerializer,
     DashboardSerializer,
 )
-from .views_functions.column_functions import change_order_columns
+
+
+# Кастомное представление, что была вожможность возвращать в Response не только Token
+class CustomAuthToken(ObtainAuthToken):
+    """Кастомный вьюсета для получения Token."""
+
+    def post(self, request, *args, **kwargs):
+        print('request>>>', request.data)
+
+        username = request.data.get('username', None)
+        password = request.data.get('password', None)
+
+        if username is None or password is None:
+            return Response(
+                {'error': 'Нужен и логин, и пароль'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        serializer = self.serializer_class(data=request.data,
+                                           context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        return Response(
+            {
+                'token': token.key,
+                'user_id': user.pk,
+                'user_name': user.username,
+                'user_email': user.email,
+                'success': 'Можно еще, что-нибудь вернуть - кроме денег!!! :)'
+            },
+            status=status.HTTP_200_OK
+        )
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def token_destroy(request):
+    print(request.headers['Authorization'])
+    token = request.headers['Authorization'][6:]
+    Token.objects.get(key=token).delete()
+    return Response(
+        {
+            'success': 'Токен удален'
+        },
+        status=status.HTTP_200_OK
+    )
 
 
 @api_view(["GET"])
 # @authentication_classes([SessionAuthentication, BasicAuthentication])
-# @permission_classes([IsAuthenticated])
-def test_api(request, format=None):
+@permission_classes([IsAuthenticated])
+def test_api(request):
 
     # data = Token.objects.get(key=token).user
 
@@ -34,25 +78,16 @@ def test_api(request, format=None):
     #     "user": str(request.user),  # `django.contrib.auth.User` instance.
     #     "auth": str(request.auth),  # None
     # }
-    token = request.headers["Token"]
+    token = request.headers['Authorization'][6:]
 
     user = Token.objects.get(key=token).user
 
     return Response(user.username)
 
 
-# выдача токена
-@api_view(["GET"])
-def create_token(request):
-
-    users = User.objects.get(id=1)
-
-    token = Token.objects.create(user=users)
-
-    return Response(token.key)
-
-
 @api_view(["GET", "POST"])
+# @permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def columns(request):
 
     dashboard_id = request.data["dashboardId"]
@@ -64,19 +99,19 @@ def columns(request):
 
 
 @api_view(["GET"])
+# @permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def dashboards(request):
-
+    # print('dashboards(request)>>>',request.headers['Authorization'][6:])
     queryset = Dashboard.objects.all()
     serializer = DashboardSerializer(queryset, many=True)
     return Response(serializer.data)
 
 
-@api_view(["POST"])
-def login(request):
-    return Response(request.data)
-
 
 @api_view(["POST"])
+# @permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def swap_columns(request):
 
     dashboard_id = request.data["dashboardId"]
@@ -95,6 +130,8 @@ def swap_columns(request):
 
 
 @api_view(["POST"])
+# @permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def swap_cards(request):
 
     try:
@@ -117,6 +154,7 @@ def swap_cards(request):
 
 
 @api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
 def create_column(request):
     # TODO добавить параметры idWorkSpace: 1
 
@@ -143,6 +181,7 @@ def create_column(request):
 
 
 @api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
 def create_card(request):
 
     card_column = request.data["column"]
@@ -170,6 +209,7 @@ def create_card(request):
 
 
 @api_view(["POST"])
+@permission_classes([IsAuthenticated])
 def delete_column(request):
 
     id_column_deleted = request.data["id_column"]
@@ -183,6 +223,7 @@ def delete_column(request):
 
 
 @api_view(["GET", "POST"])
+@permission_classes([AllowAny])
 def cards(request):
     if request.method == "POST":
         serializer = CardSerializer(data=request.data)
