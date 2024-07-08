@@ -20,7 +20,7 @@ from .serializers import (
 )
 
 
-# Кастомное представление, что была вожможность возвращать в Response не только Token
+# Кастомное представление, что б была возможность возвращать в Response не только Token
 class CustomAuthToken(ObtainAuthToken):
     """Кастомный вьюсета для получения Token."""
 
@@ -98,15 +98,21 @@ def columns(request):
     return Response(serializer.data)
 
 
-@api_view(["GET"])
+@api_view(["GET", "POST"])
 # @permission_classes([AllowAny])
 @permission_classes([IsAuthenticated])
 def dashboards(request):
     # print('dashboards(request)>>>',request.headers['Authorization'][6:])
-    queryset = Dashboard.objects.all()
+    # print(request.data["dashboardId"])
+
+    if request.data:
+        dashboard_id = request.data["dashboardId"]
+        queryset = Dashboard.objects.all().filter(id=dashboard_id)
+    else:
+        queryset = Dashboard.objects.all()
+
     serializer = DashboardSerializer(queryset, many=True)
     return Response(serializer.data)
-
 
 
 @api_view(["POST"])
