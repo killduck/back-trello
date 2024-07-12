@@ -229,14 +229,30 @@ def delete_column(request):
 
 
 @api_view(["GET", "POST"])
-@permission_classes([AllowAny])
-def cards(request):
-    if request.method == "POST":
-        serializer = CardSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    queryset = Card.objects.all()
+@permission_classes([IsAuthenticated])
+def column(request):
+    if request.data['id']:
+        column_id = request.data['id']
+        queryset = Column.objects.all().filter(id=column_id)
+
+    serializer = ColumnSerializer(queryset, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
+def card(request):
+    # print(request.data['id'])
+    # if request.method == "POST":
+    #     serializer = CardSerializer(data=request.data)
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    if request.data['id']:
+        card_id = request.data['id']
+        queryset = Card.objects.all().filter(id=card_id)
+
     serializer = CardSerializer(queryset, many=True)
     return Response(serializer.data)
+
