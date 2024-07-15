@@ -256,3 +256,42 @@ def card(request):
     serializer = CardSerializer(queryset, many=True)
     return Response(serializer.data)
 
+
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
+def new_data_card(request):
+    print(f'263__ {request.data}')
+    if request.data['id'] and request.data['name']:
+        card_id = request.data['id']
+        card_new_name = request.data['name']
+        try:
+            Card.objects.filter(id=card_id).update(name=card_new_name)
+
+        except:
+            print("если что-то сюда прилетит, то будем разбираться")
+            return Response(False, status=status.HTTP_404_NOT_FOUND)
+
+        queryset = Card.objects.all().filter(id=card_id)
+
+        serializer = CardSerializer(queryset, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
+def new_data_column(request):
+    print(f'283__ {request.data}')
+    if request.data['id'] and request.data['name']:
+        column_id = request.data['id']
+        column_new_name = request.data['name']
+        try:
+            Column.objects.filter(id=column_id).update(name=column_new_name)
+
+        except:
+            print("если что-то сюда прилетит, то будем разбираться")
+            return Response(False, status=status.HTTP_404_NOT_FOUND)
+
+        queryset = Column.objects.all().filter(id=column_id)
+        serializer = ColumnSerializer(queryset, many=True)
+
+    return Response(serializer.data)
