@@ -1,7 +1,8 @@
+from django.shortcuts import get_object_or_404
+
 from rest_framework import status
 from rest_framework.decorators import (
     api_view,
-    authentication_classes,
     permission_classes,
 )
 
@@ -67,24 +68,6 @@ def token_destroy(request):
     )
 
 
-@api_view(["GET"])
-# @authentication_classes([SessionAuthentication, BasicAuthentication])
-@permission_classes([IsAuthenticated])
-def test_api(request):
-
-    # data = Token.objects.get(key=token).user
-
-    # content = {
-    #     "user": str(request.user),  # `django.contrib.auth.User` instance.
-    #     "auth": str(request.auth),  # None
-    # }
-    token = request.headers['Authorization'][6:]
-
-    user = Token.objects.get(key=token).user
-
-    return Response(user.username)
-
-
 @api_view(["GET", "POST"])
 # @permission_classes([AllowAny])
 @permission_classes([IsAuthenticated])
@@ -102,15 +85,15 @@ def columns(request):
 # @permission_classes([AllowAny])
 @permission_classes([IsAuthenticated])
 def dashboards(request):
-    # print('dashboards(request)>>>',request.headers['Authorization'][6:])
-    # print(request.data["dashboardId"])
 
-    if request.data:
+    if request.method == "POST":
         dashboard_id = request.data["dashboardId"]
-        queryset = Dashboard.objects.all().filter(id=dashboard_id)
-    else:
-        queryset = Dashboard.objects.all()
+        # queryset = Dashboard.objects.get(id=dashboard_id)
+        queryset = get_object_or_404(Dashboard, id=dashboard_id)
+        serializer = DashboardSerializer(queryset, many=False)
+        return Response(serializer.data)
 
+    queryset = Dashboard.objects.all()
     serializer = DashboardSerializer(queryset, many=True)
     return Response(serializer.data)
 
@@ -162,7 +145,7 @@ def swap_cards(request):
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def create_column(request):
-    # TODO добавить параметры idWorkSpace: 1
+    # TODO добавить параметры idWorkSpace: 1 ?? уже не суждено
 
     dashboard_columns = request.data["idDashboard"]
 
@@ -202,7 +185,6 @@ def create_card(request):
     try:
         new_add_card = Card.objects.create(
             name=request.data["name"],
-            author_id=request.data["author"],
             order=order,
             column_id=request.data["column"],
         )
@@ -255,4 +237,3 @@ def card(request):
 
     serializer = CardSerializer(queryset, many=True)
     return Response(serializer.data)
-

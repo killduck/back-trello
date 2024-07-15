@@ -28,13 +28,11 @@ class CardAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "name",
-        "author",
         "order",
         "column",
     )
     search_fields = ("name",)
     list_filter = (
-        "author",
         "column",
     )
 
