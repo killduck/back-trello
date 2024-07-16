@@ -215,8 +215,8 @@ class DashboardUserRole(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['dashboard', 'user', 'role'],
-                name='unique_dashboard_role'
+                fields=['dashboard', 'user'],
+                name='unique_dashboard_user'
             )
         ]
 
@@ -252,8 +252,8 @@ class CardUserRole(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['card', 'user', 'role'],
-                name='unique_card_role'
+                fields=['card', 'user'],
+                name='unique_card_user'
             )
         ]
 

@@ -8,16 +8,16 @@ from rest_framework.decorators import (
 
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
 
-from .models import Card, Column, Dashboard
+from .models import Card, Column, Dashboard, DashboardUserRole
 from .serializers import (
     CardSerializer,
     ColumnSerializer,
     DashboardSerializer,
+    DashboardUserRoleSerializer,
 )
 
 
@@ -82,8 +82,8 @@ def columns(request):
 
 
 @api_view(["GET", "POST"])
-# @permission_classes([AllowAny])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
+# @permission_classes([IsAuthenticated])
 def dashboards(request):
 
     if request.method == "POST":
@@ -236,4 +236,13 @@ def card(request):
         queryset = Card.objects.all().filter(id=card_id)
 
     serializer = CardSerializer(queryset, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["GET", "POST"])
+@permission_classes([AllowAny])
+# @permission_classes([IsAuthenticated])
+def dashboard_role(request):
+    queryset = DashboardUserRole.objects.all()
+    serializer = DashboardUserRoleSerializer(queryset, many=True)
     return Response(serializer.data)

@@ -1,4 +1,8 @@
-from trello.models import Column, Card, Dashboard, User
+from trello.models import (
+    Column, Card,
+    Dashboard, DashboardUserRole,
+    Role, User
+)
 
 tables = [
     {
@@ -150,6 +154,50 @@ tables = [
                 "name": "Task #4",
                 "order": 1 ,
                 "column": Column(id=3),
+            },
+        ],
+    },
+    {
+        "table_name": Role,
+        "table_dada": [
+            {
+                "id": 1,
+                "name": "admin",
+                "description": "Администратор"
+            },
+            {
+                "id": 2,
+                "name": "participant",
+                "description": "Участник"
+            },
+            {
+                "id": 3,
+                "name": "guest",
+                "description": "Гость"
+            }
+
+        ],
+    },
+    {
+        "table_name": DashboardUserRole,
+        "table_dada": [
+            {
+                "id": 1,
+                "dashboard": Dashboard(id=1),
+                "user": User(id=5),
+                "role": Role(id=1),
+            },
+            {
+                "id": 2,
+                "dashboard": Dashboard(id=2),
+                "user": User(id=5),
+                "role": Role(id=1),
+            },
+            {
+                "id": 3,
+                "dashboard": Dashboard(id=1),
+                "user": User(id=2),
+                "role": Role(id=2),
             },
         ],
     },
