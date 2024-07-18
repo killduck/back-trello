@@ -26,7 +26,6 @@ class CustomAuthToken(ObtainAuthToken):
     """Кастомный вьюсета для получения Token."""
 
     def post(self, request, *args, **kwargs):
-        print('request>>>', request.data)
 
         username = request.data.get('username', None)
         password = request.data.get('password', None)
@@ -47,6 +46,8 @@ class CustomAuthToken(ObtainAuthToken):
                 'token': token.key,
                 'user_id': user.pk,
                 'user_name': user.username,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
                 'user_email': user.email,
                 'success': 'Можно еще, что-нибудь вернуть - кроме денег!!! :)'
             },
@@ -82,8 +83,8 @@ def columns(request):
 
 
 @api_view(["GET", "POST"])
-@permission_classes([AllowAny])
-# @permission_classes([IsAuthenticated])
+# @permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def dashboards(request):
 
     if request.method == "POST":

@@ -199,6 +199,12 @@ tables = [
                 "user": User(id=2),
                 "role": Role(id=2),
             },
+            {
+                "id": 4,
+                "dashboard": Dashboard(id=2),
+                "user": User(id=4),
+                "role": Role(id=2),
+            },
         ],
     },
 ]

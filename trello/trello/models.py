@@ -110,7 +110,6 @@ class Column(models.Model):
         help_text="Номер позиции",
         null=True,
     )
-
     dashboard = models.ForeignKey(
         "Dashboard",
         on_delete=models.CASCADE,
@@ -125,6 +124,31 @@ class Column(models.Model):
         verbose_name_plural = "колонки"
         ordering = [
             "order",
+        ]
+
+    def __str__(self):
+        return self.name
+
+
+class Label(models.Model):
+    """Модель для цветовых меток."""
+
+    name = models.CharField(
+        max_length=50,
+        verbose_name="Наименование цветовой метки",
+        help_text="Введите наименование цветовой метки",
+    )
+    color_hex = models.CharField(
+        max_length=200,
+        verbose_name="Hex цвета",
+        help_text="Введите hex код цвета",
+    )
+
+    class Meta:
+        verbose_name = "Метка"
+        verbose_name_plural = "метки"
+        ordering = [
+            "name",
         ]
 
     def __str__(self):
@@ -152,6 +176,27 @@ class Card(models.Model):
         verbose_name="Колонка",
         help_text="Введите колонку к которой относится карточка",
     )
+    date_start = models.DateField(
+        auto_now=False,
+        auto_now_add=False,
+        blank=True,
+        null=True,
+    )
+    date_end = models.DateTimeField(
+        auto_now=False,
+        auto_now_add=False,
+        blank=True,
+        null=True,
+    )
+    label = models.ForeignKey(
+        "Label",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="cards",
+        verbose_name="Метка",
+        help_text="Введите цветовую метку",
+    )
 
     class Meta:
         verbose_name = "Карточку"
@@ -172,7 +217,6 @@ class Role(models.Model):
         verbose_name="Наименование роли",
         help_text="Введите наименование роли",
     )
-
     description = models.CharField(
         max_length=200,
         verbose_name="Описание роли",
@@ -227,7 +271,7 @@ class DashboardUserRole(models.Model):
         )
 
 
-class CardUserRole(models.Model):
+class CardUser(models.Model):
     """Модель для ролей юзеров в карточке."""
 
     card = models.ForeignKey(
@@ -241,12 +285,6 @@ class CardUserRole(models.Model):
         on_delete=models.CASCADE,
         related_name="user_card",
         verbose_name="Польователь",
-    )
-    role = models.ForeignKey(
-        "Role",
-        on_delete=models.CASCADE,
-        related_name="role_card",
-        verbose_name="Роль",
     )
 
     class Meta:
@@ -262,3 +300,49 @@ class CardUserRole(models.Model):
             f'В карточке={self.card.name} пользователь={self.user.username} '
             f'имеет роль={self.role.name}.'
         )
+
+
+class Checklist(models.Model):
+    """Модель для чек-листа."""
+
+    name = models.CharField(
+        max_length=50,
+        verbose_name="Наименование чек-листа",
+        help_text="Введите наименование чек-листа",
+    )
+    card = models.ForeignKey(
+        "Card",
+        on_delete=models.CASCADE,
+        related_name="checklist",
+        verbose_name="Карточка",
+    )
+
+    class Meta:
+        verbose_name = "Чеклист"
+        verbose_name_plural = "чеклисты"
+
+    def __str__(self):
+        return self.name
+
+
+class Checkstep(models.Model):
+    """Модель задачек для чек-листа."""
+
+    text = models.TextField(
+        verbose_name="Текст чекбокса",
+        help_text="Введите текст",
+    )
+    checkbox = models.BooleanField()
+    checklist = models.ForeignKey(
+        "Checklist",
+        on_delete=models.CASCADE,
+        related_name="checkstep",
+        verbose_name="Чек-лист",
+    )
+
+    class Meta:
+        verbose_name = "Чекбокс"
+        verbose_name_plural = "чекбоксы"
+
+    def __str__(self):
+        return self.text

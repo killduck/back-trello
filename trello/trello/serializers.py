@@ -3,15 +3,15 @@ from rest_framework import serializers
 from .models import Card, Column, Dashboard, Role, DashboardUserRole
 
 
-class DashboardUserRoleSerializer(serializers.ModelSerializer):
+class RoleSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = DashboardUserRole
+        model = Role
 
         fields = (
-            "dashboard",
-            "user",
-            "role",
+            "id",
+            "name",
+            "description",
         )
 
 
@@ -23,9 +23,11 @@ class CardSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "name",
-            # "author",
             "order",
             "column",
+            "date_start",
+            "date_end",
+            "label",
         )
 
 
@@ -45,6 +47,19 @@ class ColumnSerializer(serializers.ModelSerializer):
         )
 
 
+class DashboardUserRoleSerializer(serializers.ModelSerializer):
+    role = RoleSerializer(many=False)
+
+    class Meta:
+        model = DashboardUserRole
+
+        fields = (
+            "dashboard",
+            "user",
+            "role",
+        )
+
+
 class DashboardSerializer(serializers.ModelSerializer):
 
     column = ColumnSerializer(many=True, required=False)
@@ -59,18 +74,6 @@ class DashboardSerializer(serializers.ModelSerializer):
             'img',
             'dashboard_user_role',
             'column',
-        )
-
-
-class RoleSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Role
-
-        fields = (
-            "id",
-            "name",
-            "description",
         )
 
 
