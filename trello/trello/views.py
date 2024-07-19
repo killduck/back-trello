@@ -102,9 +102,6 @@ def columns(request):
 # @permission_classes([AllowAny])
 @permission_classes([IsAuthenticated])
 def dashboards(request):
-    # print('dashboards(request)>>>',request.headers['Authorization'][6:])
-    # print(request.data["dashboardId"])
-
     if request.data:
         dashboard_id = request.data["dashboardId"]
         queryset = Dashboard.objects.all().filter(id=dashboard_id)
@@ -191,7 +188,6 @@ def create_column(request):
 def create_card(request):
 
     card_column = request.data["column"]
-
     last_card_in_column = Card.objects.filter(column=card_column).last()
 
     if last_card_in_column:
@@ -217,20 +213,30 @@ def create_card(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def delete_column(request):
-
-    id_column_deleted = request.data["id_column"]
-
     try:
-        Column.objects.filter(id=id_column_deleted).delete()
+        id_column_deleted = request.data["id_column"]
+        if id_column_deleted:
+            Column.objects.filter(id=id_column_deleted).delete()
     except:
         return Response(False, status=status.HTTP_404_NOT_FOUND)
+    return Response(True, status=status.HTTP_200_OK)
 
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def delete_card(request):
+    try:
+        id_card_deleted = request.data["id_card"]
+        if id_card_deleted:
+            Card.objects.filter(id=id_card_deleted).delete()
+    except:
+        return Response(False, status=status.HTTP_404_NOT_FOUND)
     return Response(True, status=status.HTTP_200_OK)
 
 
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
-def column(request):
+def take_data_column(request):
     if request.data['id']:
         column_id = request.data['id']
         queryset = Column.objects.all().filter(id=column_id)
@@ -241,14 +247,7 @@ def column(request):
 
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
-def card(request):
-    # print(request.data['id'])
-    # if request.method == "POST":
-    #     serializer = CardSerializer(data=request.data)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+def take_data_card(request):
     if request.data['id']:
         card_id = request.data['id']
         queryset = Card.objects.all().filter(id=card_id)
@@ -260,19 +259,16 @@ def card(request):
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def new_data_card(request):
-    print(f'263__ {request.data}')
     if request.data['id'] and request.data['name']:
         card_id = request.data['id']
         card_new_name = request.data['name']
         try:
             Card.objects.filter(id=card_id).update(name=card_new_name)
-
         except:
             print("если что-то сюда прилетит, то будем разбираться")
             return Response(False, status=status.HTTP_404_NOT_FOUND)
 
         queryset = Card.objects.all().filter(id=card_id)
-
         serializer = CardSerializer(queryset, many=True)
     return Response(serializer.data)
 
@@ -280,18 +276,15 @@ def new_data_card(request):
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def new_data_column(request):
-    print(f'283__ {request.data}')
     if request.data['id'] and request.data['name']:
         column_id = request.data['id']
         column_new_name = request.data['name']
         try:
             Column.objects.filter(id=column_id).update(name=column_new_name)
-
         except:
             print("если что-то сюда прилетит, то будем разбираться")
             return Response(False, status=status.HTTP_404_NOT_FOUND)
 
         queryset = Column.objects.all().filter(id=column_id)
         serializer = ColumnSerializer(queryset, many=True)
-
     return Response(serializer.data)
