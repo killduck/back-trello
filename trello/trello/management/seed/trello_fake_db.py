@@ -1,4 +1,8 @@
-from trello.models import Column, Card, Dashboard, User
+from trello.models import (
+    Column, Card,
+    Dashboard, DashboardUserRole,
+    Role, User
+)
 
 tables = [
     {
@@ -106,58 +110,100 @@ tables = [
             {
                 "id": 1,
                 "name": "ES Lint",
-                "author": User(id=4),
                 "order": 0,
                 "column": Column(id=1),
             },
             {
                 "id": 2,
                 "name": "Лёня хреначит реакт компоненты",
-                "author": User(id=4),
                 "order": 1,
                 "column": Column(id=1),
             },
             {
                 "id": 3,
                 "name": "Task #1",
-                "author": User(id=2),
-                "order": 0 ,
+                "order": 0,
                 "column": Column(id=2),
             },
             {
                 "id": 4,
                 "name": "Task #2",
-                "author": User(id=4),
-                "order": 1 ,
+                "order": 1,
                 "column": Column(id=2),
             },
             {
                 "id": 5,
                 "name": "Кнопки меню",
-                "author": User(id=3),
                 "order": 0,
                 "column": Column(id=4),
             },
                         {
                 "id": 6,
                 "name": "Search button",
-                "author": User(id=2),
                 "order": 1,
                 "column": Column(id=4),
             },
             {
                 "id": 7,
                 "name": "Task #3",
-                "author": User(id=4),
-                "order": 0 ,
+                "order": 0,
                 "column": Column(id=3),
             },
             {
                 "id": 8,
                 "name": "Task #4",
-                "author": User(id=2),
-                "order": 1 ,
+                "order": 1,
                 "column": Column(id=3),
+            },
+        ],
+    },
+    {
+        "table_name": Role,
+        "table_dada": [
+            {
+                "id": 1,
+                "name": "admin",
+                "description": "Администратор"
+            },
+            {
+                "id": 2,
+                "name": "participant",
+                "description": "Участник"
+            },
+            {
+                "id": 3,
+                "name": "guest",
+                "description": "Гость"
+            }
+
+        ],
+    },
+    {
+        "table_name": DashboardUserRole,
+        "table_dada": [
+            {
+                "id": 1,
+                "dashboard": Dashboard(id=1),
+                "user": User(id=5),
+                "role": Role(id=1),
+            },
+            {
+                "id": 2,
+                "dashboard": Dashboard(id=2),
+                "user": User(id=5),
+                "role": Role(id=1),
+            },
+            {
+                "id": 3,
+                "dashboard": Dashboard(id=1),
+                "user": User(id=2),
+                "role": Role(id=2),
+            },
+            {
+                "id": 4,
+                "dashboard": Dashboard(id=2),
+                "user": User(id=4),
+                "role": Role(id=2),
             },
         ],
     },
