@@ -3,23 +3,28 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import (
     api_view,
-    authentication_classes,
     permission_classes,
 )
 
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
 
-from .models import Card, Column, Dashboard, DashboardUserRole
+from .models import (
+    Card,
+    Column,
+    Dashboard,
+    DashboardUserRole,
+    User
+)
 from .serializers import (
     CardSerializer,
     ColumnSerializer,
     DashboardSerializer,
     DashboardUserRoleSerializer,
+    UsereSerializer,
 )
 
 
@@ -57,6 +62,18 @@ class CustomAuthToken(ObtainAuthToken):
         )
 
 
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
+def user(request):
+
+    auth_user = request.user.id
+
+    queryset = get_object_or_404(User, id=auth_user)
+    serializer = UsereSerializer(queryset, many=False)
+
+    return Response(serializer.data)
+
+
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def token_destroy(request):
@@ -89,14 +106,15 @@ def columns(request):
 @permission_classes([IsAuthenticated])
 def dashboards(request):
 
+    auth_user = request.user.id
+
     if request.method == "POST":
         dashboard_id = request.data["dashboardId"]
-        # queryset = Dashboard.objects.get(id=dashboard_id)
         queryset = get_object_or_404(Dashboard, id=dashboard_id)
         serializer = DashboardSerializer(queryset, many=False)
         return Response(serializer.data)
 
-    queryset = Dashboard.objects.all()
+    queryset = Dashboard.objects.filter(dashboard_user_role__user_id=auth_user)
     serializer = DashboardSerializer(queryset, many=True)
     return Response(serializer.data)
 

@@ -7,6 +7,7 @@ from . import views
 urlpatterns = [
     path('login/', views.CustomAuthToken.as_view(), name="token-create"),
     path('logout/', views.token_destroy, name="token-destroy"),
+    path('user/', views.user, name="user"),
     path("dashboards/", views.dashboards, name="dashboards"),
     path("dashboard-role/", views.dashboard_role, name="dashboard-role"),
     path("columns/", views.columns, name="columns"),
