@@ -122,13 +122,13 @@ tables = [
             {
                 "id": 3,
                 "name": "Task #1",
-                "order": 0 ,
+                "order": 0,
                 "column": Column(id=2),
             },
             {
                 "id": 4,
                 "name": "Task #2",
-                "order": 1 ,
+                "order": 1,
                 "column": Column(id=2),
             },
             {
@@ -146,13 +146,13 @@ tables = [
             {
                 "id": 7,
                 "name": "Task #3",
-                "order": 0 ,
+                "order": 0,
                 "column": Column(id=3),
             },
             {
                 "id": 8,
                 "name": "Task #4",
-                "order": 1 ,
+                "order": 1,
                 "column": Column(id=3),
             },
         ],
