@@ -3,7 +3,9 @@ from rest_framework import serializers
 from .models import Card, Column, Dashboard, Role, DashboardUserRole, User
 
 
-class UsereSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
+
+    first_letter = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -16,8 +18,12 @@ class UsereSerializer(serializers.ModelSerializer):
             "last_name",
             "is_active",
             "is_staff",
-            "is_superuser"
+            "is_superuser",
+            "first_letter",
         )
+
+    def get_first_letter(self, obj):
+        return obj.username[:1].upper()
 
 
 class RoleSerializer(serializers.ModelSerializer):
@@ -82,6 +88,7 @@ class DashboardSerializer(serializers.ModelSerializer):
     column = ColumnSerializer(many=True, required=False)
     dashboard_user_role = DashboardUserRoleSerializer(many=True, required=False)
 
+
     class Meta:
         model = Dashboard
 
@@ -89,8 +96,8 @@ class DashboardSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'img',
-            'dashboard_user_role',
             'column',
+            'dashboard_user_role',
         )
 
 

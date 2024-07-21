@@ -24,7 +24,7 @@ from .serializers import (
     ColumnSerializer,
     DashboardSerializer,
     DashboardUserRoleSerializer,
-    UsereSerializer,
+    UserSerializer,
 )
 
 
@@ -69,7 +69,7 @@ def user(request):
     auth_user = request.user.id
 
     queryset = get_object_or_404(User, id=auth_user)
-    serializer = UsereSerializer(queryset, many=False)
+    serializer = UserSerializer(queryset, many=False)
 
     return Response(serializer.data)
 
@@ -302,4 +302,16 @@ def new_data_column(request):
 def dashboard_role(request):
     queryset = DashboardUserRole.objects.all()
     serializer = DashboardUserRoleSerializer(queryset, many=True)
+    return Response(serializer.data)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def dashboard_user(request):
+
+    dashboard_id = request.data["dashboardId"]
+
+    users = DashboardUserRole.objects.values('user').filter(dashboard=dashboard_id)
+    queryset = User.objects.filter(id__in=users)
+    serializer = UserSerializer(queryset, many=True)
     return Response(serializer.data)
