@@ -102,6 +102,17 @@ tables = [
                 "is_superuser": True,
                 "password": 'admin',
             },
+            {
+                "id": 6,
+                "username": "vasya",
+                "first_name": "Вася",
+                "last_name": "Пупкин",
+                "email": "vasya@mail.ru",
+                "is_active": True,
+                "is_staff": False,
+                "is_superuser": False,
+                "password": 'vasya',
+            },
         ],
     },
     {

@@ -11,13 +11,15 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
-
 from .models import (
     Card,
     Column,
     Dashboard,
     DashboardUserRole,
     User
+)
+from .permissions import (
+   IsUserHasRole,
 )
 from .serializers import (
     CardSerializer,
@@ -28,7 +30,7 @@ from .serializers import (
 )
 
 
-# Кастомное представление, что б была возможность возвращать в Response не только Token
+# Кастомное представление, что бы была возможность возвращать в Response не только Token
 class CustomAuthToken(ObtainAuthToken):
     """Кастомный вьюсета для получения Token."""
 
@@ -102,8 +104,7 @@ def columns(request):
 
 
 @api_view(["GET", "POST"])
-# @permission_classes([AllowAny])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsUserHasRole])  # кастомный пермишен, что бы пользователь не смог через URL получить доступ к доске, где у него нет прав/ролей
 def dashboards(request):
 
     auth_user = request.user.id
@@ -297,8 +298,9 @@ def new_data_column(request):
 
 
 @api_view(["GET", "POST"])
-@permission_classes([AllowAny])
+# @permission_classes([AllowAny])
 # @permission_classes([IsAuthenticated])
+@permission_classes([IsUserHasRole])
 def dashboard_role(request):
     queryset = DashboardUserRole.objects.all()
     serializer = DashboardUserRoleSerializer(queryset, many=True)
