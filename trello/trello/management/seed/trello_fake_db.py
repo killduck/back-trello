@@ -94,8 +94,8 @@ tables = [
             {
                 "id": 5,
                 "username": "admin",
-                "first_name": "No",
-                "last_name": "Name",
+                "first_name": "Admin",
+                "last_name": "Login",
                 "email": "admin@mail.ru",
                 "is_active": True,
                 "is_staff": True,

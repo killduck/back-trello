@@ -9,6 +9,7 @@ urlpatterns = [
     path('logout/', views.token_destroy, name="token-destroy"),
     path("dashboards/", views.dashboards, name="dashboards"),
     path("dashboard-role/", views.dashboard_role, name="dashboard-role"),
+    path("dashboard-user/", views.dashboard_user, name="dashboard-user"),
     path("columns/", views.columns, name="columns"),
     path("take-data-column/", views.take_data_column, name="take-data-column"),
     path("new-data-column/", views.new_data_column, name="new_data_column"),
@@ -21,4 +22,5 @@ urlpatterns = [
     path("delete-column/", views.delete_column, name="delete-column"),
     path("delete-card/", views.delete_card, name="delete-card"),
     path("admin/", admin.site.urls),
+    path("card-user-update/", views.card_user_update, name="card-user-update"),
 ]

@@ -1,6 +1,34 @@
 from rest_framework import serializers
 
-from .models import Card, Column, Dashboard, Role, DashboardUserRole
+from .models import Card, Column, Dashboard, Role, DashboardUserRole, User, CardUser
+
+
+class CardUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CardUser
+
+        fields = (
+            "id",
+            "card_id",
+            "user_id",
+        )
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+
+        fields = (
+            "id",
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "is_active",
+            "is_staff",
+            "is_superuser",
+            "password",
+        )
 
 
 class RoleSerializer(serializers.ModelSerializer):
