@@ -16,7 +16,8 @@ from .models import (
     Column,
     Dashboard,
     DashboardUserRole,
-    User
+    User,
+    CardUser
 )
 from .permissions import (
    IsUserHasRole,
@@ -27,6 +28,7 @@ from .serializers import (
     DashboardSerializer,
     DashboardUserRoleSerializer,
     UserSerializer,
+    CardUserSerializer,
 )
 
 
@@ -307,9 +309,78 @@ def dashboard_role(request):
     return Response(serializer.data)
 
 
+@api_view(["GET", "POST"])
+@permission_classes([AllowAny])
+# @permission_classes([IsAuthenticated])
+def dashboard_user(request):
+    users_id = []
+    if request.data['dashboard_id']:
+        dashboard_id = request.data['dashboard_id']
+        dashboard = DashboardUserRole.objects.all().filter(dashboard_id=dashboard_id)
+
+        for user in dashboard:
+            users_id.append(user.user_id)
+
+    queryset = User.objects.all().filter(id__in=users_id)
+    serializer = UserSerializer(queryset, many=True)
+
+    return Response(serializer.data)
+
+
+@api_view(["GET", "POST"])
+@permission_classes([AllowAny])
+def card_user_update(request):
+    print(request.data)
+    if request.data['user_id'] and request.data['card_id']:
+        user_id = request.data['user_id']
+        card_id = request.data['card_id']
+
+        try:
+            new_card_user, created = CardUser.objects.get_or_create(
+                card_id=card_id,
+                user_id=user_id,
+            )
+        except:
+            print("если что-то сюда прилетит, то будем разбираться")
+            return Response(False, status=status.HTTP_404_NOT_FOUND)
+
+        card_user_serializer = CardUserSerializer(new_card_user)
+        # print(f'card_user_serializer => {card_user_serializer.data['id']}')
+        queryset = User.objects.all().filter(id=new_card_user.user_id)
+        # print(f'332__ {queryset}')
+        user_serializer = UserSerializer(queryset, many=True).data[0]
+        # print(f'user_serializer => {user_serializer.data[0]}')
+
+        return Response(
+            {
+                "id": card_user_serializer.data['id'],
+                "card_id": card_user_serializer.data['card_id'],
+                "user_id": card_user_serializer.data['user_id'],
+                "user_data": user_serializer,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+@api_view(["GET", "POST"])
+@permission_classes([AllowAny])
+def card_user_delete(request):
+    print(request.data)
+    if request.data['user_id'] and request.data['card_id']:
+        user_id = request.data['user_id']
+        try:
+            if CardUser.objects.filter(user_id=user_id):
+                CardUser.objects.filter(user_id=user_id).delete()
+            else:
+                return Response(False, status=status.HTTP_404_NOT_FOUND)
+        except:
+            return Response(False, status=status.HTTP_404_NOT_FOUND)
+
+        return Response(True, status=status.HTTP_200_OK)
+
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
-def dashboard_user(request):
+def dashboard_user_header(request):
 
     dashboard_id = request.data["dashboardId"]
 

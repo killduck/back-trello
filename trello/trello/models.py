@@ -298,7 +298,7 @@ class CardUser(models.Model):
     def __str__(self):
         return (
             f'В карточке={self.card.name} пользователь={self.user.username} '
-            f'имеет роль={self.role.name}.'
+            # f'имеет роль={self.role.name}.'
         )
 
 
