@@ -3,18 +3,25 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import (
     api_view,
-    authentication_classes,
     permission_classes,
 )
 
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
-
-from .models import Card, Column, Dashboard, DashboardUserRole, User, CardUser
+from .models import (
+    Card,
+    Column,
+    Dashboard,
+    DashboardUserRole,
+    User,
+    CardUser
+)
+from .permissions import (
+   IsUserHasRole,
+)
 from .serializers import (
     CardSerializer,
     ColumnSerializer,
@@ -25,7 +32,7 @@ from .serializers import (
 )
 
 
-# Кастомное представление, что б была возможность возвращать в Response не только Token
+# Кастомное представление, что бы была возможность возвращать в Response не только Token
 class CustomAuthToken(ObtainAuthToken):
     """Кастомный вьюсета для получения Token."""
 
@@ -59,6 +66,18 @@ class CustomAuthToken(ObtainAuthToken):
         )
 
 
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
+def user(request):
+
+    auth_user = request.user.id
+
+    queryset = get_object_or_404(User, id=auth_user)
+    serializer = UserSerializer(queryset, many=False)
+
+    return Response(serializer.data)
+
+
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def token_destroy(request):
@@ -87,18 +106,18 @@ def columns(request):
 
 
 @api_view(["GET", "POST"])
-# @permission_classes([AllowAny])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsUserHasRole])  # кастомный пермишен, что бы пользователь не смог через URL получить доступ к доске, где у него нет прав/ролей
 def dashboards(request):
+
+    auth_user = request.user.id
 
     if request.method == "POST":
         dashboard_id = request.data["dashboardId"]
-        # queryset = Dashboard.objects.get(id=dashboard_id)
         queryset = get_object_or_404(Dashboard, id=dashboard_id)
         serializer = DashboardSerializer(queryset, many=False)
         return Response(serializer.data)
 
-    queryset = Dashboard.objects.all()
+    queryset = Dashboard.objects.filter(dashboard_user_role__user_id=auth_user)
     serializer = DashboardSerializer(queryset, many=True)
     return Response(serializer.data)
 
@@ -281,8 +300,9 @@ def new_data_column(request):
 
 
 @api_view(["GET", "POST"])
-@permission_classes([AllowAny])
+# @permission_classes([AllowAny])
 # @permission_classes([IsAuthenticated])
+@permission_classes([IsUserHasRole])
 def dashboard_role(request):
     queryset = DashboardUserRole.objects.all()
     serializer = DashboardUserRoleSerializer(queryset, many=True)
@@ -357,3 +377,14 @@ def card_user_delete(request):
             return Response(False, status=status.HTTP_404_NOT_FOUND)
 
         return Response(True, status=status.HTTP_200_OK)
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def dashboard_user_header(request):
+
+    dashboard_id = request.data["dashboardId"]
+
+    users = DashboardUserRole.objects.values('user').filter(dashboard=dashboard_id)
+    queryset = User.objects.filter(id__in=users)
+    serializer = UserSerializer(queryset, many=True)
+    return Response(serializer.data)

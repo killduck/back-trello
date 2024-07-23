@@ -7,9 +7,11 @@ from . import views
 urlpatterns = [
     path('login/', views.CustomAuthToken.as_view(), name="token-create"),
     path('logout/', views.token_destroy, name="token-destroy"),
+    path('user/', views.user, name="user"),
     path("dashboards/", views.dashboards, name="dashboards"),
     path("dashboard-role/", views.dashboard_role, name="dashboard-role"),
     path("dashboard-user/", views.dashboard_user, name="dashboard-user"),
+    path("dashboard-user-header/", views.dashboard_user_header, name="dashboard-user-header"),
     path("columns/", views.columns, name="columns"),
     path("take-data-column/", views.take_data_column, name="take-data-column"),
     path("new-data-column/", views.new_data_column, name="new_data_column"),
