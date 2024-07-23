@@ -340,3 +340,20 @@ def card_user_update(request):
             },
             status=status.HTTP_200_OK,
         )
+
+
+@api_view(["GET", "POST"])
+@permission_classes([AllowAny])
+def card_user_delete(request):
+    print(request.data)
+    if request.data['user_id'] and request.data['card_id']:
+        user_id = request.data['user_id']
+        try:
+            if CardUser.objects.filter(user_id=user_id):
+                CardUser.objects.filter(user_id=user_id).delete()
+            else:
+                return Response(False, status=status.HTTP_404_NOT_FOUND)
+        except:
+            return Response(False, status=status.HTTP_404_NOT_FOUND)
+
+        return Response(True, status=status.HTTP_200_OK)
