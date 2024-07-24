@@ -367,3 +367,38 @@ def dashboard_user(request):
     queryset = User.objects.filter(id__in=users)
     serializer = UserSerializer(queryset, many=True)
     return Response(serializer.data)
+
+
+from django.core.mail import send_mail
+from django.conf import settings
+from .utils import Letter, SendMessage
+
+@api_view(["GET", "POST"])
+@permission_classes([AllowAny])
+def email(request):
+
+    settings.EMAIL_BACKEND = settings.METHOD['console']
+
+    test_letter = Letter(
+    'Тема письма',
+    'Сообщение письма........',
+    'raa@nmgk.ru',
+    'console'
+    )
+
+    test2 = SendMessage(test_letter)
+    print(test2._send_email())
+
+
+
+
+
+    # send_mail(
+    #     'Email Subject here',
+    #     'Email content',
+    #     'python31@top-python31.ru',
+    #     ['emailto@gmail.com'],
+    #     fail_silently=False
+    # )
+
+    return Response(True)
