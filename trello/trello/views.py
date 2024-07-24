@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.shortcuts import get_object_or_404
 
 from rest_framework import status
@@ -30,6 +31,7 @@ from .serializers import (
     UserSerializer,
     CardUserSerializer,
 )
+from .utils import SendMessage
 
 
 # Кастомное представление, что бы была возможность возвращать в Response не только Token
@@ -369,36 +371,34 @@ def dashboard_user(request):
     return Response(serializer.data)
 
 
-from django.core.mail import send_mail
-from django.conf import settings
-from .utils import Letter, SendMessage
-
 @api_view(["GET", "POST"])
 @permission_classes([AllowAny])
 def email(request):
 
-    settings.EMAIL_BACKEND = settings.METHOD['console']
+    # params_message = request.data
 
-    test_letter = Letter(
-    'Тема письма',
-    'Сообщение письма........',
-    'raa@nmgk.ru',
-    'console'
-    )
+    params_message = {
+        "subject_letter" : "The subject of the letter",
+        "text_letter" : "ссылка",
+        "type_message" : "add_dashboard",
+        "addres_mail" : "Raa78@mail.ru",
+        "method" : "console",
+        "fail_silently" : True,
+        "sender_email": "python31@top-python31.ru"
+    }
 
-    test2 = SendMessage(test_letter)
-    print(test2._send_email())
+    settings.MESSAGE = params_message['text_letter']
 
+    letter = {
+        'subject_letter' : params_message['subject_letter'],
+        'text_letter' : settings.MAIL_MESSAGE[params_message['type_message']],
+        'addres_mail' : [params_message['addres_mail']],
+    }
+    print(settings.MESSAGE)
+    print(settings.MAIL_MESSAGE[params_message['type_message']])
 
+    send = SendMessage(letter, params_message['method'], params_message['fail_silently'])
+    send.get_send_email
 
-
-
-    # send_mail(
-    #     'Email Subject here',
-    #     'Email content',
-    #     'python31@top-python31.ru',
-    #     ['emailto@gmail.com'],
-    #     fail_silently=False
-    # )
 
     return Response(True)

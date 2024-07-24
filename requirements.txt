@@ -5,10 +5,13 @@ django-filter==24.2
 django-seed==0.3.1
 djangorestframework==3.15.1
 Faker==25.2.0
+gunicorn==22.0.0
 Markdown==3.6
+packaging==24.1
 pillow==10.3.0
 psycopg2-binary==2.9.9
 python-dateutil==2.9.0.post0
+python-dotenv==1.0.1
 six==1.16.0
 sqlparse==0.5.0
 toposort==1.10
