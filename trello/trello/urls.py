@@ -26,6 +26,6 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("card-user-update/", views.card_user_update, name="card-user-update"),
     path("card-user-delete/", views.card_user_delete, name="card-user-delete"),
-    path("email/", views.email, name="email"),
+    path("sending-mail/", views.sending_mail, name="sending-mail"),
 
 ]

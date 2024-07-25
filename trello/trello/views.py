@@ -371,34 +371,46 @@ def dashboard_user(request):
     return Response(serializer.data)
 
 
-@api_view(["GET", "POST"])
+@api_view(["POST"])
 @permission_classes([AllowAny])
-def email(request):
+def sending_mail(request):
 
-    # params_message = request.data
+    request = request.data
 
-    params_message = {
-        "subject_letter" : "The subject of the letter",
-        "text_letter" : "ссылка",
-        "type_message" : "add_dashboard",
-        "addres_mail" : "Raa78@mail.ru",
-        "method" : "console",
-        "fail_silently" : True,
-        "sender_email": "python31@top-python31.ru"
-    }
+    # образец_принимаемого_объекта = {
+    #     "addres_mail" : "Raa78@mail.ru", - обязательное поле с адресом получателя
+    #     "subject_letter" : "The subject of the letter", - не обязательное поле с темой письма, но желательное
+    #     "text_letter" : "Текст сообшения", - обязательное поле с текстом сообщения (ради этого и  делаем)
+    #     "type_message" : "add_dashboard", - вид шаблона сообщения, если его не будет придет тестовое сообщение
+    #     "method" : "console", - не обязательное поле для выбора отправки smtp/console/file - по умолчанию пишет в консоль
+    #     "fail_silently" : True, - не обязательное поле, указывает Соообщать об ошибках или нет
+    #     "sender_email": "python31@top-python31.ru" - не обязательное поле отправителья, по умолчанию забит адрес почты хоста
+    #      "hash text" : { - это поле для хэширование не обязательное и  еще в работе, думаю пока
+    #           "algorithm" : 'sha256'
+    #       }
+    # }
 
-    settings.MESSAGE = params_message['text_letter']
+    if request and request.get('addres_mail') != None:
 
-    letter = {
-        'subject_letter' : params_message['subject_letter'],
-        'text_letter' : settings.MAIL_MESSAGE[params_message['type_message']],
-        'addres_mail' : [params_message['addres_mail']],
-    }
-    print(settings.MESSAGE)
-    print(settings.MAIL_MESSAGE[params_message['type_message']])
+        message = request['text_letter']
 
-    send = SendMessage(letter, params_message['method'], params_message['fail_silently'])
-    send.get_send_email
+        check_type_letter = request.get('type_message'),
+
+        letter = {
+            'subject_letter' : request.get('subject_letter', ''),
+            'text_letter' : settings.MAIL_MESSAGE[check_type_letter[0]] + message if check_type_letter[0] != None else settings.MAIL_MESSAGE['test'],
+            'addres_mail' : [request['addres_mail']],
+        }
+
+        send = SendMessage(
+            letter,
+            request.get('method'),
+            request.get('fail_silently', False),
+            request.get('sender_email')
+            )
+        send.get_send_email
+
+        return Response(True)
 
 
-    return Response(True)
+    return Response(False)
