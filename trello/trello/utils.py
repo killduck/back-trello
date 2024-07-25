@@ -34,10 +34,8 @@ class SendMessage:
 class HashMessage:
 
     def __init__(self, message):
-
         self.__message = message
 
-
     @property
-    def get_send_email(self):
+    def get_hash_message(self):
         pass

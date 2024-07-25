@@ -188,7 +188,7 @@ EMAIL_BACKEND = ''
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.timeweb.ru'
-EMAIL_PORT = 465
+EMAIL_PORT = 25
 EMAIL_HOST_USER = 'python31@top-python31.ru'
 EMAIL_HOST_PASSWORD = 'Python31!'
 
@@ -197,5 +197,6 @@ EMAIL_HOST_PASSWORD = 'Python31!'
 MAIL_MESSAGE = {
     'add_dashboard': f'Вас приглашают стать учаcтником доски. Пройдите по ссылке https://www.google.ru/#',
     'deadline': f'У вас просрочена задача ',
-    'test': 'Тестовое сообщение',
+    'test': 'Тестовое сообщение/Test message!!!',
+    'empty': '',
 }

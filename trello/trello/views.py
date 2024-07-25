@@ -372,23 +372,29 @@ def dashboard_user(request):
 
 
 @api_view(["POST"])
-@permission_classes([AllowAny])
-def sending_mail(request):
+# @permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
+def send_mail(request):
 
     request = request.data
 
-    # образец_принимаемого_объекта = {
-    #     "addres_mail" : "Raa78@mail.ru", - обязательное поле с адресом получателя
-    #     "subject_letter" : "The subject of the letter", - не обязательное поле с темой письма, но желательное
-    #     "text_letter" : "Текст сообшения", - обязательное поле с текстом сообщения (ради этого и  делаем)
-    #     "type_message" : "add_dashboard", - вид шаблона сообщения, если его не будет придет тестовое сообщение
-    #     "method" : "console", - не обязательное поле для выбора отправки smtp/console/file - по умолчанию пишет в консоль
-    #     "fail_silently" : True, - не обязательное поле, указывает Соообщать об ошибках или нет
-    #     "sender_email": "python31@top-python31.ru" - не обязательное поле отправителья, по умолчанию забит адрес почты хоста
-    #      "hash text" : { - это поле для хэширование не обязательное и  еще в работе, думаю пока
-    #           "algorithm" : 'sha256'
-    #       }
-    # }
+    """
+    образец_принимаемого_объекта = {
+    *** Основные поля которые нужно направлять на роут send-mail/ ***
+        "addres_mail" : "Raa78@mail.ru",  # поле с адресом получателя
+        "subject_letter" : "The subject of the letter",  #  поле с темой письма не обязательное, но желательно
+        "text_letter" : "Текст сообщения",  # поле с текстом сообщения (ради этого и  делаем)
+        "method" : "smtp",  # выбор способа отправки почты smtp/console/file - по умолчанию пишет в консоль
+    *** Не обязательные поля, буду формироваться из значений по умолчанию ***
+        "type_message" : "add_dashboard",  # вид шаблона сообщения, если не указан берется пустая строка + text_letter
+        "fail_silently" : True,  # указывает сообщать (True) об ошибках или нет(False)
+        "sender_email": "python31@top-python31.ru"  # почтовый сервер, по умолчанию забит адрес почты хоста
+    *** Поле для хеширования сообщения, еще в работе, думаю пока над функционалом ***
+        "hash text" : {
+            "algorithm" : "sha256"
+        }
+    }
+    """
 
     if request and request.get('addres_mail') != None:
 
@@ -398,7 +404,7 @@ def sending_mail(request):
 
         letter = {
             'subject_letter' : request.get('subject_letter', ''),
-            'text_letter' : settings.MAIL_MESSAGE[check_type_letter[0]] + message if check_type_letter[0] != None else settings.MAIL_MESSAGE['test'],
+            'text_letter' : settings.MAIL_MESSAGE[check_type_letter[0]] + message if check_type_letter[0] != None else settings.MAIL_MESSAGE['empty'] + message,
             'addres_mail' : [request['addres_mail']],
         }
 
@@ -411,6 +417,5 @@ def sending_mail(request):
         send.get_send_email
 
         return Response(True)
-
 
     return Response(False)
