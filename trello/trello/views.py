@@ -259,6 +259,8 @@ def take_data_column(request):
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def take_data_card(request):
+    # print(request.user.id)
+    auth_user = request.user.id
     if request.data['id']:
         card_id = request.data['id']
         queryset_card = Card.objects.all().filter(id=card_id)
@@ -273,6 +275,7 @@ def take_data_card(request):
             {
                 "card": serializer_card,
                 "card_users_data": serializer_card_users_data,
+                "auth_user": auth_user,
             },
             status=status.HTTP_200_OK,
         )
