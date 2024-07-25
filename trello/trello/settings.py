@@ -1,4 +1,12 @@
+import os
+
+from dotenv import load_dotenv
+
 from pathlib import Path
+
+
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -13,7 +21,12 @@ SECRET_KEY = "django-insecure-g(yyp6r242twmylqjtrdm2p+m4y@)3qh!vnfx$175(@*n!2t7#
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '94.198.219.33',
+    '127.0.0.1',
+    'localhost',
+    'top-python31.ru'
+]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
@@ -98,12 +111,12 @@ WSGI_APPLICATION = "trello.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "trello",
-        "USER": "postgres",
-        "PASSWORD": "123",
-        "HOST": "localhost",
-        "PORT": "",
+        'ENGINE': os.getenv('DB_ENGINE', default='django.db.backends.postgresql'),
+        'NAME': os.getenv('DB_NAME', default='trello'),
+        'USER': os.getenv('POSTGRES_USER', default='postgres'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', '123'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PORT': os.getenv('DB_PORT', default='5432'),
     }
 }
 
@@ -163,3 +176,27 @@ AUTH_USER_MODEL = 'trello.User'
 
 # Общие настройки для админок
 EMPTY_VALUE_DISPLAY = '-пусто-'
+
+
+# Настройка почтового сервера
+METHOD = {
+    'smtp': 'django.core.mail.backends.smtp.EmailBackend',
+    'console': 'django.core.mail.backends.console.EmailBackend',
+    'file': 'django.core.mail.backends.filebased.EmailBackend'
+}
+EMAIL_BACKEND = ''
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.timeweb.ru'
+EMAIL_PORT = 25
+EMAIL_HOST_USER = 'python31@top-python31.ru'
+EMAIL_HOST_PASSWORD = 'Python31!'
+
+
+# Настройки для сообщений
+MAIL_MESSAGE = {
+    'add_dashboard': f'Вас приглашают стать учаcтником доски. Пройдите по ссылке https://www.google.ru/#',
+    'deadline': f'У вас просрочена задача ',
+    'test': 'Тестовое сообщение/Test message!!!',
+    'empty': '',
+}
