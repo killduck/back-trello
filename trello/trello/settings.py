@@ -19,7 +19,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-g(yyp6r242twmylqjtrdm2p+m4y@)3qh!vnfx$175(@*n!2t7#"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG_STATUS', default=True)
 
 ALLOWED_HOSTS = [
     '94.198.219.33',
@@ -49,12 +49,6 @@ INSTALLED_APPS = [
     "django_seed",
 ]
 
-# REST_FRAMEWORK = {
-#     "DEFAULT_AUTHENTICATION_CLASSES": [
-#         "rest_framework.authentication.BasicAuthentication",
-#         "rest_framework.authentication.SessionAuthentication",
-#     ]
-# }
 
 REST_FRAMEWORK = {
     # Разрешение на уровне проекта - все запросы только для авторизированным
@@ -158,7 +152,8 @@ USE_TZ = False  # при True глючит загрузка seedов модел�
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = '/static_backend/'
+STATIC_ROOT = BASE_DIR / 'static_backend'
 
 
 # разрешаем обрабатывать запросы, приходящие с любого хоста, игнорируя политику Same Origin.
