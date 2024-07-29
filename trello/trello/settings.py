@@ -32,7 +32,13 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
 
-CSRF_TRUSTED_ORIGINS = ["https://top-python31.ru", "https://www.top-python31.ru"]
+CSRF_TRUSTED_ORIGINS = [
+    "147.45.185.171",
+    "http://top-python31.ru",
+    "http://www.top-python31.ru",
+    "https://top-python31.ru",
+    "https://www.top-python31.ru",
+]
 
 # Application definition
 
