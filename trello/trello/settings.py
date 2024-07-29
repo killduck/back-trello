@@ -22,9 +22,9 @@ SECRET_KEY = "django-insecure-g(yyp6r242twmylqjtrdm2p+m4y@)3qh!vnfx$175(@*n!2t7#
 DEBUG = os.getenv('DEBUG_STATUS', default=True)
 
 ALLOWED_HOSTS = [
-    '94.198.219.33',
     '127.0.0.1',
     'localhost',
+    '147.45.185.171',
     'top-python31.ru'
 ]
 
@@ -32,6 +32,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
 
+CSRF_TRUSTED_ORIGINS = ["https://top-python31.ru", "https://www.top-python31.ru"]
 
 # Application definition
 
