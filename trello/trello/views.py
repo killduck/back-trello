@@ -419,3 +419,18 @@ def send_mail(request):
         return Response(True)
 
     return Response(False)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def change_role_board(request):
+    print('change_role_board>>>', request.data)
+
+    role_parameters = {
+        'role': None,
+        'number_admin_on_board': None,
+        'number_user_on_board': None
+    }
+
+
+    return Response(role_parameters)

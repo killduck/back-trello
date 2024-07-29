@@ -23,9 +23,10 @@ urlpatterns = [
     path("create-card/", views.create_card, name="create-card"),
     path("delete-column/", views.delete_column, name="delete-column"),
     path("delete-card/", views.delete_card, name="delete-card"),
-    path("admin/", admin.site.urls),
     path("card-user-update/", views.card_user_update, name="card-user-update"),
     path("card-user-delete/", views.card_user_delete, name="card-user-delete"),
     path("send-mail/", views.send_mail, name="send-mail"),
+    path("change-role-board/",views.change_role_board, name="change-role-board"),
+    path("admin/", admin.site.urls),
 
 ]
