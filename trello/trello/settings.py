@@ -33,7 +33,6 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "147.45.185.171",
     "http://top-python31.ru",
     "http://www.top-python31.ru",
     "https://top-python31.ru",
