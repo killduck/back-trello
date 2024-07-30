@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, get_list_or_404
 
 from rest_framework import status
 from rest_framework.decorators import (
@@ -423,14 +423,39 @@ def send_mail(request):
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
+def search_role_board(request):
+    # print('search_role_board>>>', request.data)
+
+    user_auth_id = request.user.id
+    user_card_id = request.data['user_id']
+    active_boards = request.data['dashboard_id']
+
+    users_on_board = DashboardUserRole.objects.filter(dashboard_id = active_boards)
+
+    role_auth_user = users_on_board.filter(user_id=user_auth_id).values('role__name').first()['role__name']
+
+    role_card_user = users_on_board.filter(user_id=user_card_id).values('role__name').first()['role__name']
+
+    count_user_on_board = users_on_board.count()
+
+    count_admin_on_board = users_on_board.filter(role__name = 'admin').count()
+
+
+    role_parameters = {
+        'user_auth_id': user_auth_id,
+        'role_auth_user': role_auth_user,
+        'user_card_id': user_card_id,
+        'role_card_user': role_card_user,
+        'count_user_on_board': count_user_on_board,
+        'count_admin_on_board': count_admin_on_board,
+    }
+
+    return Response(role_parameters)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
 def change_role_board(request):
     print('change_role_board>>>', request.data)
 
-    role_parameters = {
-        'role': None,
-        'number_admin_on_board': None,
-        'number_user_on_board': None
-    }
-
-
-    return Response(role_parameters)
+    return Response(True)
