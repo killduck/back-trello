@@ -121,6 +121,7 @@ def dashboards(request):
 
     queryset = Dashboard.objects.filter(dashboard_user_role__user_id=auth_user)
     serializer = DashboardSerializer(queryset, many=True)
+    print(f'124__ {serializer.data}')
     return Response(serializer.data)
 
 
