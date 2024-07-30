@@ -18,7 +18,8 @@ from .models import (
     Dashboard,
     DashboardUserRole,
     User,
-    CardUser
+    CardUser,
+    Role
 )
 from .permissions import (
    IsUserHasRole,
@@ -456,6 +457,37 @@ def search_role_board(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def change_role_board(request):
-    print('change_role_board>>>', request.data)
+    # print('change_role_board>>>', request.data)
+
+    user_id = request.data['user_id']
+    active_boards = request.data['dashboard_id']
+
+    users_on_board = DashboardUserRole.objects.get(
+                                      dashboard_id = active_boards,
+                                      user_id = user_id
+                                      )
+
+
+    # users_on_board = DashboardUserRole.objects.filter(dashboard_id = active_boards,
+    #                                                   user_id = user_id)
+
+
+    # print('change_role_board users_on_board >>>', users_on_board)
+
+    if request.data['action'] == 'add_admin':
+        role_admin = get_object_or_404(Role, name='admin').id
+
+        # record = users_on_board.update(role=role_admin)
+
+
+        users_on_board.role_id = role_admin
+        users_on_board.save()
+
+
+        print('record>>>', users_on_board.role_id)
+        print('change_role_board users_on_board >>>', users_on_board)
+
+        return Response(True)
+
 
     return Response(True)
