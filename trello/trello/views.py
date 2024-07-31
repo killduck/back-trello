@@ -18,7 +18,8 @@ from .models import (
     Dashboard,
     DashboardUserRole,
     User,
-    CardUser
+    CardUser,
+    Label,
 )
 from .permissions import (
    IsUserHasRole,
@@ -30,6 +31,7 @@ from .serializers import (
     DashboardUserRoleSerializer,
     UserSerializer,
     CardUserSerializer,
+    LabelSerializer,
 )
 from .utils import SendMessage
 
@@ -70,6 +72,35 @@ class CustomAuthToken(ObtainAuthToken):
 
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
+def label_data(request):
+
+    queryset = Label.objects.all().order_by('id')
+    serializer = LabelSerializer(queryset, many=True)
+
+    return Response(serializer.data)
+
+
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
+def add_label_to_card(request):
+    if request.data['card_id'] and request.data['label_id'] or (request.data['label_id'] is None):
+        card_id = request.data['card_id']
+        label_id = request.data['label_id']
+        try:
+            Card.objects.filter(id=card_id).update(label_id=label_id)
+        except:
+            print("если что-то сюда прилетит, то будем разбираться")
+            return Response(False, status=status.HTTP_404_NOT_FOUND)
+
+        queryset = Card.objects.all().filter(id=card_id)
+        serializer = CardSerializer(queryset, many=True)
+        return Response(serializer.data)
+    else:
+        return Response(False, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
 def user(request):
 
     auth_user = request.user.id
@@ -83,7 +114,6 @@ def user(request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def token_destroy(request):
-    # print(request.headers['Authorization'])
     token = request.headers['Authorization'][6:]
     Token.objects.get(key=token).delete()
     return Response(
@@ -121,7 +151,7 @@ def dashboards(request):
 
     queryset = Dashboard.objects.filter(dashboard_user_role__user_id=auth_user)
     serializer = DashboardSerializer(queryset, many=True)
-    print(f'124__ {serializer.data}')
+
     return Response(serializer.data)
 
 
@@ -262,7 +292,6 @@ def take_data_column(request):
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def take_data_card(request):
-    # print(request.user.id)
     auth_user = request.user.id
     if request.data['id']:
         card_id = request.data['id']
