@@ -116,3 +116,11 @@ media/
 # **/migrations/**
 # !**/migrations
 # !**/migrations/__init__.py
+
+# Свои исключения
+static_backend
+static_backend/
+/static_backend/
+static
+static/
+/static/

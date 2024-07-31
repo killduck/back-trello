@@ -19,12 +19,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-g(yyp6r242twmylqjtrdm2p+m4y@)3qh!vnfx$175(@*n!2t7#"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG_STATUS', default=True)
 
 ALLOWED_HOSTS = [
-    '94.198.219.33',
     '127.0.0.1',
     'localhost',
+    '147.45.185.171',
     'top-python31.ru'
 ]
 
@@ -32,6 +32,12 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    "http://top-python31.ru",
+    "http://www.top-python31.ru",
+    "https://top-python31.ru",
+    "https://www.top-python31.ru",
+]
 
 # Application definition
 
@@ -49,12 +55,6 @@ INSTALLED_APPS = [
     "django_seed",
 ]
 
-# REST_FRAMEWORK = {
-#     "DEFAULT_AUTHENTICATION_CLASSES": [
-#         "rest_framework.authentication.BasicAuthentication",
-#         "rest_framework.authentication.SessionAuthentication",
-#     ]
-# }
 
 REST_FRAMEWORK = {
     # Разрешение на уровне проекта - все запросы только для авторизированным
@@ -114,8 +114,8 @@ DATABASES = {
         'ENGINE': os.getenv('DB_ENGINE', default='django.db.backends.postgresql'),
         'NAME': os.getenv('DB_NAME', default='trello'),
         'USER': os.getenv('POSTGRES_USER', default='postgres'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', '123'),
-        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='123'),
+        'HOST': os.getenv('DB_HOST', default='localhost'),
         'PORT': os.getenv('DB_PORT', default='5432'),
     }
 }
@@ -158,7 +158,8 @@ USE_TZ = False  # при True глючит загрузка seedов модел�
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = '/static_backend/'
+STATIC_ROOT = BASE_DIR / 'static_backend'
 
 
 # разрешаем обрабатывать запросы, приходящие с любого хоста, игнорируя политику Same Origin.
