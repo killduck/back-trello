@@ -6,7 +6,7 @@ from . import views
 
 urlpatterns = [
     path(
-        '',  # сюда позже добавить приставку api/
+        'api/',  # сюда позже добавить приставку api/
         include(
             [
                 path('login/', views.CustomAuthToken.as_view(), name="token-create"),

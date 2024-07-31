@@ -433,25 +433,29 @@ def search_role_board(request):
 
     users_on_board = DashboardUserRole.objects.filter(dashboard_id = active_boards)
 
-    role_auth_user = users_on_board.filter(user_id=user_auth_id).values('role__name').first()['role__name']
+    try:
 
-    role_card_user = users_on_board.filter(user_id=user_card_id).values('role__name').first()['role__name']
+        role_auth_user = users_on_board.filter(user_id=user_auth_id).values('role__name').first()['role__name']
 
-    count_user_on_board = users_on_board.count()
+        role_card_user = users_on_board.filter(user_id=user_card_id).values('role__name').first()['role__name']
 
-    count_admin_on_board = users_on_board.filter(role__name = 'admin').count()
+        count_user_on_board = users_on_board.count()
+
+        count_admin_on_board = users_on_board.filter(role__name = 'admin').count()
 
 
-    role_parameters = {
-        'user_auth_id': user_auth_id,
-        'role_auth_user': role_auth_user,
-        'user_card_id': user_card_id,
-        'role_card_user': role_card_user,
-        'count_user_on_board': count_user_on_board,
-        'count_admin_on_board': count_admin_on_board,
-    }
+        role_parameters = {
+            'user_auth_id': user_auth_id,
+            'role_auth_user': role_auth_user,
+            'user_card_id': user_card_id,
+            'role_card_user': role_card_user,
+            'count_user_on_board': count_user_on_board,
+            'count_admin_on_board': count_admin_on_board,
+        }
 
-    return Response(role_parameters)
+        return Response(role_parameters)
+    except:
+        return Response(False)
 
 
 @api_view(["POST"])
