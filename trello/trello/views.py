@@ -462,32 +462,22 @@ def change_role_board(request):
     user_id = request.data['user_id']
     active_boards = request.data['dashboard_id']
 
-    users_on_board = DashboardUserRole.objects.get(
-                                      dashboard_id = active_boards,
-                                      user_id = user_id
-                                      )
+    users_on_board = DashboardUserRole.objects.filter(dashboard_id = active_boards,
+                                                      user_id = user_id)
 
-
-    # users_on_board = DashboardUserRole.objects.filter(dashboard_id = active_boards,
-    #                                                   user_id = user_id)
-
-
-    # print('change_role_board users_on_board >>>', users_on_board)
 
     if request.data['action'] == 'add_admin':
         role_admin = get_object_or_404(Role, name='admin').id
+        users_on_board.update(role_id=role_admin)
+        return Response(True,status=status.HTTP_200_OK)
 
-        # record = users_on_board.update(role=role_admin)
+    if request.data['action'] == 'del_admin':
+        role_participant = get_object_or_404(Role, name='participant').id
+        users_on_board.update(role_id=role_participant)
+        return Response(True,status=status.HTTP_200_OK)
 
+    if request.data['action'] == 'del_user':
+        users_on_board.delete()
+        return Response(True,status=status.HTTP_200_OK)
 
-        users_on_board.role_id = role_admin
-        users_on_board.save()
-
-
-        print('record>>>', users_on_board.role_id)
-        print('change_role_board users_on_board >>>', users_on_board)
-
-        return Response(True)
-
-
-    return Response(True)
+    return Response(False)
