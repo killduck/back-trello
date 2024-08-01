@@ -3,6 +3,52 @@ from django.conf import settings
 from django.core.mail import send_mail
 
 
+class PreparingMessage:
+
+    def __init__(self,
+                 subject_letter = 'Letter without subject',
+                 text_letter = '',
+                ):
+
+
+        self.__subject_letter = subject_letter
+        self.__text_letter = text_letter
+
+    @property
+    def get_test(self):
+        letter = {
+            'subject_letter': self.__subject_letter,
+            'text_letter': settings.MAIL_MESSAGE['test'],
+        }
+        return letter
+
+    @property
+    def get_empty(self):
+        letter = {
+            'subject_letter': self.__subject_letter,
+            'text_letter': self.__text_letter,
+        }
+        return letter
+
+    @property
+    def get_add_dashboard(self):
+        letter = {
+            'subject_letter': self.__subject_letter,
+            'text_letter': settings.MAIL_MESSAGE['add_dashboard'] + self.__text_letter,
+        }
+        return letter
+
+    @property
+    def get_deadline(self):
+        letter = {
+            'subject_letter': self.__subject_letter,
+            'text_letter': settings.MAIL_MESSAGE['deadline'] + self.__text_letter,
+        }
+        return letter
+
+
+
+
 class SendMessage:
 
     def __init__(self,

@@ -32,7 +32,7 @@ from .serializers import (
     UserSerializer,
     CardUserSerializer,
 )
-from .utils import SendMessage
+from .utils import SendMessage, PreparingMessage
 
 
 # Кастомное представление, что бы была возможность возвращать в Response не только Token
@@ -485,3 +485,24 @@ def change_role_board(request):
         return Response(True,status=status.HTTP_200_OK)
 
     return Response(False)
+
+
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def test(request):
+
+    {
+        "subject_letter":"Моя тема",
+        "text_letter": "Qwerty & ksdghkgsghlak"
+    }
+
+    request = request.data
+
+    send = PreparingMessage(
+        subject_letter = request['subject_letter'],
+        text_letter = request['text_letter'],
+    )
+    print(send.get_deadline)
+
+    return Response(True)
