@@ -147,12 +147,40 @@ class Label(models.Model):
     class Meta:
         verbose_name = "Метка"
         verbose_name_plural = "метки"
-        ordering = [
-            "name",
-        ]
+        ordering = ["id"]
 
     def __str__(self):
         return self.name
+
+
+class Activity(models.Model):
+    """Модель для действий в карточке."""
+
+    author = models.ForeignKey(
+        "User",
+        on_delete=models.CASCADE,
+        related_name="activity",
+        verbose_name="Пользователь",
+    )
+    date_start = models.DateField(
+        auto_now=False,
+        auto_now_add=False,
+        blank=True,
+        null=True,
+    )
+    text = models.TextField(
+        max_length=500,
+        verbose_name="Наименование цветовой метки",
+        help_text="Введите наименование цветовой метки",
+    )
+
+    class Meta:
+        verbose_name = "Действия"
+        verbose_name_plural = "действие"
+        ordering = ["id"]
+
+    def __str__(self):
+        return self.text
 
 
 class Card(models.Model):
@@ -196,6 +224,19 @@ class Card(models.Model):
         related_name="cards",
         verbose_name="Метка",
         help_text="Введите цветовую метку",
+    )
+    description = models.TextField(
+        verbose_name="Текст описания карточки",
+        help_text="Введите текст",
+        max_length=500,
+        null=True,
+    )
+    activity = models.ForeignKey(
+        "Activity",
+        on_delete=models.CASCADE,
+        related_name="card",
+        verbose_name="Действия",
+        null=True,
     )
 
     class Meta:
@@ -247,7 +288,7 @@ class DashboardUserRole(models.Model):
         "User",
         on_delete=models.CASCADE,
         related_name="user_dashboard",
-        verbose_name="Польователь",
+        verbose_name="Пользователь",
     )
     role = models.ForeignKey(
         "Role",
