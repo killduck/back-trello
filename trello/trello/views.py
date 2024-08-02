@@ -32,7 +32,7 @@ from .serializers import (
     UserSerializer,
     CardUserSerializer,
 )
-from .utils import SendMessage, PreparingMessage
+from .utils import SendMessage, PreparingMessage, SendMessage2
 
 
 # Кастомное представление, что бы была возможность возвращать в Response не только Token
@@ -494,15 +494,37 @@ def test(request):
 
     {
         "subject_letter":"Моя тема",
-        "text_letter": "Qwerty & ksdghkgsghlak"
+        "text_letter": "Qwerty & ksdghkgsghlak",
+        "template":"add_dashboard",
+        "addres_mail": "rubtsov1978@gmail.com"
+    }
+
+
+    {
+        "subject_letter":"Моя тема",
+        "text_letter": "Qwerty & ksdghkgsghlak",
+        "addres_mail": "rubtsov1978@gmail.com"
     }
 
     request = request.data
 
-    send = PreparingMessage(
-        subject_letter = request['subject_letter'],
-        text_letter = request['text_letter'],
-    )
-    print(send.get_deadline)
+    if request:
+        message = PreparingMessage(
+            subject_letter = request.get('subject_letter', ""),
+            text_letter = request.get('text_letter', ""),
+            template = request.get('template', "")
+        )
 
-    return Response(True)
+        send = SendMessage2 (
+            letter = message.get_message,
+            addres_mail = request['addres_mail']
+        )
+
+        send.get_send_email
+
+
+
+
+        return Response(True)
+
+    return Response(status=status.HTTP_404_NOT_FOUND)
