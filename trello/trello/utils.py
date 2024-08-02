@@ -6,9 +6,9 @@ from django.core.mail import send_mail
 class PreparingMessage:
 
     def __init__(self,
+                 template,
                  subject_letter = 'Letter without subject',
                  text_letter = '',
-                 template = ''
                 ):
 
 
@@ -25,36 +25,7 @@ class PreparingMessage:
         return letter
 
 
-
 class SendMessage:
-
-    def __init__(self,
-                 letter,
-                 method,
-                 fail_silently,
-                 sender_email,
-                ):
-
-        self.__letter = letter
-        self.__method = method
-        self.__fail_silently = fail_silently
-        self.__sender_email = sender_email
-
-    @property
-    def get_send_email(self):
-
-        settings.EMAIL_BACKEND = settings.METHOD[self.__method] if self.__method != None else settings.METHOD['console']
-
-        send_mail (
-            self.__letter['subject_letter'],
-            self.__letter['text_letter'],
-            self.__sender_email if self.__sender_email != None else settings.EMAIL_HOST_USER,
-            self.__letter['addres_mail'],
-            self.__fail_silently
-        )
-
-
-class SendMessage2:
 
     def __init__(self,
                  letter,
@@ -69,21 +40,30 @@ class SendMessage2:
         self.__sender_email = sender_email
         self.__fail_silently = fail_silently
 
-    @property
-    def get_send_email(self):
 
-        settings.EMAIL_BACKEND = settings.METHOD['smtp']
-
+    def __send(self,):
         send_mail (
             self.__letter['subject_letter'],
             self.__letter['text_letter'],
             self.__sender_email,
-            [self.__addres_mail],
+            self.__addres_mail,
             self.__fail_silently
         )
 
+    @property
+    def get_send_email(self):
+        settings.EMAIL_BACKEND = settings.METHOD['smtp']
+        self.__send()
 
+    @property
+    def get_write_to_file(self):
+        settings.EMAIL_BACKEND = settings.METHOD['file']
+        self.__send()
 
+    @property
+    def get_output_to_console(self):
+        settings.EMAIL_BACKEND = settings.METHOD['console']
+        self.__send()
 
 
 class HashMessage:

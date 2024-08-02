@@ -32,7 +32,7 @@ from .serializers import (
     UserSerializer,
     CardUserSerializer,
 )
-from .utils import SendMessage, PreparingMessage, SendMessage2
+from .utils import SendMessage, PreparingMessage
 
 
 # Кастомное представление, что бы была возможность возвращать в Response не только Token
@@ -96,7 +96,6 @@ def token_destroy(request):
 
 
 @api_view(["GET", "POST"])
-# @permission_classes([AllowAny])
 @permission_classes([IsAuthenticated])
 def columns(request):
 
@@ -126,7 +125,6 @@ def dashboards(request):
 
 
 @api_view(["POST"])
-# @permission_classes([AllowAny])
 @permission_classes([IsAuthenticated])
 def swap_columns(request):
 
@@ -146,7 +144,6 @@ def swap_columns(request):
 
 
 @api_view(["POST"])
-# @permission_classes([AllowAny])
 @permission_classes([IsAuthenticated])
 def swap_cards(request):
 
@@ -304,8 +301,6 @@ def new_data_column(request):
 
 
 @api_view(["GET", "POST"])
-# @permission_classes([AllowAny])
-# @permission_classes([IsAuthenticated])
 @permission_classes([IsUserHasRole])
 def dashboard_role(request):
     queryset = DashboardUserRole.objects.all()
@@ -314,7 +309,7 @@ def dashboard_role(request):
 
 
 @api_view(["GET", "POST"])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def card_user_update(request):
     # print(request.data)
     if request.data['user_id'] and request.data['card_id']:
@@ -346,7 +341,7 @@ def card_user_update(request):
 
 
 @api_view(["GET", "POST"])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def card_user_delete(request):
     if request.data['user_id'] and request.data['card_id']:
         user_id = request.data['user_id']
@@ -373,53 +368,51 @@ def dashboard_user(request):
 
 
 @api_view(["POST"])
-# @permission_classes([AllowAny])
 @permission_classes([IsAuthenticated])
 def send_mail(request):
-
-    request = request.data
 
     """
     образец_принимаемого_объекта = {
     *** Основные поля которые нужно направлять на роут send-mail/ ***
-        "addres_mail" : "Raa78@mail.ru",  # поле с адресом получателя
-        "subject_letter" : "The subject of the letter",  #  поле с темой письма не обязательное, но желательно
-        "text_letter" : "Текст сообщения",  # поле с текстом сообщения (ради этого и  делаем)
-        "method" : "smtp",  # выбор способа отправки почты smtp/console/file - по умолчанию пишет в консоль
-    *** Не обязательные поля, буду формироваться из значений по умолчанию ***
-        "type_message" : "add_dashboard",  # вид шаблона сообщения, если не указан берется пустая строка + text_letter
-        "fail_silently" : True,  # указывает сообщать (True) об ошибках или нет(False)
-        "sender_email": "python31@top-python31.ru"  # почтовый сервер, по умолчанию забит адрес почты хоста
-    *** Поле для хеширования сообщения, еще в работе, думаю пока над функционалом ***
-        "hash text" : {
-            "algorithm" : "sha256"
-        }
+        "subject_letter" - поле с темой письма не обязательное, но желательно
+        "text_letter" - поле с текстом сообщения (ради этого и  делаем)
+        "template": "add_dashboard" или "deadline" # вид шаблона текста письма.
+                                                    Берется из settings.py из перменной MAIL_MESSAGE.
+                                                    Поле можно опустить.
+        "addres_mail" : "Raa78@mail.ru",  # поле с адресом получателя (обязательно)
+    }
+
+    ОБРАЗЕЦ
+    {
+        "subject_letter": "Обрарить внимание",
+        "text_letter": "Qwerty & asdfgh",
+        "template": "deadline",
+        "addres_mail": "Raa78@mail.ru"
     }
     """
 
-    if request and request.get('addres_mail') != None:
+    request = request.data
 
-        message = request['text_letter']
+    if request:
 
-        check_type_letter = request.get('type_message'),
-
-        letter = {
-            'subject_letter' : request.get('subject_letter', ''),
-            'text_letter' : settings.MAIL_MESSAGE[check_type_letter[0]] + message if check_type_letter[0] != None else settings.MAIL_MESSAGE['empty'] + message,
-            'addres_mail' : [request['addres_mail']],
-        }
+        message = PreparingMessage(
+            subject_letter = request.get('subject_letter', ''),
+            text_letter = request.get('text_letter', ''),
+            template = request.get('template', '')
+        )
 
         send = SendMessage(
-            letter,
-            request.get('method'),
-            request.get('fail_silently', False),
-            request.get('sender_email')
-            )
-        send.get_send_email
+            letter = message.get_message,
+            addres_mail = [request['addres_mail']]
+        )
 
+        send.get_send_email
+        # отпраляем email. Либо:
+        # - end.get_write_to_file = записать в файл send.get_write_to_file
+        # - send.get_output_to_console = вывести в сонсоль send.get_output_to_console
         return Response(True)
 
-    return Response(False)
+    return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(["POST"])
@@ -461,7 +454,6 @@ def search_role_board(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def change_role_board(request):
-    # print('change_role_board>>>', request.data)
 
     user_id = request.data['user_id']
     active_boards = request.data['dashboard_id']
@@ -487,7 +479,6 @@ def change_role_board(request):
     return Response(False)
 
 
-
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def test(request):
@@ -510,20 +501,17 @@ def test(request):
 
     if request:
         message = PreparingMessage(
-            subject_letter = request.get('subject_letter', ""),
-            text_letter = request.get('text_letter', ""),
-            template = request.get('template', "")
+            subject_letter = request.get('subject_letter', ''),
+            text_letter = request.get('text_letter', ''),
+            template = request.get('template', '')
         )
 
-        send = SendMessage2 (
+        send = SendMessage(
             letter = message.get_message,
-            addres_mail = request['addres_mail']
+            addres_mail = [request['addres_mail']]
         )
 
         send.get_send_email
-
-
-
 
         return Response(True)
 
