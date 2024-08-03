@@ -19,8 +19,10 @@ from .models import (
     DashboardUserRole,
     User,
     CardUser,
-    Role
+    Role,
+    Label,
 )
+
 from .permissions import (
    IsUserHasRole,
 )
@@ -31,6 +33,7 @@ from .serializers import (
     DashboardUserRoleSerializer,
     UserSerializer,
     CardUserSerializer,
+    LabelSerializer,
 )
 from .utils import SendMessage, PreparingMessage
 
@@ -71,6 +74,35 @@ class CustomAuthToken(ObtainAuthToken):
 
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
+def label_data(request):
+
+    queryset = Label.objects.all().order_by('id')
+    serializer = LabelSerializer(queryset, many=True)
+
+    return Response(serializer.data)
+
+
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
+def add_label_to_card(request):
+    if request.data['card_id'] and request.data['label_id'] or (request.data['label_id'] is None):
+        card_id = request.data['card_id']
+        label_id = request.data['label_id']
+        try:
+            Card.objects.filter(id=card_id).update(label_id=label_id)
+        except:
+            print("если что-то сюда прилетит, то будем разбираться")
+            return Response(False, status=status.HTTP_404_NOT_FOUND)
+
+        queryset = Card.objects.all().filter(id=card_id)
+        serializer = CardSerializer(queryset, many=True)
+        return Response(serializer.data)
+    else:
+        return Response(False, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
 def user(request):
 
     auth_user = request.user.id
@@ -84,7 +116,6 @@ def user(request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def token_destroy(request):
-    print(request.headers['Authorization'])
     token = request.headers['Authorization'][6:]
     Token.objects.get(key=token).delete()
     return Response(
@@ -250,20 +281,36 @@ def take_data_column(request):
         column_id = request.data['id']
         queryset = Column.objects.all().filter(id=column_id)
 
-    serializer = ColumnSerializer(queryset, many=True)
-    return Response(serializer.data)
+        serializer = ColumnSerializer(queryset, many=True)
+        return Response(serializer.data)
+    else:
+        return Response(False, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def take_data_card(request):
+    auth_user = request.user.id
     if request.data['id']:
         card_id = request.data['id']
-        queryset = Card.objects.all().filter(id=card_id)
+        queryset_card = Card.objects.all().filter(id=card_id)
 
-    serializer = CardSerializer(queryset, many=True)
-    print(serializer.data)
-    return Response(serializer.data)
+        card_users = CardUser.objects.values('user').filter(card_id=card_id)
+        card_users_data = User.objects.filter(id__in=card_users)
+
+        serializer_card_users_data = UserSerializer(card_users_data, many=True).data
+        serializer_card = CardSerializer(queryset_card, many=True).data
+
+        return Response(
+            {
+                "card": serializer_card,
+                "card_users_data": serializer_card_users_data,
+                "auth_user": auth_user,
+            },
+            status=status.HTTP_200_OK,
+        )
+    else:
+        return Response(False, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(["GET", "POST"])
@@ -280,7 +327,10 @@ def new_data_card(request):
 
         queryset = Card.objects.all().filter(id=card_id)
         serializer = CardSerializer(queryset, many=True)
-    return Response(serializer.data)
+
+        return Response(serializer.data)
+    else:
+        return Response(False, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(["GET", "POST"])
@@ -297,7 +347,10 @@ def new_data_column(request):
 
         queryset = Column.objects.all().filter(id=column_id)
         serializer = ColumnSerializer(queryset, many=True)
-    return Response(serializer.data)
+
+        return Response(serializer.data)
+    else:
+        return Response(False, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(["GET", "POST"])
@@ -311,7 +364,6 @@ def dashboard_role(request):
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def card_user_update(request):
-    # print(request.data)
     if request.data['user_id'] and request.data['card_id']:
         user_id = request.data['user_id']
         card_id = request.data['card_id']
@@ -325,19 +377,12 @@ def card_user_update(request):
             print("если что-то сюда прилетит, то будем разбираться")
             return Response(False, status=status.HTTP_404_NOT_FOUND)
 
-        card_user_serializer = CardUserSerializer(new_card_user).data
-        queryset = User.objects.all().filter(id=card_user_serializer['user_id'])
+        queryset = User.objects.all().filter(id=new_card_user.user_id)
         user_serializer = UserSerializer(queryset, many=True).data[0]
 
-        return Response(
-            {
-                "id": card_user_serializer['id'],
-                "card_id": card_user_serializer['card_id'],
-                "user_id": card_user_serializer['user_id'],
-                "user_data": user_serializer,
-            },
-            status=status.HTTP_200_OK,
-        )
+        return Response(user_serializer)
+    else:
+        return Response(False, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(["GET", "POST"])
@@ -345,20 +390,20 @@ def card_user_update(request):
 def card_user_delete(request):
     if request.data['user_id'] and request.data['card_id']:
         user_id = request.data['user_id']
+        card_id = request.data['card_id']
         try:
-            if CardUser.objects.filter(user_id=user_id):
-                CardUser.objects.filter(user_id=user_id).delete()
-            else:
-                return Response(False, status=status.HTTP_404_NOT_FOUND)
+            CardUser.objects.filter(card_id=card_id, user_id=user_id).delete()
         except:
             return Response(False, status=status.HTTP_404_NOT_FOUND)
 
         return Response(True, status=status.HTTP_200_OK)
+    else:
+        return Response(False, status=status.HTTP_404_NOT_FOUND)
+
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def dashboard_user(request):
-
     dashboard_id = request.data["dashboardId"]
 
     users = DashboardUserRole.objects.values('user').filter(dashboard=dashboard_id)

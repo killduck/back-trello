@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Card, Column, Dashboard, Role, DashboardUserRole, User, CardUser
+from .models import Card, Column, Dashboard, Role, DashboardUserRole, User, CardUser, Label
 
 
 class CardUserSerializer(serializers.ModelSerializer):
@@ -49,7 +49,21 @@ class RoleSerializer(serializers.ModelSerializer):
         )
 
 
+class LabelSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Label
+
+        fields = (
+            "id",
+            "name",
+            "color_hex",
+        )
+
+
 class CardSerializer(serializers.ModelSerializer):
+
+    label = LabelSerializer(many=False)
 
     class Meta:
         model = Card
