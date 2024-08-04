@@ -158,11 +158,14 @@ class Activity(models.Model):
 
     author = models.ForeignKey(
         "User",
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name="activity",
+        blank=True,
+        null=True,
         verbose_name="Пользователь",
+        help_text="Введите пользователя к которой описывает действие",
     )
-    date_start = models.DateField(
+    date = models.DateField(
         auto_now=False,
         auto_now_add=False,
         blank=True,

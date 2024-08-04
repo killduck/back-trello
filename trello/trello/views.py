@@ -74,7 +74,7 @@ class CustomAuthToken(ObtainAuthToken):
 @permission_classes([IsAuthenticated])
 def label_data(request):
 
-    queryset = Label.objects.all().order_by('id')
+    queryset = Label.objects.all()
     serializer = LabelSerializer(queryset, many=True)
 
     return Response(serializer.data)
@@ -255,6 +255,7 @@ def create_card(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def delete_column(request):
+    print(request.data)
     try:
         id_column_deleted = request.data["id_column"]
         if id_column_deleted:
@@ -279,12 +280,20 @@ def delete_card(request):
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def take_data_column(request):
+    auth_user = request.user.id
+    print(request.data)
     if request.data['id']:
         column_id = request.data['id']
         queryset = Column.objects.all().filter(id=column_id)
 
-        serializer = ColumnSerializer(queryset, many=True)
-        return Response(serializer.data)
+        serializer_column = ColumnSerializer(queryset, many=True).data
+        return Response(
+            {
+                "column": serializer_column,
+                "auth_user": auth_user,
+            },
+            status=status.HTTP_200_OK,
+        )
     else:
         return Response(False, status=status.HTTP_404_NOT_FOUND)
 
