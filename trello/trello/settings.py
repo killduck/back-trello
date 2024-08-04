@@ -19,7 +19,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-g(yyp6r242twmylqjtrdm2p+m4y@)3qh!vnfx$175(@*n!2t7#"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG_STATUS', default=True)
+DEBUG_STATUS = os.getenv('DEBUG_STATUS')
+
+DEBUG = False if DEBUG_STATUS == 'False' else True
+
 
 ALLOWED_HOSTS = [
     '127.0.0.1',
@@ -198,6 +201,4 @@ EMAIL_HOST_PASSWORD = 'Python31!'
 MAIL_MESSAGE = {
     'add_dashboard': f'Вас приглашают стать учаcтником доски. Пройдите по ссылке https://www.google.ru/#',
     'deadline': f'У вас просрочена задача ',
-    'test': 'Тестовое сообщение/Test message!!!',
-    'empty': '',
 }

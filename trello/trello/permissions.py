@@ -14,7 +14,6 @@ class IsUserHasRole(BasePermission):
 
     def has_permission(self, request, view):
         user = request.user
-        print('IsUserHasRole>>>', view)
 
         if request.method == "POST":
             dashboard_id = request.data["dashboardId"]
