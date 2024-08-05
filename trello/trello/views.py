@@ -406,10 +406,14 @@ def card_user_delete(request):
 def dashboard_user(request):
     dashboard_id = request.data["dashboardId"]
 
-    users = DashboardUserRole.objects.values('user').filter(dashboard=dashboard_id)
-    queryset = User.objects.filter(id__in=users)
-    serializer = UserSerializer(queryset, many=True)
-    return Response(serializer.data)
+    if request.data["dashboardId"].isdigit():
+
+        users = DashboardUserRole.objects.values('user').filter(dashboard=dashboard_id)
+        queryset = User.objects.filter(id__in=users)
+        serializer = UserSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    return Response(False, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(["POST"])
@@ -528,36 +532,56 @@ def change_role_board(request):
 @permission_classes([AllowAny])
 def test(request):
 
+    # {
+    #     "subject_letter":"Моя тема",
+    #     "text_letter": "Qwerty & ksdghkgsghlak",
+    #     "template":"add_dashboard",
+    #     "addres_mail": "rubtsov1978@gmail.com"
+    # }
+
+
+    # {
+    #     "subject_letter":"Моя тема",
+    #     "text_letter": "Qwerty & ksdghkgsghlak",
+    #     "addres_mail": "rubtsov1978@gmail.com"
+    # }
+
+    # request = request.data
+
+    # if request:
+    #     message = PreparingMessage(
+    #         subject_letter = request.get('subject_letter', ''),
+    #         text_letter = request.get('text_letter', ''),
+    #         template = request.get('template', '')
+    #     )
+
+    #     send = SendMessage(
+    #         letter = message.get_message,
+    #         addres_mail = [request['addres_mail']]
+    #     )
+
+    #     send.get_send_email
+
+    #     return Response(True)
+
+    # return Response(status=status.HTTP_404_NOT_FOUND)
+
     {
-        "subject_letter":"Моя тема",
-        "text_letter": "Qwerty & ksdghkgsghlak",
-        "template":"add_dashboard",
-        "addres_mail": "rubtsov1978@gmail.com"
+        "user_id": 2,
+        "dashboard_id": 1
     }
 
 
-    {
-        "subject_letter":"Моя тема",
-        "text_letter": "Qwerty & ksdghkgsghlak",
-        "addres_mail": "rubtsov1978@gmail.com"
-    }
+    dashboard_id = request.data["dashboard_id"]
+    user_id = request.data["user_id"]
 
-    request = request.data
+    card = Card.objects.filter(column__dashboard_id = dashboard_id)
 
-    if request:
-        message = PreparingMessage(
-            subject_letter = request.get('subject_letter', ''),
-            text_letter = request.get('text_letter', ''),
-            template = request.get('template', '')
-        )
 
-        send = SendMessage(
-            letter = message.get_message,
-            addres_mail = [request['addres_mail']]
-        )
+    card_user = CardUser.objects.filter(card_id__in = card, user_id=user_id)
+    print('card_user>>>', card_user)
 
-        send.get_send_email
+    card_user.delete()
 
-        return Response(True)
 
-    return Response(status=status.HTTP_404_NOT_FOUND)
+    return Response(True,status=status.HTTP_200_OK)
