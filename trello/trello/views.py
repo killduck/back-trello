@@ -395,26 +395,26 @@ def card_user_delete(request):
          - если ключ есть, вернется значение ключа
         Ну и воспользуемся функцией get_object_or_404(). Если по зачениям ключей выборка объекта будет уходит в ошибку,
         get_object_or_404() выкинет автоматом 404
-    """
+    """  # TODO Если нет возражений, коментарий-пояснение можно удалить
+
     user_id = request.data.get('user_id', False)
     card_id = request.data.get('card_id', False)
 
     dashboard_id = request.data.get('dashboard_id', False)
-    del_dashboard_user = request.data.get('del_dashboard_user', False)
 
     if user_id and card_id:
         card_user = get_object_or_404(CardUser, card_id=card_id, user_id=user_id)
         card_user.delete()
         return Response(True, status=status.HTTP_200_OK)
 
-    if del_dashboard_user:
+    if user_id and dashboard_id:
         card = get_list_or_404(Card, column__dashboard_id = dashboard_id)
         card_user = CardUser.objects.filter(card_id__in = card, user_id=user_id)
         card_user.delete()
         return Response(True, status=status.HTTP_200_OK)
 
     return Response(False, status=status.HTTP_404_NOT_FOUND)
-
+    # TODO Если нет возражений, закоментированный код можно удалить
     #     try:
     #         CardUser.objects.filter(card_id=card_id, user_id=user_id).delete()
     #     except:
@@ -423,7 +423,6 @@ def card_user_delete(request):
     #     return Response(True, status=status.HTTP_200_OK)
     # else:
     #     return Response(False, status=status.HTTP_404_NOT_FOUND)
-
 
 
 @api_view(["POST"])
@@ -557,62 +556,36 @@ def change_role_board(request):
 @permission_classes([AllowAny])
 def test(request):
 
-    # {
-    #     "subject_letter":"Моя тема",
-    #     "text_letter": "Qwerty & ksdghkgsghlak",
-    #     "template":"add_dashboard",
-    #     "addres_mail": "rubtsov1978@gmail.com"
-    # }
+    {
+        "subject_letter":"Моя тема",
+        "text_letter": "Qwerty & ksdghkgsghlak",
+        "template":"add_dashboard",
+        "addres_mail": "rubtsov1978@gmail.com"
+    }
 
 
-    # {
-    #     "subject_letter":"Моя тема",
-    #     "text_letter": "Qwerty & ksdghkgsghlak",
-    #     "addres_mail": "rubtsov1978@gmail.com"
-    # }
+    {
+        "subject_letter":"Моя тема",
+        "text_letter": "Qwerty & ksdghkgsghlak",
+        "addres_mail": "rubtsov1978@gmail.com"
+    }
 
-    # request = request.data
+    request = request.data
 
-    # if request:
-    #     message = PreparingMessage(
-    #         subject_letter = request.get('subject_letter', ''),
-    #         text_letter = request.get('text_letter', ''),
-    #         template = request.get('template', '')
-    #     )
+    if request:
+        message = PreparingMessage(
+            subject_letter = request.get('subject_letter', ''),
+            text_letter = request.get('text_letter', ''),
+            template = request.get('template', '')
+        )
 
-    #     send = SendMessage(
-    #         letter = message.get_message,
-    #         addres_mail = [request['addres_mail']]
-    #     )
+        send = SendMessage(
+            letter = message.get_message,
+            addres_mail = [request['addres_mail']]
+        )
 
-    #     send.get_send_email
+        send.get_send_email
 
-    #     return Response(True)
-
-    # return Response(status=status.HTTP_404_NOT_FOUND)
-
-    # {
-    #     "user_id": 5,
-    #     "dashboard_id": 1,
-    #     "del_dashboard_user": true
-    # }
-
-    if request.method == 'POST':
-
-        user_id = request.data.get('user_id', False)
-        dashboard_id = request.data.get('dashboard_id', False)
-        # print(user_id, dashboard_id)
-
-
-        card = get_list_or_404(Card, column__dashboard_id = dashboard_id)
-        card_user = CardUser.objects.filter(card_id__in = card, user_id=user_id)
-
-
-        print('card_user>>>', card_user)
-
-        card_user.delete()
-
-        return Response(status=status.HTTP_200_OK)
-
+        return Response(True)
 
     return Response(status=status.HTTP_404_NOT_FOUND)
