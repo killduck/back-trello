@@ -103,6 +103,26 @@ def add_label_to_card(request):
 
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
+def add_card_description(request):
+    print(request.data)
+    if request.data['card_id'] and request.data['description'] or (request.data['description'] is None):
+        card_id = request.data['card_id']
+        description = request.data['description']
+        try:
+            Card.objects.filter(id=card_id).update(description=description)
+        except:
+            print("если что-то сюда прилетит, то будем разбираться")
+            return Response(False, status=status.HTTP_404_NOT_FOUND)
+
+        queryset = Card.objects.all().filter(id=card_id)
+        serializer = CardSerializer(queryset, many=True)
+        return Response(serializer.data)
+    else:
+        return Response(False, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
 def user(request):
 
     auth_user = request.user.id
@@ -253,7 +273,7 @@ def create_card(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def delete_column(request):
-    print(request.data)
+    # print(request.data)
     try:
         id_column_deleted = request.data["id_column"]
         if id_column_deleted:

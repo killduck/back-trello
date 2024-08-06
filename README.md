@@ -113,7 +113,7 @@ python manage.py clear_DB
 Засеять БазуДанных фейковыми данными для теста:
 
 ```
-
+python manage.py seeds
 
 ```
 

@@ -76,6 +76,7 @@ class CardSerializer(serializers.ModelSerializer):
             "date_start",
             "date_end",
             "label",
+            "description",
         )
 
 
