@@ -385,20 +385,44 @@ def card_user_update(request):
         return Response(False, status=status.HTTP_404_NOT_FOUND)
 
 
-@api_view(["GET", "POST"])
+@api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def card_user_delete(request):
-    if request.data['user_id'] and request.data['card_id']:
-        user_id = request.data['user_id']
-        card_id = request.data['card_id']
-        try:
-            CardUser.objects.filter(card_id=card_id, user_id=user_id).delete()
-        except:
-            return Response(False, status=status.HTTP_404_NOT_FOUND)
+    """
+        Cорри, я немного подчистил представление, т.к. сказать соблюдем DRY и уберем лишние пустые условия
+        Так же воспользуемся методом get() и зададим условие:
+         - если в словаре не находится ключ, то get() вернет False
+         - если ключ есть, вернется значение ключа
+        Ну и воспользуемся функцией get_object_or_404(). Если по зачениям ключей выборка объекта будет уходит в ошибку,
+        get_object_or_404() выкинет автоматом 404
+    """  # TODO Если нет возражений, коментарий-пояснение можно удалить
 
+    user_id = request.data.get('user_id', False)
+    card_id = request.data.get('card_id', False)
+
+    dashboard_id = request.data.get('dashboard_id', False)
+
+    if user_id and card_id:
+        card_user = get_object_or_404(CardUser, card_id=card_id, user_id=user_id)
+        card_user.delete()
         return Response(True, status=status.HTTP_200_OK)
-    else:
-        return Response(False, status=status.HTTP_404_NOT_FOUND)
+
+    if user_id and dashboard_id:
+        card = get_list_or_404(Card, column__dashboard_id = dashboard_id)
+        card_user = CardUser.objects.filter(card_id__in = card, user_id=user_id)
+        card_user.delete()
+        return Response(True, status=status.HTTP_200_OK)
+
+    return Response(False, status=status.HTTP_404_NOT_FOUND)
+    # TODO Если нет возражений, закоментированный код можно удалить
+    #     try:
+    #         CardUser.objects.filter(card_id=card_id, user_id=user_id).delete()
+    #     except:
+    #         return Response(False, status=status.HTTP_404_NOT_FOUND)
+
+    #     return Response(True, status=status.HTTP_200_OK)
+    # else:
+    #     return Response(False, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(["POST"])
@@ -406,10 +430,14 @@ def card_user_delete(request):
 def dashboard_user(request):
     dashboard_id = request.data["dashboardId"]
 
-    users = DashboardUserRole.objects.values('user').filter(dashboard=dashboard_id)
-    queryset = User.objects.filter(id__in=users)
-    serializer = UserSerializer(queryset, many=True)
-    return Response(serializer.data)
+    if request.data["dashboardId"].isdigit():
+
+        users = DashboardUserRole.objects.values('user').filter(dashboard=dashboard_id)
+        queryset = User.objects.filter(id__in=users)
+        serializer = UserSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    return Response(False, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(["POST"])
