@@ -103,6 +103,7 @@ tables = [
                 "is_staff": False,
                 "is_superuser": False,
                 "password": "Raa78",
+                "img": "Andrey.png",
             },
             {
                 "id": 3,
@@ -114,6 +115,7 @@ tables = [
                 "is_staff": False,
                 "is_superuser": False,
                 "password": "ilya616",
+                "img": "Ilya_ava.png",
             },
             {
                 "id": 4,
@@ -125,6 +127,7 @@ tables = [
                 "is_staff": False,
                 "is_superuser": False,
                 "password": "killduck",
+                "img": "leo_ava.png",
             },
             {
                 "id": 5,
@@ -136,6 +139,7 @@ tables = [
                 "is_staff": True,
                 "is_superuser": True,
                 "password": 'admin',
+                "img": "",
             },
             {
                 "id": 6,
@@ -147,6 +151,7 @@ tables = [
                 "is_staff": False,
                 "is_superuser": False,
                 "password": 'vasya',
+                "img": "",
             },
         ],
     },

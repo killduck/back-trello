@@ -42,6 +42,8 @@ git pull --all
 
 ```
 python -m venv .venv
+
+python3 -m venv .venv
 ```
 
 - Активация виртуального окружение

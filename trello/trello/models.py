@@ -42,6 +42,11 @@ class User(AbstractUser):
         verbose_name='Фамилия',
         help_text='Введите фамилию пользователя',
     )
+    img = models.ImageField(
+        max_length=200,
+        null=True,
+        verbose_name="Фото пользователя",
+    )
     #  Помечает учетную запись пользователя как активную. Django рекомендуеn установить этот флаг равным False вместо удаления учетных записей.
     is_active = models.BooleanField(
         default=True,

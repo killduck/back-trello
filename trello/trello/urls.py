@@ -33,8 +33,8 @@ urlpatterns = [
                 path("label-data/", views.label_data, name="label-data"),
                 path("add-label-to-card/", views.add_label_to_card, name="add-label-to-card"),
                 path("add-card-description/", views.add_card_description, name="add-card-description"),
-                path("search-role-board/",views.search_role_board, name="search-role-board"),
-                path("change-role-board/",views.change_role_board, name="change-role-board"),
+                path("search-role-board/", views.search_role_board, name="search-role-board"),
+                path("change-role-board/", views.change_role_board, name="change-role-board"),
                 path("test/", views.test),
             ]
         ),
