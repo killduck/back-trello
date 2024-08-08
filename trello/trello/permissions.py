@@ -15,7 +15,12 @@ class IsUserHasRole(BasePermission):
     def has_permission(self, request, view):
         user = request.user
 
+
         if request.method == "POST":
+
+            if not request.data["dashboardId"].isdigit():
+                return False
+
             dashboard_id = request.data["dashboardId"]
             users_in_dashboard = DashboardUserRole.objects.values('user').filter(dashboard=dashboard_id)
             obj_users = User.objects.filter(id__in=users_in_dashboard)
