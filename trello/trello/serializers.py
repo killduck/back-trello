@@ -31,6 +31,7 @@ class UserSerializer(serializers.ModelSerializer):
             "is_staff",
             "is_superuser",
             "first_letter",
+            "img",
         )
 
     def get_first_letter(self, obj):
@@ -76,6 +77,7 @@ class CardSerializer(serializers.ModelSerializer):
             "date_start",
             "date_end",
             "label",
+            "description",
         )
 
 

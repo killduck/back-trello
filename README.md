@@ -42,6 +42,8 @@ git pull --all
 
 ```
 python -m venv .venv
+
+python3 -m venv .venv
 ```
 
 - Активация виртуального окружение
@@ -114,6 +116,7 @@ python manage.py clear_DB
 
 ```
 python manage.py seeds
+
 ```
 
 - Создание Супер Пользователя для доступа к Админке Django:
