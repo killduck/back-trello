@@ -123,6 +123,19 @@ def add_card_description(request):
 
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
+def add_card_activity(request):
+    print(request.data)
+    # TODO использовать update_or_create
+
+
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
+def del_card_activity(request):
+    print(request.data)
+
+
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
 def user(request):
 
     auth_user = request.user.id
