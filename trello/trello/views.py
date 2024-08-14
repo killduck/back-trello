@@ -558,27 +558,51 @@ def search_role_board(request):
 def change_role_board(request):
 
     user_id = request.data['user_id']
+
     active_boards = request.data['dashboard_id']
 
     users_on_board = DashboardUserRole.objects.filter(dashboard_id = active_boards,
                                                       user_id = user_id)
 
+    changeable_user_role = users_on_board.first().role.name
 
-    if request.data['action'] == 'add_admin':
+
+    user_auth_id = request.user.id
+
+    user_auth_on_board = DashboardUserRole.objects.filter(dashboard_id = active_boards,
+                                                      user_id = user_auth_id).first()
+
+    user_auth_role = user_auth_on_board.role.name
+
+    count_admins_on_board = DashboardUserRole.objects.filter(dashboard_id = active_boards,
+                                                      role__name = 'admin').count()
+
+    print('changeable_user_role>>>', changeable_user_role)
+
+    if (request.data['action'] == 'add_admin' and
+        user_auth_role == 'admin'):
+
         role_admin = get_object_or_404(Role, name='admin').id
         users_on_board.update(role_id=role_admin)
         return Response(True,status=status.HTTP_200_OK)
 
-    if request.data['action'] == 'del_admin':
+    if (request.data['action'] == 'del_admin' and
+        user_auth_role == 'admin' and
+        count_admins_on_board > 1):
+
         role_participant = get_object_or_404(Role, name='participant').id
         users_on_board.update(role_id=role_participant)
         return Response(True,status=status.HTTP_200_OK)
 
     if request.data['action'] == 'del_user':
+        if changeable_user_role == 'admin' and not user_auth_role == "admin":
+            print('?????')
+            pass
+
         users_on_board.delete()
         return Response(True,status=status.HTTP_200_OK)
 
-    return Response(False)
+    return Response(False, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(["POST"])
