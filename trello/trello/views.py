@@ -1,4 +1,4 @@
-from datetime import datetime as DT
+from datetime import datetime
 
 from django.conf import settings
 from django.shortcuts import get_object_or_404, get_list_or_404
@@ -130,28 +130,29 @@ def add_card_activity(request):
 
     if request.data['card_id'] and request.data['author_id'] and request.data['comment']:
         # print(f'132__ {request.data, DT.now()}')
+        '''это нужно при создании нового коммента'''
         if request.data['find_by_date'] == 'no':
-            request.data['find_by_date'] = DT.now()
+            request.data['find_by_date'] = datetime.now()
         # print(f'135__ {request.data}')
         Activity.objects.update_or_create(
             date=request.data['find_by_date'],
             defaults={
                 'comment': request.data['comment'],
-                'action': 'добавил(а) комментарий',
+                'action': 'обновил(а) комментарий',
             },
             create_defaults={
                 'card_id': request.data['card_id'],
                 'author_id': request.data['author_id'],
                 'comment': request.data['comment'],
                 'action': 'добавил(а) комментарий',
-                'date': DT.now(),
+                # 'date': DT.now(),
             }
         )
         # queryset_card = Card.objects.all().filter(id=request.data['card_id'])
         # serializer_card = CardSerializer(queryset_card, many=True).data
         queryset_activity = Activity.objects.filter(card_id=request.data['card_id']).reverse()
         serializer_activity = ActivitySerializer(queryset_activity, many=True).data
-        print(f'135__ {serializer_activity}')
+        # print(f'135__ {serializer_activity}')
         return Response(serializer_activity)
     else:
         return Response(False, status=status.HTTP_404_NOT_FOUND)
@@ -161,6 +162,12 @@ def add_card_activity(request):
 @permission_classes([IsAuthenticated])
 def del_card_activity(request):
     print(request.data)
+    try:
+        id_comment = request.data["comment_id"]
+        Activity.objects.filter(id=id_comment).delete()
+    except:
+        return Response(False, status=status.HTTP_404_NOT_FOUND)
+    return Response(True, status=status.HTTP_200_OK)
 
 
 @api_view(["GET", "POST"])
