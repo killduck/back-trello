@@ -638,7 +638,20 @@ def test(request):
         )
 
         send.get_send_email
+        send.get_write_to_file
+        send.get_output_to_console
 
         return Response(True)
 
     return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+from django.shortcuts import render
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def test2(request):
+    templates = 'mail_template.html'
+    context = {
+        'data': 'Вас приглашают стать учаcтником доски. Пройдите по ссылке https://www.google.ru/#Qwerty & ksdghkgsghlak',
+    }
+    return render(request, templates, context)
