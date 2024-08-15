@@ -106,7 +106,7 @@ def add_label_to_card(request):
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def add_card_description(request):
-    print(request.data)
+    # print(request.data)
     if request.data['card_id'] and request.data['description'] or (request.data['description'] is None):
         card_id = request.data['card_id']
         description = request.data['description']
@@ -129,11 +129,10 @@ def add_card_activity(request):
     # print(f'129__ {request.data}')
 
     if request.data['card_id'] and request.data['author_id'] and request.data['comment']:
-        # print(f'132__ {request.data, DT.now()}')
         '''это нужно при создании нового коммента'''
         if request.data['find_by_date'] == 'no':
             request.data['find_by_date'] = datetime.now()
-        # print(f'135__ {request.data}')
+        ''' '''
         Activity.objects.update_or_create(
             date=request.data['find_by_date'],
             defaults={
@@ -145,14 +144,10 @@ def add_card_activity(request):
                 'author_id': request.data['author_id'],
                 'comment': request.data['comment'],
                 'action': 'добавил(а) комментарий',
-                # 'date': DT.now(),
             }
         )
-        # queryset_card = Card.objects.all().filter(id=request.data['card_id'])
-        # serializer_card = CardSerializer(queryset_card, many=True).data
         queryset_activity = Activity.objects.filter(card_id=request.data['card_id']).reverse()
         serializer_activity = ActivitySerializer(queryset_activity, many=True).data
-        # print(f'135__ {serializer_activity}')
         return Response(serializer_activity)
     else:
         return Response(False, status=status.HTTP_404_NOT_FOUND)
@@ -161,7 +156,7 @@ def add_card_activity(request):
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def del_card_activity(request):
-    print(request.data)
+    # print(request.data)
     try:
         id_comment = request.data["comment_id"]
         Activity.objects.filter(id=id_comment).delete()
@@ -348,7 +343,7 @@ def delete_card(request):
 @permission_classes([IsAuthenticated])
 def take_data_column(request):
     auth_user = request.user.id
-    print(request.data)
+    # print(request.data)
     if request.data['id']:
         column_id = request.data['id']
         queryset = Column.objects.all().filter(id=column_id)
@@ -458,6 +453,18 @@ def card_user_update(request):
         queryset = User.objects.all().filter(id=new_card_user.user_id)
         user_serializer = UserSerializer(queryset, many=True).data[0]
 
+        if request.data['auth_user']:
+            action_text = f'добавил(а) участника "{user_serializer['username']}" к этой карточке'
+            if user_id == request.data['auth_user']:
+                action_text = "присоединился(-лась) к этой карточке"
+
+            Activity.objects.create(
+                card_id=request.data['card_id'],
+                author_id=request.data['auth_user'],
+                comment=None,
+                action=action_text,
+            )
+
         return Response(user_serializer)
     else:
         return Response(False, status=status.HTTP_404_NOT_FOUND)
@@ -483,6 +490,22 @@ def card_user_delete(request):
     if user_id and card_id:
         card_user = get_object_or_404(CardUser, card_id=card_id, user_id=user_id)
         card_user.delete()
+
+        if request.data['auth_user']:
+            queryset = User.objects.all().filter(id=user_id)
+            user_serializer = UserSerializer(queryset, many=True).data[0]
+
+            action_text = f'убрал(а) участника "{user_serializer['username']}" из этой карточке'
+            if user_id == request.data['auth_user']:
+                action_text = "покинул(а) эту карточку"
+
+            Activity.objects.create(
+                card_id=request.data['card_id'],
+                author_id=request.data['auth_user'],
+                comment=None,
+                action=action_text,
+            )
+
         return Response(True, status=status.HTTP_200_OK)
 
     if user_id and dashboard_id:
