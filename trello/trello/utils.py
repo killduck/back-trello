@@ -49,7 +49,7 @@ class SendMessage:
             self.__sender_email,
             self.__addres_mail,
             self.__fail_silently,
-            html_message=html_content,
+            html_message = html_content,
         )
 
     @property

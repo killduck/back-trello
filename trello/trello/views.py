@@ -510,7 +510,7 @@ def send_mail(request):
 
         send.get_send_email
         # отпраляем email. Либо:
-        # - end.get_write_to_file = записать в файл send.get_write_to_file
+        # - send.get_write_to_file = записать в файл send.get_write_to_file
         # - send.get_output_to_console = вывести в сонсоль send.get_output_to_console
         return Response(True)
 
@@ -611,7 +611,7 @@ def test(request):
 
     {
         "subject_letter":"Моя тема",
-        "text_letter": "Qwerty & ksdghkgsghlak",
+        "text_letter": "Qwerty&ksdghkgsghlak",
         "template":"add_dashboard",
         "addres_mail": "rubtsov1978@gmail.com"
     }
@@ -619,7 +619,7 @@ def test(request):
 
     {
         "subject_letter":"Моя тема",
-        "text_letter": "Qwerty & ksdghkgsghlak",
+        "text_letter": "Тестовое сообщение для проверки функционала.",
         "addres_mail": "rubtsov1978@gmail.com"
     }
 

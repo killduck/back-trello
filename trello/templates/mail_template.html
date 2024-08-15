@@ -1,12 +1,309 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-  </head>
-  <body>
-    <h3>Проверка шаблона HTML письма</h3>
-    <p style="color: red">{{ data }}</p>
-  </body>
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome Email</title>
+  <style>
+    body {
+      font-family: Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    p {
+      color: #7c7c7c
+    }
+
+    .email-container {
+      max-width: 720px;
+      margin: 32px auto;
+      height: 100%;
+      box-shadow: 0px 0px 10px #e7e7e7;
+    }
+
+    .block {
+      text-align: center;
+      width: 100%;
+      color: #7b858b;
+      background: rgb(46, 46, 46);
+      padding: 32px;
+      padding-bottom: 64px;
+      clip-path: polygon(0 0, 100% 0%, 100% 100%, 0 75%);
+    }
+
+    .blockHeading {
+      font-size: 42px;
+      padding: 38px;
+    }
+
+    .subTitle {
+      font-size: 16px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 12px;
+    }
+
+    .logo {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      & span {
+        font-size: 30px;
+        font-weight: 600;
+      }
+
+      &>svg {
+        width: 48px;
+        height: auto;
+        margin-right: 5px;
+      }
+    }
+
+    /* Email Body */
+    .greet {
+      font-size: 28px;
+      padding: 10px;
+      padding: 0 24px 0 24px;
+      margin: 12px auto;
+
+      &>a {
+        border: none !important;
+        padding: 5px;
+        font-weight: 600 !important;
+      }
+    }
+
+    .subHeading {
+      font-size: 22px;
+      padding-top: 12px;
+    }
+
+    .page-content {
+      padding-left: 24px;
+      padding-right: 24px;
+      font-size: 18px;
+    }
+
+    .btnEmail {
+      padding: 10px 24px;
+      font-weight: bold;
+      margin: 0 auto;
+      background: #fff;
+      margin-top: 18px;
+      cursor: pointer;
+    }
+
+    .btnCenter {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+    }
+
+    .p-b-10 {
+      padding-bottom: 10px;
+    }
+
+    /* Email Footer */
+    .emailFooter {
+      padding-top: 32px;
+      background: #efefef;
+      clip-path: polygon(0 0, 100% 25%, 100% 100%, 0 100%);
+    }
+
+    .footerTitle {
+      text-align: center;
+      padding-top: 6px;
+      font-size: 24px;
+      font-weight: 500;
+      margin: 0;
+
+    }
+
+    .icons {
+      text-align: center;
+      padding: 5px;
+      display: flex;
+      justify-content: center;
+
+      & a {
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: center;
+        align-items: center;
+        text-decoration: none;
+        padding: 5px;
+        cursor: pointer;
+        &:hover {
+          border-radius: 8px;
+          background-color: #e2e2e2;
+          opacity: 75%;
+        }
+
+        & svg {
+          width: 50px;
+          height: auto;
+          padding-right: 5px;
+        }
+
+        & .academy {
+          text-decoration: none;
+          display: flex;
+          flex-direction: column;
+          font-size: 12px;
+          font-weight: 550;
+          color: #000;
+        }
+      }
+    }
+
+    .icon {
+      padding: 6px;
+    }
+
+    .img {
+      padding: 0 10px;
+    }
+
+    .footerQuestion {
+      text-align: center;
+      font-size: 18px;
+      margin: 0;
+      padding: 4px;
+      color: #7b858b;
+
+    }
+
+    .detail {
+      text-decoration: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #7b858b;
+      padding-bottom: 24px;
+
+      & svg {
+        width: 25px;
+        height: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="email-container">
+    <table style="border-collapse: separate; border-spacing: 0;">
+      <thead>
+        <tr>
+          <td class="block">
+            <div class="subTitle p-b-10">Веб-студия</div>
+            <div class="logo">
+              <svg width="256px" height="255px" viewBox="0 0 256 255" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
+                <defs>
+                  <linearGradient x1="12.9593594%" y1="12.0393928%" x2="79.6388325%" y2="78.2008538%"
+                    id="linearGradient-1">
+                    <stop stop-color="#387EB8" offset="0%"></stop>
+                    <stop stop-color="#366994" offset="100%"></stop>
+                  </linearGradient>
+                  <linearGradient x1="19.127525%" y1="20.5791813%" x2="90.7415328%" y2="88.4290372%"
+                    id="linearGradient-2">
+                    <stop stop-color="#FFE052" offset="0%"></stop>
+                    <stop stop-color="#FFC331" offset="100%"></stop>
+                  </linearGradient>
+                </defs>
+                <g>
+                  <path
+                    d="M126.915866,0.0722755491 C62.0835831,0.0722801733 66.1321288,28.1874648 66.1321288,28.1874648 L66.2044043,57.3145115 L128.072276,57.3145115 L128.072276,66.0598532 L41.6307171,66.0598532 C41.6307171,66.0598532 0.144551098,61.3549438 0.144551098,126.771315 C0.144546474,192.187673 36.3546019,189.867871 36.3546019,189.867871 L57.9649915,189.867871 L57.9649915,159.51214 C57.9649915,159.51214 56.8001363,123.302089 93.5968379,123.302089 L154.95878,123.302089 C154.95878,123.302089 189.434218,123.859386 189.434218,89.9830604 L189.434218,33.9695088 C189.434218,33.9695041 194.668541,0.0722755491 126.915866,0.0722755491 L126.915866,0.0722755491 L126.915866,0.0722755491 Z M92.8018069,19.6589497 C98.9572068,19.6589452 103.932242,24.6339846 103.932242,30.7893845 C103.932246,36.9447844 98.9572068,41.9198193 92.8018069,41.9198193 C86.646407,41.9198239 81.6713721,36.9447844 81.6713721,30.7893845 C81.6713674,24.6339846 86.646407,19.6589497 92.8018069,19.6589497 L92.8018069,19.6589497 L92.8018069,19.6589497 Z"
+                    fill="url(#linearGradient-1)"></path>
+                  <path
+                    d="M128.757101,254.126271 C193.589403,254.126271 189.540839,226.011081 189.540839,226.011081 L189.468564,196.884035 L127.600692,196.884035 L127.600692,188.138693 L214.042251,188.138693 C214.042251,188.138693 255.528417,192.843589 255.528417,127.427208 C255.52844,62.0108566 219.318366,64.3306589 219.318366,64.3306589 L197.707976,64.3306589 L197.707976,94.6863832 C197.707976,94.6863832 198.87285,130.896434 162.07613,130.896434 L100.714182,130.896434 C100.714182,130.896434 66.238745,130.339138 66.238745,164.215486 L66.238745,220.229038 C66.238745,220.229038 61.0044225,254.126271 128.757101,254.126271 L128.757101,254.126271 L128.757101,254.126271 Z M162.87116,234.539597 C156.715759,234.539597 151.740726,229.564564 151.740726,223.409162 C151.740726,217.253759 156.715759,212.278727 162.87116,212.278727 C169.026563,212.278727 174.001595,217.253759 174.001595,223.409162 C174.001618,229.564564 169.026563,234.539597 162.87116,234.539597 L162.87116,234.539597 L162.87116,234.539597 Z"
+                    fill="url(#linearGradient-2)"></path>
+                </g>
+              </svg>
+              <span>Python31</span>
+            </div>
+
+          </td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <div class="greet">
+              Приветствуем!
+              <br>
+              <span class="subHeading">
+                Мы маленькая, но очень гордая команда web-разработчиков.
+              </span>
+              <a href="http://top-python31.ru" target="_blank"
+                style="font-size: 15px; font-family: Helvetica, Arial, sans-serif; font-weight: normal; color: #ffffff; text-decoration: none; background-color: #5D9CEC; border-top: 10px solid #5D9CEC; border-bottom: 10px solid #5D9CEC; border-left: 20px solid #5D9CEC; border-right: 20px solid #5D9CEC; border-radius: 3px; -webkit-border-radius: 3px; -moz-border-radius: 3px; display: inline-block;"
+                class="mobile-button">
+                Наш проект →
+              </a>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="page-content">
+            <p>
+              Данное письмо сформировано почтовым сервером.
+            </p>
+            <p>
+              И уведомляет Вас о следующем событии:
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td class="page-content">
+            <p>
+              <span style="color: #4d59ff">{{ data }}</span>
+            </p>
+          </td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td class="emailFooter">
+            <div class="icons">
+              <a href="https://nn.top-academy.ru/">
+                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="none" viewBox="0 0 75 38">
+                  <path fill="#1B0D43"
+                    d="M16.565 28.098q-1.286.915-2.755 1.408-1.47.494-3.342.494-3.343.001-5.216-2.104-1.873-2.103-1.873-5.652v-5.598H0v-4.353h3.38V7.5h5.582v4.793h4.885v4.353H8.962v5.598q0 1.354.606 2.122.605.768 1.892.768.807 0 1.542-.274.735-.275 1.69-.86zM30.537 24.377q1.193-1.298 1.194-3.458 0-2.157-1.194-3.457t-2.957-1.299q-1.762 0-2.956 1.299t-1.194 3.457q0 2.16 1.194 3.458 1.192 1.299 2.956 1.299t2.957-1.3m-7.86 4.518a9.33 9.33 0 0 1-3.692-3.22Q17.59 23.59 17.59 20.92q0-2.67 1.395-4.756a9.34 9.34 0 0 1 3.692-3.22 10.9 10.9 0 0 1 4.903-1.133q2.535 0 4.83 1.134a9.6 9.6 0 0 1 3.729 3.22q1.431 2.085 1.432 4.755t-1.36 4.757q-1.358 2.085-3.654 3.219t-4.977 1.134q-2.608 0-4.903-1.134M55.944 24.146q1.304-1.243 1.304-3.292 0-1.903-1.102-3.147t-2.976-1.244q-1.138 0-2.405.805-1.268.805-2.443 2.305v4.244q2.13 1.573 4.04 1.573 2.278 0 3.582-1.244m3.103-11.14q1.836 1.19 2.939 3.274 1.101 2.086 1.102 4.647-.002 2.56-1.194 4.646a8.6 8.6 0 0 1-3.306 3.274q-2.112 1.19-4.756 1.19-3.086 0-5.51-2.086v5.195h3.343V37.5H39.434v-4.354h3.416v-16.5h-3.416v-4.353h8.888v3.329q1.47-1.83 3.232-2.817 1.764-.988 3.526-.988 2.13 0 3.967 1.19">
+                  </path>
+                  <path fill="#FF6847" d="M71 4.5v20h4V.5H51v4z"></path>
+                </svg>
+                <div class="academy">
+                  <div>Компьютерная Академия</div>
+                  <div>Топ</div>
+                </div>
+              </a>
+            </div>
+            <p class="footerTitle">
+              Python31
+            </p>
+            <p>
+              <a href="mailto:python31@top-python31.ru" class="detail">
+                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="902px" height="902px" viewBox="0 0 902 902"
+                  style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd">
+                  <g>
+                    <path style="opacity:0.971" fill="#0065ff"
+                      d="M 153.5,186.5 C 351.5,186.333 549.5,186.5 747.5,187C 772.675,193.509 788.509,209.342 795,234.5C 795.667,378.5 795.667,522.5 795,666.5C 788.509,691.658 772.675,707.491 747.5,714C 549.5,714.667 351.5,714.667 153.5,714C 128.325,707.491 112.491,691.658 106,666.5C 105.333,522.5 105.333,378.5 106,234.5C 112.673,209.327 128.506,193.327 153.5,186.5 Z M 167.5,227.5 C 356.167,227.333 544.834,227.5 733.5,228C 743.294,227.974 749.961,232.474 753.5,241.5C 670.68,324.82 587.68,407.986 504.5,491C 475.442,513.413 444.442,516.413 411.5,500C 407.167,497 402.833,494 398.5,491C 315.333,407.833 232.167,324.667 149,241.5C 149.479,235.005 152.979,230.838 159.5,229C 162.365,228.817 165.031,228.317 167.5,227.5 Z M 146.5,297.5 C 197.931,347.66 248.931,398.326 299.5,449.5C 248.847,500.653 198.014,551.653 147,602.5C 146.5,500.834 146.333,399.167 146.5,297.5 Z M 753.5,299.5 C 754.666,399.666 754.833,499.999 754,600.5C 704.194,549.694 654.028,499.194 603.5,449C 654.007,399.66 704.007,349.826 753.5,299.5 Z M 573.5,478.5 C 632.915,538.416 692.749,598.416 753,658.5C 752.149,665.364 748.316,669.864 741.5,672C 549.858,673.658 358.192,673.992 166.5,673C 158.507,672.927 152.673,669.427 149,662.5C 148.333,661.5 148.333,660.5 149,659.5C 209.014,599.32 269.18,539.32 329.5,479.5C 343.039,491.873 356.039,504.706 368.5,518C 404.174,549.403 444.84,558.07 490.5,544C 504.39,539.058 517.057,532.058 528.5,523C 543.952,508.715 558.952,493.882 573.5,478.5 Z" />
+                  </g>
+                </svg>
+                <span>Напиши нам</span>
+              </a>
+            </p>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</body>
+
 </html>
