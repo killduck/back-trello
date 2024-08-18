@@ -605,53 +605,42 @@ def change_role_board(request):
     return Response(False, status=status.HTTP_404_NOT_FOUND)
 
 
-@api_view(["POST"])
-@permission_classes([AllowAny])
-def test(request):
+# @api_view(["POST"])
+# @permission_classes([AllowAny])
+# def test_view(request):
 
-    {
-        "subject_letter":"Моя тема",
-        "text_letter": "Qwerty&ksdghkgsghlak",
-        "template":"add_dashboard",
-        "addres_mail": "rubtsov1978@gmail.com"
-    }
-
-
-    {
-        "subject_letter":"Моя тема",
-        "text_letter": "Тестовое сообщение для проверки функционала.",
-        "addres_mail": "rubtsov1978@gmail.com"
-    }
-
-    request = request.data
-
-    if request:
-        message = PreparingMessage(
-            subject_letter = request.get('subject_letter', ''),
-            text_letter = request.get('text_letter', ''),
-            template = request.get('template', '')
-        )
-
-        send = SendMessage(
-            letter = message.get_message,
-            addres_mail = [request['addres_mail']]
-        )
-
-        send.get_send_email
-        send.get_write_to_file
-        send.get_output_to_console
-
-        return Response(True)
-
-    return Response(status=status.HTTP_404_NOT_FOUND)
+#     {
+#         "subject_letter":"Моя тема",
+#         "text_letter": "Qwerty&ksdghkgsghlak",
+#         "template":"add_dashboard",
+#         "addres_mail": "rubtsov1978@gmail.com"
+#     }
 
 
-from django.shortcuts import render
-@api_view(["GET"])
-@permission_classes([AllowAny])
-def test2(request):
-    templates = 'mail_template.html'
-    context = {
-        'data': 'Вас приглашают стать учаcтником доски. Пройдите по ссылке https://www.google.ru/#Qwerty & ksdghkgsghlak',
-    }
-    return render(request, templates, context)
+#     {
+#         "subject_letter":"Моя тема",
+#         "text_letter": "Тестовое сообщение для проверки функционала.",
+#         "addres_mail": "rubtsov1978@gmail.com"
+#     }
+
+#     request = request.data
+
+#     if request:
+#         message = PreparingMessage(
+#             subject_letter = request.get('subject_letter', ''),
+#             text_letter = request.get('text_letter', ''),
+#             template = request.get('template', '')
+#         )
+
+#         send = SendMessage(
+#             letter = message.get_message,
+#             addres_mail = [request['addres_mail']]
+#         )
+
+#         send.get_send_email
+#         send.get_write_to_file
+#         send.get_output_to_console
+
+#         return Response(True)
+
+#     return Response(status=status.HTTP_404_NOT_FOUND)
