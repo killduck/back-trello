@@ -510,7 +510,7 @@ def send_mail(request):
 
         send.get_send_email
         # отпраляем email. Либо:
-        # - end.get_write_to_file = записать в файл send.get_write_to_file
+        # - send.get_write_to_file = записать в файл send.get_write_to_file
         # - send.get_output_to_console = вывести в сонсоль send.get_output_to_console
         return Response(True)
 
@@ -558,63 +558,89 @@ def search_role_board(request):
 def change_role_board(request):
 
     user_id = request.data['user_id']
+
     active_boards = request.data['dashboard_id']
 
     users_on_board = DashboardUserRole.objects.filter(dashboard_id = active_boards,
                                                       user_id = user_id)
 
+    changeable_user_role = users_on_board.first().role.name
 
-    if request.data['action'] == 'add_admin':
+
+    user_auth_id = request.user.id
+
+    user_auth_on_board = DashboardUserRole.objects.filter(dashboard_id = active_boards,
+                                                      user_id = user_auth_id).first()
+
+    user_auth_role = user_auth_on_board.role.name
+
+    count_admins_on_board = DashboardUserRole.objects.filter(dashboard_id = active_boards,
+                                                      role__name = 'admin').count()
+
+    print('changeable_user_role>>>', changeable_user_role)
+
+    if (request.data['action'] == 'add_admin' and
+        user_auth_role == 'admin'):
+
         role_admin = get_object_or_404(Role, name='admin').id
         users_on_board.update(role_id=role_admin)
         return Response(True,status=status.HTTP_200_OK)
 
-    if request.data['action'] == 'del_admin':
+    if (request.data['action'] == 'del_admin' and
+        user_auth_role == 'admin' and
+        count_admins_on_board > 1):
+
         role_participant = get_object_or_404(Role, name='participant').id
         users_on_board.update(role_id=role_participant)
         return Response(True,status=status.HTTP_200_OK)
 
     if request.data['action'] == 'del_user':
+        if changeable_user_role == 'admin' and not user_auth_role == "admin":
+            print('?????')
+            pass
+
         users_on_board.delete()
         return Response(True,status=status.HTTP_200_OK)
 
-    return Response(False)
+    return Response(False, status=status.HTTP_404_NOT_FOUND)
 
 
-@api_view(["POST"])
-@permission_classes([AllowAny])
-def test(request):
+# @api_view(["POST"])
+# @permission_classes([AllowAny])
+# def test_view(request):
 
-    {
-        "subject_letter":"Моя тема",
-        "text_letter": "Qwerty & ksdghkgsghlak",
-        "template":"add_dashboard",
-        "addres_mail": "rubtsov1978@gmail.com"
-    }
+#     {
+#         "subject_letter":"Моя тема",
+#         "text_letter": "Qwerty&ksdghkgsghlak",
+#         "template":"add_dashboard",
+#         "addres_mail": "rubtsov1978@gmail.com"
+#     }
 
 
-    {
-        "subject_letter":"Моя тема",
-        "text_letter": "Qwerty & ksdghkgsghlak",
-        "addres_mail": "rubtsov1978@gmail.com"
-    }
+#     {
+#         "subject_letter":"Моя тема",
+#         "text_letter": "Тестовое сообщение для проверки функционала.",
+#         "addres_mail": "rubtsov1978@gmail.com"
+#     }
 
-    request = request.data
+#     request = request.data
 
-    if request:
-        message = PreparingMessage(
-            subject_letter = request.get('subject_letter', ''),
-            text_letter = request.get('text_letter', ''),
-            template = request.get('template', '')
-        )
+#     if request:
+#         message = PreparingMessage(
+#             subject_letter = request.get('subject_letter', ''),
+#             text_letter = request.get('text_letter', ''),
+#             template = request.get('template', '')
+#         )
 
-        send = SendMessage(
-            letter = message.get_message,
-            addres_mail = [request['addres_mail']]
-        )
+#         send = SendMessage(
+#             letter = message.get_message,
+#             addres_mail = [request['addres_mail']]
+#         )
 
-        send.get_send_email
+#         send.get_send_email
+#         send.get_write_to_file
+#         send.get_output_to_console
 
-        return Response(True)
+#         return Response(True)
 
-    return Response(status=status.HTTP_404_NOT_FOUND)
+#     return Response(status=status.HTTP_404_NOT_FOUND)

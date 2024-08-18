@@ -83,10 +83,12 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "trello.urls"
 
+TEMPLATES_DIR = BASE_DIR.joinpath('templates')
+
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [TEMPLATES_DIR],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -161,7 +163,8 @@ USE_TZ = False  # при True глючит загрузка seedов модел�
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = '/static_backend/'
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / 'static',]
 STATIC_ROOT = BASE_DIR / 'static_backend'
 
 

@@ -6,7 +6,7 @@ from . import views
 
 urlpatterns = [
     path(
-        'api/',  # сюда позже добавить приставку api/
+        'api/',
         include(
             [
                 path('login/', views.CustomAuthToken.as_view(), name="token-create"),
@@ -14,7 +14,6 @@ urlpatterns = [
                 path('user/', views.user, name="user"),
                 path("dashboards/", views.dashboards, name="dashboards"),
                 path("dashboard-role/", views.dashboard_role, name="dashboard-role"),
-                # path("card-user/", views.card_user, name="card-user"),
                 path("dashboard-user/", views.dashboard_user, name="dashboard-user"),
                 path("columns/", views.columns, name="columns"),
                 path("take-data-column/", views.take_data_column, name="take-data-column"),
@@ -35,7 +34,6 @@ urlpatterns = [
                 path("add-card-description/", views.add_card_description, name="add-card-description"),
                 path("search-role-board/", views.search_role_board, name="search-role-board"),
                 path("change-role-board/", views.change_role_board, name="change-role-board"),
-                path("test/", views.test),
             ]
         ),
     ),
