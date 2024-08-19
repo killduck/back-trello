@@ -243,17 +243,30 @@ def swap_columns(request):
 def swap_cards(request):
 
     try:
+        column_name_start = Card.objects.filter(id=request.data['active_id'])[0].column
+
         for card in request.data["order_cards"]:
             Card.objects.filter(id=card["id"]).update(
                 order=card["order"], column=card["column"]
             )
+
+        column_name_end = Card.objects.filter(id=request.data["active_id"])[0].column
+
+        if request.user.id and request.data['active_id'] and (column_name_start != column_name_end):
+            action_text = f'переместил(а) эту карточку из колонки "{column_name_start}" в колонку "{column_name_end}"'
+            Activity.objects.create(
+                card_id=request.data['active_id'],
+                author_id=request.user.id,
+                comment=None,
+                action=action_text,
+            )
+
         print("обновили порядок карточек в БД")
     except:
         print("если что-то сюда прилетит, то будем разбираться")
         return Response(False, status=status.HTTP_404_NOT_FOUND)
 
     dashboard_id = request.data["dashboardId"]
-
     list_column = Column.objects.filter(dashboard=dashboard_id)
 
     queryset = Card.objects.filter(column_id__in=list_column)
