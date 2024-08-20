@@ -467,7 +467,7 @@ def card_user_update(request):
         user_serializer = UserSerializer(queryset, many=True).data[0]
 
         if request.data['auth_user']:
-            action_text = f'добавил(а) участника "{user_serializer['username']}" к этой карточке'
+            action_text = f"добавил(а) участника \"{user_serializer['username']}\" к этой карточке"
             if user_id == request.data['auth_user']:
                 action_text = "присоединился(-лась) к этой карточке"
 
@@ -508,7 +508,7 @@ def card_user_delete(request):
             queryset = User.objects.all().filter(id=user_id)
             user_serializer = UserSerializer(queryset, many=True).data[0]
 
-            action_text = f'убрал(а) участника "{user_serializer['username']}" из этой карточке'
+            action_text = f"убрал(а) участника \"{user_serializer['username']}\" из этой карточке"
             if user_id == request.data['auth_user']:
                 action_text = "покинул(а) эту карточку"
 
