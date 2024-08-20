@@ -1,7 +1,7 @@
 from trello.models import (
     Column, Card,
     Dashboard, DashboardUserRole,
-    Role, User, Label,
+    Role, User, Label, Activity,
 )
 
 tables = [
@@ -266,4 +266,30 @@ tables = [
             },
         ],
     },
+    {
+        "table_name": Activity,
+        "table_dada": [
+            {
+                "id": 1,
+                "author": User(id=2),
+                "card": Card(id=5),
+                # "comment": "asdafff",
+                "action": "оставил комментарий",
+            },
+{
+                "id": 2,
+                "author": User(id=5),
+                "card": Card(id=5),
+                "comment": None,
+                "action": "присоединился(-лась) к этой карточке",
+            },
+{
+                "id": 3,
+                "author": User(id=2),
+                "card": Card(id=5),
+                # "comment": "git@github.com:Ilya616/back-group31.git",
+                "action": "оставил комментарий",
+            },
+        ]
+    }
 ]

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.conf import settings
 from django.shortcuts import get_object_or_404, get_list_or_404
 
@@ -20,7 +22,7 @@ from .models import (
     User,
     CardUser,
     Role,
-    Label,
+    Label, Activity,
 )
 
 from .permissions import (
@@ -33,7 +35,7 @@ from .serializers import (
     DashboardUserRoleSerializer,
     UserSerializer,
     CardUserSerializer,
-    LabelSerializer,
+    LabelSerializer, ActivitySerializer,
 )
 from .utils import SendMessage, PreparingMessage
 
@@ -104,7 +106,7 @@ def add_label_to_card(request):
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def add_card_description(request):
-    print(request.data)
+    # print(request.data)
     if request.data['card_id'] and request.data['description'] or (request.data['description'] is None):
         card_id = request.data['card_id']
         description = request.data['description']
@@ -119,6 +121,48 @@ def add_card_description(request):
         return Response(serializer.data)
     else:
         return Response(False, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
+def add_card_activity(request):
+    # print(f'129__ {request.data}')
+
+    if request.data['card_id'] and request.data['author_id'] and request.data['comment']:
+        '''это нужно при создании нового коммента'''
+        if request.data['find_by_date'] == 'no':
+            request.data['find_by_date'] = datetime.now()
+        ''' '''
+        Activity.objects.update_or_create(
+            date=request.data['find_by_date'],
+            defaults={
+                'comment': request.data['comment'],
+                'action': 'обновил(а) комментарий',
+            },
+            create_defaults={
+                'card_id': request.data['card_id'],
+                'author_id': request.data['author_id'],
+                'comment': request.data['comment'],
+                'action': 'добавил(а) комментарий',
+            }
+        )
+        queryset_activity = Activity.objects.filter(card_id=request.data['card_id']).reverse()
+        serializer_activity = ActivitySerializer(queryset_activity, many=True).data
+        return Response(serializer_activity)
+    else:
+        return Response(False, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
+def del_card_activity(request):
+    # print(request.data)
+    try:
+        id_comment = request.data["comment_id"]
+        Activity.objects.filter(id=id_comment).delete()
+    except:
+        return Response(False, status=status.HTTP_404_NOT_FOUND)
+    return Response(True, status=status.HTTP_200_OK)
 
 
 @api_view(["GET", "POST"])
@@ -199,17 +243,30 @@ def swap_columns(request):
 def swap_cards(request):
 
     try:
+        column_name_start = Card.objects.filter(id=request.data['active_id'])[0].column
+
         for card in request.data["order_cards"]:
             Card.objects.filter(id=card["id"]).update(
                 order=card["order"], column=card["column"]
             )
+
+        column_name_end = Card.objects.filter(id=request.data["active_id"])[0].column
+
+        if request.user.id and request.data['active_id'] and (column_name_start != column_name_end):
+            action_text = f'переместил(а) эту карточку из колонки "{column_name_start}" в колонку "{column_name_end}"'
+            Activity.objects.create(
+                card_id=request.data['active_id'],
+                author_id=request.user.id,
+                comment=None,
+                action=action_text,
+            )
+
         print("обновили порядок карточек в БД")
     except:
         print("если что-то сюда прилетит, то будем разбираться")
         return Response(False, status=status.HTTP_404_NOT_FOUND)
 
     dashboard_id = request.data["dashboardId"]
-
     list_column = Column.objects.filter(dashboard=dashboard_id)
 
     queryset = Card.objects.filter(column_id__in=list_column)
@@ -299,7 +356,7 @@ def delete_card(request):
 @permission_classes([IsAuthenticated])
 def take_data_column(request):
     auth_user = request.user.id
-    print(request.data)
+    # print(request.data)
     if request.data['id']:
         column_id = request.data['id']
         queryset = Column.objects.all().filter(id=column_id)
@@ -409,6 +466,18 @@ def card_user_update(request):
         queryset = User.objects.all().filter(id=new_card_user.user_id)
         user_serializer = UserSerializer(queryset, many=True).data[0]
 
+        if request.data['auth_user']:
+            action_text = f'добавил(а) участника "{user_serializer['username']}" к этой карточке'
+            if user_id == request.data['auth_user']:
+                action_text = "присоединился(-лась) к этой карточке"
+
+            Activity.objects.create(
+                card_id=request.data['card_id'],
+                author_id=request.data['auth_user'],
+                comment=None,
+                action=action_text,
+            )
+
         return Response(user_serializer)
     else:
         return Response(False, status=status.HTTP_404_NOT_FOUND)
@@ -434,6 +503,22 @@ def card_user_delete(request):
     if user_id and card_id:
         card_user = get_object_or_404(CardUser, card_id=card_id, user_id=user_id)
         card_user.delete()
+
+        if request.data['auth_user']:
+            queryset = User.objects.all().filter(id=user_id)
+            user_serializer = UserSerializer(queryset, many=True).data[0]
+
+            action_text = f'убрал(а) участника "{user_serializer['username']}" из этой карточке'
+            if user_id == request.data['auth_user']:
+                action_text = "покинул(а) эту карточку"
+
+            Activity.objects.create(
+                card_id=request.data['card_id'],
+                author_id=request.data['auth_user'],
+                comment=None,
+                action=action_text,
+            )
+
         return Response(True, status=status.HTTP_200_OK)
 
     if user_id and dashboard_id:

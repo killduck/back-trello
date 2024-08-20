@@ -160,7 +160,7 @@ class Label(models.Model):
 
 class Activity(models.Model):
     """Модель для действий в карточке."""
-
+    # поправить не нужные null=True
     author = models.ForeignKey(
         "User",
         on_delete=models.CASCADE,
@@ -170,16 +170,32 @@ class Activity(models.Model):
         verbose_name="Пользователь",
         help_text="Введите пользователя к которой описывает действие",
     )
-    date = models.DateField(
+    card = models.ForeignKey(
+        "Card",
+        on_delete=models.CASCADE,
+        related_name="activity",
+        blank=True,
+        null=True,
+        verbose_name="Карточка",
+        help_text="Введите карточку к которой относится действие",
+    )
+    date = models.DateTimeField(
         auto_now=False,
-        auto_now_add=False,
+        auto_now_add=True,
         blank=True,
         null=True,
     )
-    text = models.TextField(
+    comment = models.TextField(
         max_length=500,
-        verbose_name="Наименование цветовой метки",
-        help_text="Введите наименование цветовой метки",
+        verbose_name="Комментарий к карточке",
+        help_text="Введите комментарий к карточке",
+        null=True,
+    )
+    action = models.TextField(
+        max_length=200,
+        verbose_name="Изменение в карточке",
+        help_text="Введите изменение в карточке",
+        null=True,
     )
 
     class Meta:
@@ -237,13 +253,6 @@ class Card(models.Model):
         verbose_name="Текст описания карточки",
         help_text="Введите текст",
         max_length=500,
-        null=True,
-    )
-    activity = models.ForeignKey(
-        "Activity",
-        on_delete=models.CASCADE,
-        related_name="card",
-        verbose_name="Действия",
         null=True,
     )
 

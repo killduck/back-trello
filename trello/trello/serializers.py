@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Card, Column, Dashboard, Role, DashboardUserRole, User, CardUser, Label
+from .models import Card, Column, Dashboard, Role, DashboardUserRole, User, CardUser, Label, Activity
 
 
 class CardUserSerializer(serializers.ModelSerializer):
@@ -50,6 +50,23 @@ class RoleSerializer(serializers.ModelSerializer):
         )
 
 
+class ActivitySerializer(serializers.ModelSerializer):
+
+    author = UserSerializer(many=False)
+
+    class Meta:
+        model = Activity
+
+        fields = (
+            "id",
+            "author",
+            "card",
+            "date",
+            "comment",
+            "action",
+        )
+
+
 class LabelSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -65,6 +82,7 @@ class LabelSerializer(serializers.ModelSerializer):
 class CardSerializer(serializers.ModelSerializer):
 
     label = LabelSerializer(many=False)
+    activity = ActivitySerializer(many=True)
 
     class Meta:
         model = Card
@@ -78,6 +96,7 @@ class CardSerializer(serializers.ModelSerializer):
             "date_end",
             "label",
             "description",
+            "activity",
         )
 
 
