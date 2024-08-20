@@ -33,6 +33,7 @@ ALLOWED_HOSTS = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "https://localhost:3000",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -83,10 +84,12 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "trello.urls"
 
+TEMPLATES_DIR = BASE_DIR.joinpath('templates')
+
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [TEMPLATES_DIR],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -162,6 +165,7 @@ USE_TZ = False  # при True глючит загрузка seedов модел�
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = '/static_backend/'
+# STATICFILES_DIRS = [BASE_DIR / 'static',]
 STATIC_ROOT = BASE_DIR / 'static_backend'
 
 
