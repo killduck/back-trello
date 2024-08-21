@@ -126,31 +126,63 @@ def add_card_description(request):
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def add_card_activity(request):
-    # print(f'129__ {request.data}')
-
+    print(f'129__ {request.data}')
+    card_users = CardUserSerializer(CardUser.objects.values('user_id').filter(card_id=request.data['card_id']).
+                                    exclude(user_id=request.data['author_id']), many=True).data
+    # print(f'132__ {card_users}')
     if request.data['card_id'] and request.data['author_id'] and request.data['comment']:
-        '''это нужно при создании нового коммента'''
+        action_text = 'обновил'
+        ''' Это нужно при создании нового коммента '''
         if request.data['find_by_date'] == 'no':
+            action_text = 'добавил'
             request.data['find_by_date'] = datetime.now()
-        ''' '''
+
         Activity.objects.update_or_create(
             date=request.data['find_by_date'],
             defaults={
                 'comment': request.data['comment'],
-                'action': 'обновил(а) комментарий',
+                'action': f'{action_text}(а) комментарий',
             },
             create_defaults={
                 'card_id': request.data['card_id'],
                 'author_id': request.data['author_id'],
                 'comment': request.data['comment'],
-                'action': 'добавил(а) комментарий',
+                'action': f'{action_text}(а) комментарий',
             }
         )
+
         queryset_activity = Activity.objects.filter(card_id=request.data['card_id']).reverse()
         serializer_activity = ActivitySerializer(queryset_activity, many=True).data
+        # print(f'156__ {serializer_activity[0]['author']}')
+
+        ''' тут отправим письмо каждому юзеру карточки '''
+        mail_data = ActivitySerializer(Activity.objects.filter(date=request.data['find_by_date']).
+                                       filter(), many=True).data
+        print(f'161__ {mail_data[0]}')
+        for card_user in card_users:
+            print(f'163__ {card_user['user_id']}')
+            card_users_data = UserSerializer(User.objects.filter(id=card_user['user_id']), many=True).data[0]
+            print(f'165__ {card_users_data["email"]}, {request.data['card_id']}')
+
+            message = PreparingMessage(
+                subject_letter=f'Изменение в карточке {request.data['card_id']}',
+                text_letter=f'{mail_data[0]["author"]["first_name"]} '
+                            f'{mail_data[0]["author"]["last_name"]} '
+                            f'{action_text}(а) комментарий, созданный: '
+                            f'{mail_data[0]["date"]}',
+                template='',
+            )
+            send = SendMessage(
+                letter=message.get_message,
+                addres_mail=[card_users_data["email"]]
+            )
+            send.get_send_email
+            send.get_output_to_console
+
         return Response(serializer_activity)
     else:
         return Response(False, status=status.HTTP_404_NOT_FOUND)
+
 
 
 @api_view(["GET", "POST"])
@@ -241,7 +273,7 @@ def swap_columns(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def swap_cards(request):
-
+    # print(request.data)
     try:
         column_name_start = Card.objects.filter(id=request.data['active_id'])[0].column
 
@@ -260,6 +292,30 @@ def swap_cards(request):
                 comment=None,
                 action=action_text,
             )
+
+            ''' тут отправим письмо каждому юзеру карточки '''
+            card_users = CardUserSerializer(CardUser.objects.values('user_id').filter(card_id=request.data['active_id']).
+                                            exclude(user_id=request.user.id), many=True).data
+            mail_data = ActivitySerializer(Activity.objects.last(), many=False).data
+            # print(card_users, mail_data)
+            for card_user in card_users:
+                # print(f'302__ {card_user['user_id']}')
+                card_users_data = UserSerializer(User.objects.filter(id=card_user['user_id']), many=True).data[0]
+                # print(f'304__ {card_users_data["email"]}, {request.data['active_id']}')
+
+                message = PreparingMessage(
+                    subject_letter=f'Изменение в карточке {request.data['active_id']}',
+                    text_letter=f'{mail_data["author"]["first_name"]} '
+                                f'{mail_data["author"]["last_name"]} '
+                                f'{action_text}.',
+                    template='',
+                )
+                send = SendMessage(
+                    letter=message.get_message,
+                    addres_mail=[card_users_data["email"]]
+                )
+                send.get_send_email
+                send.get_output_to_console
 
         print("обновили порядок карточек в БД")
     except:
@@ -478,6 +534,10 @@ def card_user_update(request):
                 action=action_text,
             )
 
+            '''
+            тут отправим письмо
+            '''
+
         return Response(user_serializer)
     else:
         return Response(False, status=status.HTTP_404_NOT_FOUND)
@@ -564,7 +624,7 @@ def send_mail(request):
         "subject_letter" - поле с темой письма не обязательное, но желательно
         "text_letter" - поле с текстом сообщения (ради этого и  делаем)
         "template": "add_dashboard" или "deadline" # вид шаблона текста письма.
-                                                    Берется из settings.py из перменной MAIL_MESSAGE.
+                                                    Берется из settings.py из переменной MAIL_MESSAGE.
                                                     Поле можно опустить.
         "addres_mail" : "Raa78@mail.ru",  # поле с адресом получателя (обязательно)
     }
@@ -594,9 +654,9 @@ def send_mail(request):
         )
 
         send.get_send_email
-        # отпраляем email. Либо:
+        # отправляем email. Либо:
         # - send.get_write_to_file = записать в файл send.get_write_to_file
-        # - send.get_output_to_console = вывести в сонсоль send.get_output_to_console
+        # - send.get_output_to_console = вывести в консоль send.get_output_to_console
         return Response(True)
 
     return Response(status=status.HTTP_404_NOT_FOUND)
