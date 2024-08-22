@@ -696,28 +696,37 @@ from rest_framework.decorators import action
 from rest_framework import viewsets
 
 class InvitUserBoardViewSet(viewsets.ModelViewSet):
-    # permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.AllowAny]
+
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
 
     @action(
             detail=False,
-            methods=['get', 'post'],
-            permission_classes=(AllowAny,)
+            methods=['get',],
+            permission_classes=(AllowAny,),
+            url_path='select-users',
     )
-    def select_users(self, request, *args, **kwargse):
-        # data = [
-        #    { 'username': "red", 'email': "Rad" },
-        #    { 'username': "green", 'email': "Green" },
-        #    { 'username': "yellow", 'email': "Yellow" },
-        #    { 'username': "blue", 'email': "Blue" },
-        #    { 'username': "white", 'email': "White" },
-        # ]
+    def select_users(self, request):
+        data = [
+           { 'username': "red", 'email': "Rad" },
+           { 'username': "green", 'email': "Green" },
+           { 'username': "yellow", 'email': "Yellow" },
+           { 'username': "blue", 'email': "Blue" },
+           { 'username': "white", 'email': "White" },
+        ]
 
-        return Response(status=status.HTTP_200_OK)
+        # queryset = User.objects.all()
+        # serializer = UserSerializer(queryset, many=True)
+        return Response(data, status=status.HTTP_200_OK)
+
+
 
 
 # @api_view(["POST"])
-# # @permission_classes([AllowAny])
-# @permission_classes([IsAuthenticated])
+# @permission_classes([AllowAny])
+# # @permission_classes([IsAuthenticated])
 # def test_mail(request):
 
 #     {

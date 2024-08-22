@@ -1,7 +1,12 @@
 from django.contrib import admin
 from django.urls import include, path
+from rest_framework.routers import SimpleRouter, DefaultRouter
 
 from . import views
+
+
+router = SimpleRouter()
+router.register('invit-board', views.InvitUserBoardViewSet, basename='invit-board')
 
 
 urlpatterns = [
@@ -9,6 +14,7 @@ urlpatterns = [
         'api/',
         include(
             [
+                path('', include(router.urls)),
                 path('login/', views.CustomAuthToken.as_view(), name="token-create"),
                 path('logout/', views.token_destroy, name="token-destroy"),
                 path('user/', views.user, name="user"),
@@ -36,7 +42,7 @@ urlpatterns = [
                 path("del-card-activity/", views.del_card_activity, name="del-card-activity"),
                 path("search-role-board/", views.search_role_board, name="search-role-board"),
                 path("change-role-board/", views.change_role_board, name="change-role-board"),
-                path("select-users/", views.InvitUserBoardViewSet, name="select-users"),
+                # path("test-mail", views.test_mail,),
             ]
         ),
     ),
