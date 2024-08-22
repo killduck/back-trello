@@ -36,6 +36,7 @@ urlpatterns = [
                 path("del-card-activity/", views.del_card_activity, name="del-card-activity"),
                 path("search-role-board/", views.search_role_board, name="search-role-board"),
                 path("change-role-board/", views.change_role_board, name="change-role-board"),
+                path("select-users/", views.InvitUserBoardViewSet, name="select-users"),
             ]
         ),
     ),

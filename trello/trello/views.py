@@ -690,9 +690,35 @@ def change_role_board(request):
     return Response(False, status=status.HTTP_404_NOT_FOUND)
 
 
+
+from rest_framework import permissions
+from rest_framework.decorators import action
+from rest_framework import viewsets
+
+class InvitUserBoardViewSet(viewsets.ModelViewSet):
+    # permission_classes = [permissions.AllowAny]
+
+    @action(
+            detail=False,
+            methods=['get', 'post'],
+            permission_classes=(AllowAny,)
+    )
+    def select_users(self, request, *args, **kwargse):
+        # data = [
+        #    { 'username': "red", 'email': "Rad" },
+        #    { 'username': "green", 'email': "Green" },
+        #    { 'username': "yellow", 'email': "Yellow" },
+        #    { 'username': "blue", 'email': "Blue" },
+        #    { 'username': "white", 'email': "White" },
+        # ]
+
+        return Response(status=status.HTTP_200_OK)
+
+
 # @api_view(["POST"])
-# @permission_classes([AllowAny])
-# def test_view(request):
+# # @permission_classes([AllowAny])
+# @permission_classes([IsAuthenticated])
+# def test_mail(request):
 
 #     {
 #         "subject_letter":"Моя тема",
@@ -711,6 +737,7 @@ def change_role_board(request):
 #     request = request.data
 
 #     if request:
+#         print('views test_mail>>>', request)
 #         message = PreparingMessage(
 #             subject_letter = request.get('subject_letter', ''),
 #             text_letter = request.get('text_letter', ''),
@@ -723,8 +750,8 @@ def change_role_board(request):
 #         )
 
 #         send.get_send_email
-#         send.get_write_to_file
-#         send.get_output_to_console
+#         # send.get_write_to_file
+#         # send.get_output_to_console
 
 #         return Response(True)
 
