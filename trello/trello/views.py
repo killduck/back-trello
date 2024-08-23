@@ -726,7 +726,6 @@ class InvitUserBoardViewSet(viewsets.ModelViewSet):
 
 # @api_view(["POST"])
 # @permission_classes([AllowAny])
-# # @permission_classes([IsAuthenticated])
 # def test_mail(request):
 
 #     {
@@ -765,3 +764,35 @@ class InvitUserBoardViewSet(viewsets.ModelViewSet):
 #         return Response(True)
 
 #     return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+# from django.core.mail import EmailMultiAlternatives, get_connection
+# from django.template.loader import render_to_string
+
+# @api_view(["GET"])
+# @permission_classes([AllowAny])
+# def test_mail(request):
+
+#     subject = 'Тестовая отправка через EmailMultiAlternatives класс'
+
+#     text_content  = 'Данная отправка произведена через встроенный в Django EmailMultiAlternatives класс.'
+
+#     html_content  = render_to_string('mail_template.html', {'data': text_content })
+
+#     settings.EMAIL_BACKEND = settings.METHOD['smtp']
+
+#     connection = get_connection()
+#     connection.open()
+
+#     email = EmailMultiAlternatives(
+#         subject,
+#         text_content ,
+#         from_email = settings.EMAIL_HOST_USER,
+#         to=['rubtsov1978@gmail.com'],
+#         )
+#     email.attach_alternative(html_content,"text/html")
+#     email.send()
+
+#     connection.close()
+
+#     return Response(True, status=status.HTTP_200_OK)

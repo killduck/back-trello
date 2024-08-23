@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from django.core.mail import send_mail
+from django.core.mail import send_mail, get_connection
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
@@ -58,7 +58,10 @@ class SendMessage:
 
         html_content = render_to_string('mail_template.html', {'data': self.__letter['text_letter']})
 
+        connection = get_connection()
+        connection.open()
         self.__send(html_content)
+        connection.close()
 
     @property
     def get_write_to_file(self):
