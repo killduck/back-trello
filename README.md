@@ -161,4 +161,21 @@ http://127.0.0.1:8000/admin
 python manage.py changepassword "указать email"
 ```
 
-укажите буквенно-цифровой пароль не менее 8 символов
+- укажите буквенно-цифровой пароль не менее 8 символов
+
+```
+Спартуем "django_celery_beat":
+
+Возможно, вчначале понадобятся миграции: python manage.py migrate
+
+В водим поочереди команды в разных терминалах:
+1. redis-server (
+  эта штука должна быть установленна: для mac/linux: brew install redis ,
+  перезапуск redis: brew services restart redis ,
+ )
+2. python manage.py runserver (стартуем Джангу)
+3. celery -A trello worker -l info (стартуем Сelery worker)
+    - возможно: celery -A trello worker -l info -O fair .
+4. celery -A trello beat -l info (стартуем Сelery beat)
+
+```

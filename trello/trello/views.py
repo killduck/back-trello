@@ -163,31 +163,30 @@ def add_card_activity(request):
         ''' тут отправим письмо каждому юзеру карточки '''
         mail_data = ActivitySerializer(Activity.objects.filter(date=request.data['find_by_date']).
                                        filter(), many=True).data
-        print(f'161__ {mail_data[0]}')
+        # print(f'161__ {mail_data[0]}')
         for card_user in card_users:
             print(f'163__ {card_user['user_id']}')
             card_users_data = UserSerializer(User.objects.filter(id=card_user['user_id']), many=True).data[0]
             print(f'165__ {card_users_data["email"]}, {request.data['card_id']}')
 
-            message = PreparingMessage(
-                subject_letter=f'Изменение в карточке {request.data['card_id']}',
-                text_letter=f'{mail_data[0]["author"]["first_name"]} '
-                            f'{mail_data[0]["author"]["last_name"]} '
-                            f'{action_text}(а) комментарий, созданный: '
-                            f'{mail_data[0]["date"]}',
-                template='',
-            )
-            send = SendMessage(
-                letter=message.get_message,
-                addres_mail=[card_users_data["email"]]
-            )
-            send.get_send_email
-            send.get_output_to_console
+            # message = PreparingMessage(
+            #     subject_letter=f'Изменение в карточке {request.data['card_id']}',
+            #     text_letter=f'{mail_data[0]["author"]["first_name"]} '
+            #                 f'{mail_data[0]["author"]["last_name"]} '
+            #                 f'{action_text}(а) комментарий, созданный: '
+            #                 f'{mail_data[0]["date"]}',
+            #     template='',
+            # )
+            # send = SendMessage(
+            #     letter=message.get_message,
+            #     addres_mail=[card_users_data["email"]]
+            # )
+            # send.get_send_email
+            # send.get_output_to_console
 
         return Response(serializer_activity)
     else:
         return Response(False, status=status.HTTP_404_NOT_FOUND)
-
 
 
 @api_view(["GET", "POST"])
@@ -200,6 +199,30 @@ def del_card_activity(request):
     except:
         return Response(False, status=status.HTTP_404_NOT_FOUND)
     return Response(True, status=status.HTTP_200_OK)
+
+
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
+def add_card_due_date(request):
+    # print(request.data)
+
+    if request.data['card_id'] and request.data['end_date_time']:
+        card_id = request.data['card_id']
+        end_date_time = datetime.strptime(request.data['end_date_time'], "%d-%m-%Y %H:%M:%S")
+        # print(f'214__: {card_end_date_time}')
+        try:
+            Card.objects.filter(id=card_id).update(date_end=end_date_time)
+        except:
+            print("если что-то сюда прилетит, то будем разбираться")
+            return Response(False, status=status.HTTP_404_NOT_FOUND)
+
+        queryset = Card.objects.all().filter(id=card_id)
+        serializer = CardSerializer(queryset, many=True)
+
+        return Response(serializer.data)
+
+    else:
+        return Response(False, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(["GET", "POST"])
@@ -314,9 +337,9 @@ def swap_cards(request):
                 address_mail = card_users_data['email']
                 # print(f'304__ {card_users_data["email"]}, {request.data['card_id']}')
                 # print(f'302__ {card_user["user_id"]}, {mail_data["card"]}')
-                print(f'test__333\n')
+                print(f'swap_cards test__333:')
                 sending_email(subject_email, text_email, address_mail)
-                print(f'test__333\n')
+                print(f'swap_cards test__333\n')
 
             print("обновили порядок карточек в БД")
     except Exception as err:

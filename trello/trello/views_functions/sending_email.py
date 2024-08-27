@@ -3,6 +3,7 @@ from django.template.loader import render_to_string
 from django.conf import settings
 
 def sending_email(subject_email, text_email, address_mail):
+    print('<<< отправлено сообщение >>>')
     print(f'\n test__sending_email \n {subject_email} \n, {text_email}\n, {address_mail}\n')
     subject = subject_email
     text_content = text_email
