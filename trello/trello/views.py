@@ -189,6 +189,7 @@ def add_card_activity(request):
         return Response(False, status=status.HTTP_404_NOT_FOUND)
 
 
+
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def del_card_activity(request):
@@ -205,7 +206,6 @@ def del_card_activity(request):
 @permission_classes([IsAuthenticated])
 def add_card_due_date(request):
     # print(request.data)
-
     if request.data['card_id'] and request.data['end_date_time']:
         card_id = request.data['card_id']
         end_date_time = datetime.strptime(request.data['end_date_time'], "%d-%m-%Y %H:%M:%S")
@@ -223,6 +223,49 @@ def add_card_due_date(request):
 
     else:
         return Response(False, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
+def del_card_due_date(request):
+    print(request.data)
+    if request.data['card_id']:
+        card_id = request.data['card_id']
+
+        try:
+            Card.objects.filter(id=card_id).update(date_end=None, execute= False)
+        except:
+            print("если что-то сюда прилетит, то будем разбираться")
+            return Response(False, status=status.HTTP_404_NOT_FOUND)
+
+        queryset = Card.objects.all().filter(id=card_id)
+        serializer = CardSerializer(queryset, many=True)
+
+        return Response(serializer.data)
+
+    else:
+        return Response(False, status=status.HTTP_404_NOT_FOUND)
+
+
+
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
+def add_card_due_date_execute(request):
+    print(request.data)
+
+    try:
+        card_id = request.data['card_id']
+        card_execute = request.data['card_execute']
+        Card.objects.filter(id=card_id).update(execute=card_execute)
+
+    except:
+        print("если что-то сюда прилетит, то будем разбираться")
+        return Response(False, status=status.HTTP_404_NOT_FOUND)
+
+    queryset = Card.objects.filter(id=card_id)
+    serializer = CardSerializer(queryset, many=True)
+
+    return Response(serializer.data)
 
 
 @api_view(["GET", "POST"])

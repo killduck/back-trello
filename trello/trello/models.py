@@ -240,6 +240,10 @@ class Card(models.Model):
         blank=True,
         null=True,
     )
+    execute = models.BooleanField(
+        default=False,
+        verbose_name="выполнить до срока",
+    )
     label = models.ForeignKey(
         "Label",
         on_delete=models.SET_NULL,
