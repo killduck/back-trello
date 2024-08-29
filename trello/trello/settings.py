@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     "corsheaders",  # Подключаем библиотеку/приложение django-cors-headers
     "trello",
     "django_seed",
+    # 'django_celery_beat',
 ]
 
 
@@ -196,7 +197,9 @@ EMAIL_BACKEND = ''
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.timeweb.ru'
-EMAIL_PORT = 25
+# EMAIL_PORT = 25     # не пашет
+# EMAIL_PORT = 465    # не пашет
+EMAIL_PORT = 587
 EMAIL_HOST_USER = 'python31@top-python31.ru'
 EMAIL_HOST_PASSWORD = 'Python31!'
 
@@ -206,3 +209,18 @@ MAIL_MESSAGE = {
     'add_dashboard': f'Вас приглашают стать учаcтником доски. Пройдите по ссылке https://www.google.ru/#',
     'deadline': f'У вас просрочена задача ',
 }
+
+REDIS_HOST = "0.0.0.0"
+REDIS_PORT = "6379"
+
+CELERY_BROKER_URL = "redis://" + REDIS_HOST + ":" + REDIS_PORT + "/0"
+CELERY_BROKER_TRANSPORT_OPTIONS = {"visibility_timeout": 3600}
+CELERY_RESULT_BACKEND = "redis://" + REDIS_HOST + ":" + REDIS_PORT + "/0"
+
+CELERY_ACCEPT_CONTENT = ["application/json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+
+# CELERY_BEAT_SCHEDULER='django_celery_beat.schedulers:DatabaseScheduler' это по ходу не нужно...

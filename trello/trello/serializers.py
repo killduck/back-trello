@@ -94,6 +94,7 @@ class CardSerializer(serializers.ModelSerializer):
             "column",
             "date_start",
             "date_end",
+            "execute",
             "label",
             "description",
             "activity",
