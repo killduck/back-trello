@@ -170,9 +170,7 @@ def add_card_activity(request):
         comment_date = comment_date.strftime("%Y.%m.%d %H:%M:%S")
         comment_text = mail_data["comment"][3: -4]
         for card_user in card_users:
-            print(f'179__ {card_user["user_id"]}, \n{card_data["name"]}')
             card_users_data = UserSerializer(User.objects.filter(id=card_user['user_id']), many=True).data[0]
-            print(f'181__ {card_users_data["email"]}, {request.data['card_id']}')
 
             subject_email = f'Изменение в карточке \"{card_data["name"]}\"'
             text_email = (f'{mail_data["author"]["first_name"]} '
@@ -227,7 +225,7 @@ def add_card_due_date(request):
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def del_card_due_date(request):
-    print(request.data)
+    # print(request.data)
     if request.data['card_id']:
         card_id = request.data['card_id']
         try:
@@ -560,7 +558,7 @@ def dashboard_role(request):
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def card_user_update(request):
-    print(request.data)
+    # print(request.data)
     if request.data['user_id'] and request.data['card_id']:
         user_id = request.data['user_id']
         card_id = request.data['card_id']
@@ -626,7 +624,7 @@ def card_user_delete(request):
         get_object_or_404() выкинет автоматом 404
     """
     # TODO Если нет возражений, комментарий-пояснение можно удалить
-    print(request.data)
+    # print(request.data)
     user_id = request.data.get('user_id', False)
     card_id = request.data.get('card_id', False)
 
