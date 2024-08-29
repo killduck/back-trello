@@ -178,4 +178,6 @@ python manage.py changepassword "указать email"
     - возможно: celery -A trello worker -l info -O fair .
 4. celery -A trello beat -l info (стартуем Сelery beat)
 
+время для рассылки можно изменить в файле "celery.py" через "schedule".
+
 ```

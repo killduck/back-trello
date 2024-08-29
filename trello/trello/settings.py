@@ -197,8 +197,9 @@ EMAIL_BACKEND = ''
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.timeweb.ru'
-# EMAIL_PORT = 25
-EMAIL_PORT = 587 #465 попробуй
+# EMAIL_PORT = 25     # не пашет
+# EMAIL_PORT = 465    # не пашет
+EMAIL_PORT = 587
 EMAIL_HOST_USER = 'python31@top-python31.ru'
 EMAIL_HOST_PASSWORD = 'Python31!'
 
