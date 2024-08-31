@@ -12,7 +12,7 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {
     'every': {
         'task': 'trello.tasks.repeat_order_make',
-        # 'schedule': crontab(hour='*/3'),  # по умолчанию выполняет каждую минуту, очень гибко настраивается
-        'schedule': crontab(minute='*/1'),
+        'schedule': crontab(hour='*/3'),  # по умолчанию выполняет каждую минуту, очень гибко настраивается
+        # 'schedule': crontab(minute='*/1'),
     },
 }
