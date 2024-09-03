@@ -36,6 +36,7 @@ from .serializers import (
     UserSerializer,
     CardUserSerializer,
     LabelSerializer, ActivitySerializer,
+    UserSearchSerializer,
 )
 from .utils import SendMessage, PreparingMessage
 
@@ -662,7 +663,7 @@ def change_role_board(request):
     count_admins_on_board = DashboardUserRole.objects.filter(dashboard_id = active_boards,
                                                       role__name = 'admin').count()
 
-    print('changeable_user_role>>>', changeable_user_role)
+    # print('changeable_user_role>>>', changeable_user_role)
 
     if (request.data['action'] == 'add_admin' and
         user_auth_role == 'admin'):
@@ -681,9 +682,8 @@ def change_role_board(request):
 
     if request.data['action'] == 'del_user':
         if changeable_user_role == 'admin' and not user_auth_role == "admin":
-            print('?????')
-            pass
-
+            print('???')
+            return Response(False, status=status.HTTP_404_NOT_FOUND)
         users_on_board.delete()
         return Response(True,status=status.HTTP_200_OK)
 
@@ -696,30 +696,40 @@ from rest_framework.decorators import action
 from rest_framework import viewsets
 
 class InvitUserBoardViewSet(viewsets.ModelViewSet):
-    permission_classes = [permissions.AllowAny]
-
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
+    # permission_classes = [permissions.AllowAny]
 
     @action(
             detail=False,
-            methods=['get',],
-            permission_classes=(AllowAny,),
+            methods=['post',],
+            permission_classes=(IsAuthenticated,),
             url_path='select-users',
     )
     def select_users(self, request):
-        data = [
-           { 'username': "red", 'email': "Rad" },
-           { 'username': "green", 'email': "Green" },
-           { 'username': "yellow", 'email': "Yellow" },
-           { 'username': "blue", 'email': "Blue" },
-           { 'username': "white", 'email': "White" },
-        ]
+        data_to_search = request.data['fieldData'].strip().lower()
+        print('data_to_search>>>', data_to_search)
 
-        # queryset = User.objects.all()
-        # serializer = UserSerializer(queryset, many=True)
-        return Response(data, status=status.HTTP_200_OK)
+        search_result = []
+
+        if len(data_to_search) < 1:
+            return Response(search_result, status=status.HTTP_200_OK)
+
+        search_result = User.objects.filter(username__icontains=data_to_search).values('username', 'email')
+
+        serializer = UserSearchSerializer(search_result, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(
+            detail=False,
+            methods=['post',],
+            permission_classes=(AllowAny,),
+            url_path='invit-users',
+    )
+    def invit_users(self, request):
+        list_of_invited_users = request.data['selectedOption']
+
+        print('invit_users>>>', list_of_invited_users)
+
+        return Response(True, status=status.HTTP_200_OK)
 
 
 

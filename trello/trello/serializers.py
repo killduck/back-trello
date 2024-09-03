@@ -147,6 +147,18 @@ class DashboardSerializer(serializers.ModelSerializer):
         )
 
 
+class UserSearchSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+
+        fields = (
+            "id",
+            "username",
+            "email",
+        )
+
+
 # Пробный вариант сериализатора - пока нигде не применяем
 class TestColumnSerializer(serializers.ModelSerializer):
 
