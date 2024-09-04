@@ -694,6 +694,7 @@ def change_role_board(request):
 from rest_framework import permissions
 from rest_framework.decorators import action
 from rest_framework import viewsets
+from django.db.models import Q
 
 class InvitUserBoardViewSet(viewsets.ModelViewSet):
     # permission_classes = [permissions.AllowAny]
@@ -713,7 +714,10 @@ class InvitUserBoardViewSet(viewsets.ModelViewSet):
         if len(data_to_search) < 1:
             return Response(search_result, status=status.HTTP_200_OK)
 
-        search_result = User.objects.filter(username__icontains=data_to_search).values('username', 'email')
+        search_result = User.objects.filter(
+            Q(username__icontains=data_to_search) |
+            Q(email__icontains=data_to_search)
+        ).values('username', 'email')
 
         serializer = UserSearchSerializer(search_result, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
