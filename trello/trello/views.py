@@ -707,6 +707,11 @@ class InvitUserBoardViewSet(viewsets.ModelViewSet):
     )
     def select_users(self, request):
         data_to_search = request.data['fieldData'].strip().lower()
+
+        dashboard = request.data['dashboardId']
+
+        users_on_board = DashboardUserRole.objects.filter(dashboard_id = dashboard).values('user__username')
+
         print('data_to_search>>>', data_to_search)
 
         search_result = []
@@ -717,7 +722,9 @@ class InvitUserBoardViewSet(viewsets.ModelViewSet):
         search_result = User.objects.filter(
             Q(username__icontains=data_to_search) |
             Q(email__icontains=data_to_search)
-        ).values('username', 'email')
+        ).exclude(username__in=users_on_board).values('username', 'email')
+
+        print('result data_to_search>>>', search_result)
 
         serializer = UserSearchSerializer(search_result, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -731,7 +738,9 @@ class InvitUserBoardViewSet(viewsets.ModelViewSet):
     def invit_users(self, request):
         list_of_invited_users = request.data['selectedOption']
 
-        print('invit_users>>>', list_of_invited_users)
+        dashboard = request.data['dashboardId']
+
+        print('invit_users>>>', list_of_invited_users, dashboard)
 
         return Response(True, status=status.HTTP_200_OK)
 

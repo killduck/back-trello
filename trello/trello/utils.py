@@ -4,6 +4,9 @@ from django.core.mail import send_mail, get_connection
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
+from abc import ABC, abstractmethod
+import hashlib
+
 
 class PreparingMessage:
 
@@ -74,11 +77,28 @@ class SendMessage:
         self.__send()
 
 
-class HashMessage:
+class Hashing(ABC):
 
-    def __init__(self, message):
-        self.__message = message
+    def __init__(self, algorithm, data):
+        self.__algorithm = algorithm
+        self.__data = data
+
+    @abstractmethod
+    def get_hash_data(self):
+        pass
+
+
+class Hash(Hashing):
+    """
+    Образец создания instance класса
+    instance = Hash('SHA256', message)
+    instance.get_hash_data
+    """
 
     @property
-    def get_hash_message(self):
-        pass
+    def get_hash_data(self):
+
+        hash = hashlib.new(self._Hashing__algorithm)
+        hash.update(self._Hashing__data.encode())
+        hash_data = hash.hexdigest()
+        return hash_data
