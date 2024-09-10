@@ -38,7 +38,11 @@ from .serializers import (
     LabelSerializer, ActivitySerializer,
     UserSearchSerializer,
 )
-from .utils import SendMessage, PreparingMessage
+from .utils import (
+    Hash,
+    PreparingMessage,
+    SendMessage,
+)
 
 
 # Кастомное представление, что бы была возможность возвращать в Response не только Token
@@ -736,11 +740,17 @@ class InvitUserBoardViewSet(viewsets.ModelViewSet):
             url_path='invit-users',
     )
     def invit_users(self, request):
-        list_of_invited_users = request.data['selectedOption']
+        request = request.data
 
-        dashboard = request.data['dashboardId']
+        list_of_invited_users = request['selectedOption']
 
-        print('invit_users>>>', list_of_invited_users, dashboard)
+        dashboard_name = Dashboard.objects.filter(id=request['dashboardId']).values_list('name', flat=True).first()
+
+        print('invit_users>>>', list_of_invited_users, dashboard_name)
+
+        data = None
+
+        # hash_data = Hash('sha256', )
 
         return Response(True, status=status.HTTP_200_OK)
 
