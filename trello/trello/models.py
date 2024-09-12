@@ -2,8 +2,112 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 from django.db import models
 
+from .models_functions.upload_files_img import (
+    upload_to_files,
+    upload_to_images,
+)
 
-# Cправочные материалы по API для компонентов системы аутентификации Django https://docs.djangoproject.com/en/5.0/ref/contrib/auth/
+class ImageExtension(models.Model):
+    type= models.CharField(
+        max_length=50,
+        verbose_name="Расширение фото",
+        help_text="Введите расширение фото",
+        blank=True,
+        null=True,
+    )
+
+class CardImg(models.Model):
+    card = models.ForeignKey(
+        "Card",
+        on_delete=models.CASCADE,
+        related_name="card_img",
+        blank=True,
+        null=False,
+        verbose_name="Карточка",
+        help_text="Введите карточку к которой относится фото",
+    )
+    name = models.CharField(
+        max_length=50,
+        verbose_name="Имя фото",
+        help_text="Введите имя фото",
+        blank=True,
+        null=True,
+    )
+    size = models.IntegerField(
+        verbose_name="Размер фото",
+        help_text="Введите размер фото",
+        null=True,
+    )
+    extension = models.CharField(
+        max_length=50,
+        verbose_name="расширение фото",
+        help_text="Введите расширение фото",
+        blank=True,
+        null=True,
+    )
+    date_upload = models.DateTimeField(
+        auto_now=True,
+        auto_now_add=False,
+        blank=True,
+        null=True,
+    )
+    image_url = models.ImageField(
+        upload_to=upload_to_images,
+        blank=True,
+        null=True,
+    )
+    image = models.BooleanField(
+        default=True,
+        verbose_name="фото или нет",
+    )
+
+
+class CardFile(models.Model):
+    card = models.ForeignKey(
+        "Card",
+        on_delete=models.CASCADE,
+        related_name="card_file",
+        blank=True,
+        null=False,
+        verbose_name="Карточка",
+        help_text="Введите карточку к которой относится файл",
+    )
+    name = models.CharField(
+        max_length=50,
+        verbose_name="Имя файла",
+        help_text="Введите имя файла",
+        blank=True,
+        null=True,
+    )
+    size = models.IntegerField(
+        verbose_name="Размер файла",
+        help_text="Введите размер к файла",
+        null=True,
+    )
+    extension = models.CharField(
+        max_length=50,
+        verbose_name="расширение файла",
+        help_text="Введите расширение файла",
+        blank=True,
+        null=True,
+    )
+    date_upload = models.DateTimeField(
+        auto_now=True,
+        auto_now_add=False,
+        blank=True,
+        null=True,
+    )
+    file_url = models.FileField(
+        upload_to=upload_to_files,
+        blank=True,
+        null=True,
+    )
+    image = models.BooleanField(
+        default=False,
+        verbose_name="фото или нет",
+    )
+
+# Справочные материалы по API для компонентов системы аутентификации Django https://docs.djangoproject.com/en/5.0/ref/contrib/auth/
 class User(AbstractUser):
     """Переопределяем стандартную модель User."""
 

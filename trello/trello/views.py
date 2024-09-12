@@ -1,3 +1,5 @@
+from os.path import split
+
 from django.core.mail import EmailMultiAlternatives, get_connection
 from django.template.loader import render_to_string
 
@@ -18,14 +20,11 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
 from .models import (
-    Card,
-    Column,
-    Dashboard,
-    DashboardUserRole,
-    User,
-    CardUser,
-    Role,
-    Label, Activity,
+    Card, Column,
+    Dashboard, DashboardUserRole,
+    User, CardUser,
+    Role, Label, Activity,
+    CardImg, CardFile, ImageExtension,
 )
 
 from .permissions import (
@@ -39,11 +38,75 @@ from .serializers import (
     UserSerializer,
     CardUserSerializer,
     LabelSerializer, ActivitySerializer,
+    CardImgSerializer, CardFileSerializer,
+    ImageExtensionSerializer,
 )
 from .utils import SendMessage, PreparingMessage
 
 from .views_functions.sending_email import sending_email
 
+# from rest_framework import permissions
+# from rest_framework.parsers import MultiPartParser, FormParser
+# from rest_framework import viewsets
+
+# class UploadViewSet(viewsets.ModelViewSet):
+#     queryset = CardFile.objects.all()
+#     serializer_class = CardFileSerializer
+#     parser_classes = (MultiPartParser, FormParser)
+#     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+
+# @api_view(["GET", "POST"])
+# @permission_classes([IsAuthenticated])
+# class AddFilesToCard(viewsets.ModelViewSet):
+#     queryset = CardImg.objects.order_by('id')
+#     serializer_class = CardImgSerializer
+#     parser_classes = (MultiPartParser, FormParser)
+#     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+#
+#     def perform_create(self, serializer):
+#         print(self.request.data['file'], f'\n', self.request.POST, f'\n', self.request.FILES)
+#         # serializer.save(creator=self.request.user)
+#         serializer.save(id=self.request.id)
+
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
+def add_files_to_card(request):
+    print(request.data['file'],f'\n', request.POST,f'\n', request.FILES)
+    request = request.data
+    # print('Получаем следующий объект>>>', request.getlist('file'))
+    # print('75__>>>', CardSerializer(Card.objects.filter(id=request['card_id']), many=True).data[0]['id'])
+
+    img_extensions = ImageExtensionSerializer(ImageExtension.objects.all(), many=True).data
+    image_bool = False
+
+    for file in request.getlist('file'):
+        print('78__>>>', file.name.split('.')[-1])
+        extension=file.name.split('.')[-1]
+
+        for img_extension in img_extensions:
+            if extension == img_extension['type']:
+                image_bool = True
+
+        CardFile.objects.create(
+            card=Card.objects.get(id=request['card_id']),
+            name=file.name,
+            size=file.size,
+            extension=extension,
+            file_url=file,
+            image=image_bool,
+        )
+
+    card_data = CardSerializer(Card.objects.filter(id=request['card_id']), many=True).data[0]
+    print(f'88__card_data => {card_data['card_file']}')
+
+
+    return Response(card_data, status=status.HTTP_200_OK)
+
+    # file_list = request.data['file'].getlist('', [])
+    # print(file_list)
+    # return Response(data='da', status=status.HTTP_200_OK)
+    # return Response(data = 'net', status=status.HTTP_400_BAD_REQUEST)
 
 # Кастомное представление, что бы была возможность возвращать в Response не только Token
 class CustomAuthToken(ObtainAuthToken):

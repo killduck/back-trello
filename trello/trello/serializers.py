@@ -1,9 +1,55 @@
 from rest_framework import serializers
 
-from .models import Card, Column, Dashboard, Role, DashboardUserRole, User, CardUser, Label, Activity
+from .models import (
+    Card, Column, Dashboard, Role,
+    DashboardUserRole, User, CardUser,
+    Label, Activity, CardImg, CardFile,
+    ImageExtension,
+)
 
+class CardImgSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CardImg
+
+        fields = (
+            "id",
+            "card_id",
+            "name",
+            "size",
+            "extension",
+            "date_upload",
+            "image_url",
+        )
+
+class ImageExtensionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ImageExtension
+
+        fields = (
+            "id",
+            "type",
+        )
+
+
+class CardFileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CardFile
+
+        fields = (
+            "id",
+            "card_id",
+            "name",
+            "size",
+            "extension",
+            "date_upload",
+            "file_url",
+            "image",
+        )
 
 class CardUserSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = CardUser
 
@@ -83,6 +129,8 @@ class CardSerializer(serializers.ModelSerializer):
 
     label = LabelSerializer(many=False)
     activity = ActivitySerializer(many=True)
+    card_img = CardImgSerializer(many=True)
+    card_file = CardFileSerializer(many=True)
 
     class Meta:
         model = Card
@@ -98,6 +146,8 @@ class CardSerializer(serializers.ModelSerializer):
             "label",
             "description",
             "activity",
+            "card_img",
+            "card_file",
         )
 
 

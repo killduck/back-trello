@@ -1,6 +1,9 @@
 from django.contrib import admin
 from django.urls import include, path
 
+from django.conf import settings
+from django.conf.urls.static import static
+
 from . import views
 
 
@@ -34,12 +37,14 @@ urlpatterns = [
                 path("add-card-description/", views.add_card_description, name="add-card-description"),
                 path("add-card-activity/", views.add_card_activity, name="add-card-activity"),
                 path("del-card-activity/", views.del_card_activity, name="del-card-activity"),
-                path("add-card-due-date/", views.add_card_due_date, name="add-card-due-date/"),
-                path("del-card-due-date/", views.del_card_due_date, name="del-card-due-date/"),
-                path("add-card-due-date-execute/", views.add_card_due_date_execute, name="add-card-due-date-execute/"),
+                path("add-card-due-date/", views.add_card_due_date, name="add-card-due-date"),
+                path("del-card-due-date/", views.del_card_due_date, name="del-card-due-date"),
+                path("add-card-due-date-execute/", views.add_card_due_date_execute, name="add-card-due-date-execute"),
+                path("add-files-to-card/", views.add_files_to_card, name="add-files-to-card"),
+
                 path("search-role-board/", views.search_role_board, name="search-role-board"),
                 path("change-role-board/", views.change_role_board, name="change-role-board"),
-            ]
+            ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
         ),
     ),
     path("admin/", admin.site.urls),

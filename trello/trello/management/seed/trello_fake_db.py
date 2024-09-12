@@ -2,6 +2,7 @@ from trello.models import (
     Column, Card,
     Dashboard, DashboardUserRole,
     Role, User, Label, Activity,
+    ImageExtension,
 )
 
 tables = [
@@ -276,14 +277,14 @@ tables = [
                 # "comment": "asdafff",
                 "action": "оставил комментарий",
             },
-{
+            {
                 "id": 2,
                 "author": User(id=5),
                 "card": Card(id=5),
                 "comment": None,
                 "action": "присоединился(-лась) к этой карточке",
             },
-{
+            {
                 "id": 3,
                 "author": User(id=2),
                 "card": Card(id=5),
@@ -291,5 +292,38 @@ tables = [
                 "action": "оставил комментарий",
             },
         ]
+    },
+    {
+        "table_name": ImageExtension,
+        "table_dada": [
+            {
+                "id": 1,
+                "type": "jpg",
+            },
+            {
+                "id": 2,
+                "type": "png",
+            },
+            {
+                "id": 3,
+                "type": "bmp",
+            },
+            {
+                "id": 4,
+                "type": "gif",
+            },
+            {
+                "id": 5,
+                "type": "ico",
+            },
+            {
+                "id": 6,
+                "type": "jpeg",
+            },
+            {
+                "id": 7,
+                "type": "webp",
+            },
+        ],
     }
 ]
