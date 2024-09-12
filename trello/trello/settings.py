@@ -231,5 +231,5 @@ CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 MEDIA_ROOT = BASE_DIR / 'media_backend'
 
 # URL used to access the media
-# MEDIA_URL = '/media/'
+MEDIA_URL = '/media_backend/'
 # MEDIA_URL = 'static/'

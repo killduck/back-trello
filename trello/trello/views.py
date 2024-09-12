@@ -86,6 +86,7 @@ def add_files_to_card(request):
 
         for img_extension in img_extensions:
             if extension == img_extension['type']:
+                print(f'89__ {extension, img_extension['type']}')
                 image_bool = True
 
         CardFile.objects.create(
