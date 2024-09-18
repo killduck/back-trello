@@ -79,26 +79,21 @@ class SendMessage:
 
 class Hashing(ABC):
 
-    def __init__(self, algorithm, data):
-        self.__algorithm = algorithm
+    def __init__(self, data):
         self.__data = data
-
-    @abstractmethod
-    def get_hash_data(self):
-        pass
 
 
 class Hash(Hashing):
     """
     Образец создания instance класса
-    instance = Hash('SHA256', message)
-    instance.get_hash_data
+    instance = Hash(message)
+    instance.get_hash_sha256
     """
 
     @property
-    def get_hash_data(self):
+    def get_hash_sha256(self):
 
-        hash = hashlib.new(self._Hashing__algorithm)
+        hash = hashlib.new('sha256')
         hash.update(self._Hashing__data.encode())
         hash_data = hash.hexdigest()
         return hash_data
