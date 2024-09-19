@@ -91,6 +91,14 @@ class Hash(Hashing):
     """
 
     @property
+    def get_hash_md5(self):
+
+        hash = hashlib.new('md5')
+        hash.update(self._Hashing__data.encode())
+        hash_data = hash.hexdigest()
+        return hash_data
+
+    @property
     def get_hash_sha256(self):
 
         hash = hashlib.new('sha256')

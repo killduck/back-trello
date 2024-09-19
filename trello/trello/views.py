@@ -23,6 +23,7 @@ from .models import (
     CardUser,
     Role,
     Label, Activity,
+    InvitUserDashboard,
 )
 
 from .permissions import (
@@ -695,13 +696,11 @@ def change_role_board(request):
 
 
 
-from rest_framework import permissions
 from rest_framework.decorators import action
 from rest_framework import viewsets
 from django.db.models import Q
 
 class InvitUserBoardViewSet(viewsets.ModelViewSet):
-    # permission_classes = [permissions.AllowAny]
 
     @action(
             detail=False,
@@ -716,7 +715,7 @@ class InvitUserBoardViewSet(viewsets.ModelViewSet):
 
         users_on_board = DashboardUserRole.objects.filter(dashboard_id = dashboard).values('user__username')
 
-        print('data_to_search>>>', data_to_search)
+        # print('data_to_search>>>', data_to_search)
 
         search_result = []
 
@@ -728,7 +727,8 @@ class InvitUserBoardViewSet(viewsets.ModelViewSet):
             Q(email__icontains=data_to_search)
         ).exclude(username__in=users_on_board).values('username', 'email')
 
-        print('result data_to_search>>>', search_result)
+        #TODO из выборки нужно убирать user, если он есть в связке пользователь-доска в таблице InvitUserDashboard
+        # print('result data_to_search>>>', search_result)
 
         serializer = UserSearchSerializer(search_result, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -744,13 +744,26 @@ class InvitUserBoardViewSet(viewsets.ModelViewSet):
 
         list_of_invited_users = request['selectedOption']
 
+        if not list_of_invited_users:
+            return Response('No user', status=status.HTTP_204_NO_CONTENT)
+
+
+        # получаем имя доски для добавления в строку для хэширования
         dashboard_name = Dashboard.objects.filter(id=request['dashboardId']).values_list('name', flat=True).first()
 
         print('invit_users>>>', list_of_invited_users, dashboard_name)
+        for user in list_of_invited_users:
+            user_id = User.objects.filter(username = user['username']).values_list('id', flat=True).first()
 
-        data = None
+            hash = Hash(dashboard_name + user['email'])
+            hash_message = hash.get_hash_sha256
 
-        # hash_data = Hash('sha256', )
+            InvitUserDashboard.objects.create(
+            dashboard_id=int(request['dashboardId']),
+            user_id=user_id,
+            hash=hash_message,
+            )
+
 
         return Response(True, status=status.HTTP_200_OK)
 
