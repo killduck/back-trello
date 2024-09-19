@@ -16,6 +16,45 @@ class ImageExtension(models.Model):
         null=True,
     )
 
+class CardLink(models.Model):
+    text = models.CharField(
+        max_length=200,
+        verbose_name="Имя ссылки",
+        help_text="Введите ссылку",
+        blank=True,
+        null=True,
+    )
+    description = models.CharField(
+        max_length=200,
+        verbose_name="описание ссылки",
+        help_text="Введите описание ссылки",
+        blank=True,
+        null=True,
+    )
+    favicon = models.CharField(
+        max_length=50,
+        verbose_name="Имя ссылки для фавикона",
+        help_text="Введите ссылку для фавикона",
+        blank=True,
+        null=True,
+    )
+    first_letter = models.CharField(
+        max_length=10,
+        verbose_name="первая буква ссылки",
+        help_text="Введите первую букву ссылки",
+        blank=True,
+        null=True,
+    )
+    card = models.ForeignKey(
+        "Card",
+        on_delete=models.CASCADE,
+        related_name="card_link",
+        blank=True,
+        null=False,
+        verbose_name="Карточка",
+        help_text="Введите карточку к которой относится ссылка",
+    )
+
 class CardImg(models.Model):
     card = models.ForeignKey(
         "Card",

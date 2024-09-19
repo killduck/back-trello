@@ -24,7 +24,8 @@ from .models import (
     Dashboard, DashboardUserRole,
     User, CardUser,
     Role, Label, Activity,
-    CardImg, CardFile, ImageExtension,
+    CardImg, CardFile,
+    ImageExtension, CardLink,
 )
 
 from .permissions import (
@@ -72,35 +73,76 @@ from .views_functions.sending_email import sending_email
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def add_files_to_card(request):
-    print(request.data['file'],f'\n', request.POST,f'\n', request.FILES)
+    print('75', request.data, f'\n', request.POST,f'\n', request.FILES)
     request = request.data
     # print('Получаем следующий объект>>>', request.getlist('file'))
     # print('75__>>>', CardSerializer(Card.objects.filter(id=request['card_id']), many=True).data[0]['id'])
 
     img_extensions = ImageExtensionSerializer(ImageExtension.objects.all(), many=True).data
     image_bool = False
+    # file_list = None
+    # request_link = request['link']
+    # request_link_desc = request['linkDesc']
 
-    for file in request.getlist('file'):
-        print('78__>>>', file.name.split('.')[-1])
-        extension=file.name.split('.')[-1]
+    if len(request['file']) != 0:
+        print('84', request)
+        file_list = request.getlist('file')
+        for file in file_list:
+            print('78__>>>', file.name.split('.')[-1])
+            extension=file.name.split('.')[-1]
 
-        for img_extension in img_extensions:
-            if extension == img_extension['type']:
-                print(f'89__ {extension, img_extension['type']}')
-                image_bool = True
+            for img_extension in img_extensions:
+                if extension == img_extension['type']:
+                    print(f'89__ {extension, img_extension['type']}')
+                    image_bool = True
 
-        CardFile.objects.create(
+            CardFile.objects.create(
+                card=Card.objects.get(id=request['card_id']),
+                name=file.name,
+                size=file.size,
+                extension=extension,
+                file_url=file,
+                image=image_bool,
+            )
+    else:
+        print('103', request['file'])
+
+    if len(request['link']) != 0 or len(request['linkDesc']) != 0:
+        # получаем ссылку
+        request_link = request['link']
+        # получаем фавикон из ссылки
+        request_link_favicon = None
+        # получаем последнюю букву
+        request_link_first_letter = request['link'].split('://')[-1][0:1].upper()
+        # получаем описание ссылки
+        request_link_desc = request['linkDesc']
+        print('113', request_link, request_link_desc, request_link_first_letter, request_link_favicon)
+
+        if len(request['link']) != 0:
+            print('107', request['link'])
+            request_link = request['link']
+        else:
+            print('109', request['link'])
+            request_link = request['linkDesc']
+
+        if len(request['linkDesc']) != 0:
+            print('110', request['linkDesc'])
+            request_link_desc = request['linkDesc']
+        else:
+            print('112', request['link'])
+            request_link_desc = request['link']
+
+        CardLink.objects.create(
+            text=request_link,
+            description=request_link_desc,
+            first_letter=request_link_first_letter,
+            favicon=request_link_favicon,
             card=Card.objects.get(id=request['card_id']),
-            name=file.name,
-            size=file.size,
-            extension=extension,
-            file_url=file,
-            image=image_bool,
         )
 
     card_data = CardSerializer(Card.objects.filter(id=request['card_id']), many=True).data[0]
     print(f'88__card_data => {card_data['card_file']}')
-
+    print(f'88__card_data => {card_data}')
 
     return Response(card_data, status=status.HTTP_200_OK)
 

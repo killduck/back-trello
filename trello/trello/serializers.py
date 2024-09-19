@@ -4,8 +4,23 @@ from .models import (
     Card, Column, Dashboard, Role,
     DashboardUserRole, User, CardUser,
     Label, Activity, CardImg, CardFile,
-    ImageExtension,
+    ImageExtension, CardLink,
 )
+
+class CardLinkSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CardLink
+
+        fields = (
+            "id",
+            "text",
+            "description",
+            "first_letter",
+            "favicon",
+            "card_id",
+        )
+
 
 class CardImgSerializer(serializers.ModelSerializer):
 
@@ -131,6 +146,7 @@ class CardSerializer(serializers.ModelSerializer):
     activity = ActivitySerializer(many=True)
     card_img = CardImgSerializer(many=True)
     card_file = CardFileSerializer(many=True)
+    card_link = CardLinkSerializer(many=True)
 
     class Meta:
         model = Card
@@ -148,6 +164,7 @@ class CardSerializer(serializers.ModelSerializer):
             "activity",
             "card_img",
             "card_file",
+            "card_link",
         )
 
 
