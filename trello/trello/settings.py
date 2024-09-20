@@ -203,6 +203,6 @@ EMAIL_HOST_PASSWORD = 'Python31!'
 
 # Настройки для сообщений
 MAIL_MESSAGE = {
-    'add_dashboard': f'Вас приглашают стать учаcтником доски. Пройдите по ссылке https://www.google.ru/#',
+    'add_dashboard': f'Вас приглашают стать учаcтником доски. Пройдите по ссылке https://top-python31.ru/invit-board-confirm/',
     'deadline': f'У вас просрочена задача ',
 }

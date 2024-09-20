@@ -713,22 +713,22 @@ class InvitUserBoardViewSet(viewsets.ModelViewSet):
 
         dashboard = request.data['dashboardId']
 
+        # Пользователи, которые есть на доске
         users_on_board = DashboardUserRole.objects.filter(dashboard_id = dashboard).values('user__username')
 
-        # print('data_to_search>>>', data_to_search)
+        # Пользователи, которые приглашены на доску
+        already_invited_users = InvitUserDashboard.objects.filter(dashboard_id = dashboard).values('user__username')
 
         search_result = []
 
         if len(data_to_search) < 1:
             return Response(search_result, status=status.HTTP_200_OK)
 
+        #TODO из выборки нужно убирать user, если он есть в связке пользователь-доска в таблице InvitUserDashboard
         search_result = User.objects.filter(
             Q(username__icontains=data_to_search) |
             Q(email__icontains=data_to_search)
-        ).exclude(username__in=users_on_board).values('username', 'email')
-
-        #TODO из выборки нужно убирать user, если он есть в связке пользователь-доска в таблице InvitUserDashboard
-        # print('result data_to_search>>>', search_result)
+        ).exclude(username__in=users_on_board).exclude(username__in=already_invited_users).values('username', 'email')
 
         serializer = UserSearchSerializer(search_result, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -751,7 +751,7 @@ class InvitUserBoardViewSet(viewsets.ModelViewSet):
         # получаем имя доски для добавления в строку для хэширования
         dashboard_name = Dashboard.objects.filter(id=request['dashboardId']).values_list('name', flat=True).first()
 
-        print('invit_users>>>', list_of_invited_users, dashboard_name)
+        # print('invit_users>>>', list_of_invited_users, dashboard_name)
         for user in list_of_invited_users:
             user_id = User.objects.filter(username = user['username']).values_list('id', flat=True).first()
 
@@ -763,6 +763,19 @@ class InvitUserBoardViewSet(viewsets.ModelViewSet):
             user_id=user_id,
             hash=hash_message,
             )
+
+            message = PreparingMessage(
+                subject_letter = 'Приглашение на доску',
+                text_letter = hash_message,
+                template = 'add_dashboard'
+            )
+
+            send = SendMessage(
+            letter = message.get_message,
+            addres_mail = [user['email']]
+            )
+
+            send.get_send_email
 
 
         return Response(True, status=status.HTTP_200_OK)
