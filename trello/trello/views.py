@@ -168,6 +168,20 @@ def del_file_from_card(request):
         return Response(False, status=status.HTTP_404_NOT_FOUND)
 
 
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
+def del_link_from_card(request):
+    print(request.data)
+    try:
+        card_id = request.data["card_id"]
+        link_id = request.data["link_id"]
+        if card_id and link_id:
+            CardLink.objects.filter(id=link_id).delete()
+
+            card_data = CardSerializer(Card.objects.filter(id=card_id), many=True).data[0]
+            return Response(card_data, status=status.HTTP_200_OK)
+    except:
+        return Response(False, status=status.HTTP_404_NOT_FOUND)
 
 
 # Кастомное представление, что бы была возможность возвращать в Response не только Token
