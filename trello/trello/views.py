@@ -45,34 +45,12 @@ from .serializers import (
 from .utils import SendMessage, PreparingMessage
 
 from .views_functions.sending_email import sending_email
+from .views_functions.take_favicon import take_favicon
 
-# from rest_framework import permissions
-# from rest_framework.parsers import MultiPartParser, FormParser
-# from rest_framework import viewsets
-
-# class UploadViewSet(viewsets.ModelViewSet):
-#     queryset = CardFile.objects.all()
-#     serializer_class = CardFileSerializer
-#     parser_classes = (MultiPartParser, FormParser)
-#     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
-
-# @api_view(["GET", "POST"])
-# @permission_classes([IsAuthenticated])
-# class AddFilesToCard(viewsets.ModelViewSet):
-#     queryset = CardImg.objects.order_by('id')
-#     serializer_class = CardImgSerializer
-#     parser_classes = (MultiPartParser, FormParser)
-#     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-#
-#     def perform_create(self, serializer):
-#         print(self.request.data['file'], f'\n', self.request.POST, f'\n', self.request.FILES)
-#         # serializer.save(creator=self.request.user)
-#         serializer.save(id=self.request.id)
 
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
-def add_files_to_card(request):
+def add_file_and_link_to_card(request):
     print('75', request.data, f'\n', request.POST,f'\n', request.FILES)
     request = request.data
     # print('Получаем следующий объект>>>', request.getlist('file'))
@@ -111,33 +89,61 @@ def add_files_to_card(request):
         # получаем ссылку
         request_link = request['link']
         # получаем фавикон из ссылки
-        request_link_favicon = None
+        link_favicon = None
         # получаем последнюю букву
         request_link_first_letter = request['link'].split('://')[-1][0:1].upper()
         # получаем описание ссылки
         request_link_desc = request['linkDesc']
-        print('113', request_link, request_link_desc, request_link_first_letter, request_link_favicon)
+        link_id = None
+
+        print('113', request_link, request_link_desc, request_link_first_letter, link_favicon)
 
         if len(request['link']) != 0:
-            print('107', request['link'])
+            # print('107', request['link'])
             request_link = request['link']
+            link_favicon = take_favicon(request_link)
+            # print(126, link_favicon)
         else:
             print('109', request['link'])
             request_link = request['linkDesc']
+            link_favicon = take_favicon(request_link)
+            # print(126, link_favicon)
 
         if len(request['linkDesc']) != 0:
-            print('110', request['linkDesc'])
+            # print('110', request['linkDesc'])
             request_link_desc = request['linkDesc']
         else:
-            print('112', request['link'])
+            # print('112', request['link'])
             request_link_desc = request['link']
 
-        CardLink.objects.create(
-            text=request_link,
-            description=request_link_desc,
-            first_letter=request_link_first_letter,
-            favicon=request_link_favicon,
-            card=Card.objects.get(id=request['card_id']),
+        if request['link_id'] != '':
+            link_id = request['link_id']
+
+        print('139', type(request['link_id']))
+        # CardLink.objects.create(
+        #     text=request_link,
+        #     description=request_link_desc,
+        #     first_letter=request_link_first_letter,
+        #     favicon=link_favicon,
+        #     card=Card.objects.get(id=request['card_id']),
+        # )
+
+        CardLink.objects.update_or_create(
+            id=link_id,
+            defaults={
+                'text': request_link,
+                'description': request_link_desc,
+                'first_letter': request_link_first_letter,
+                'favicon': link_favicon,
+                'card': Card.objects.get(id=request['card_id']),
+            },
+            create_defaults={
+                'text': request_link,
+                'description': request_link_desc,
+                'first_letter': request_link_first_letter,
+                'favicon': link_favicon,
+                'card': Card.objects.get(id=request['card_id']),
+            }
         )
 
     card_data = CardSerializer(Card.objects.filter(id=request['card_id']), many=True).data[0]

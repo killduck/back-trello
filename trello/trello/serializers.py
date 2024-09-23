@@ -21,6 +21,9 @@ class CardLinkSerializer(serializers.ModelSerializer):
             "card_id",
         )
 
+    def order_by(self):
+        return CardLink.objects.order_by('id')
+
 
 class CardImgSerializer(serializers.ModelSerializer):
 

@@ -40,7 +40,7 @@ urlpatterns = [
                 path("add-card-due-date/", views.add_card_due_date, name="add-card-due-date"),
                 path("del-card-due-date/", views.del_card_due_date, name="del-card-due-date"),
                 path("add-card-due-date-execute/", views.add_card_due_date_execute, name="add-card-due-date-execute"),
-                path("add-files-to-card/", views.add_files_to_card, name="add-files-to-card"),
+                path("add-file-and-link-to-card/", views.add_file_and_link_to_card, name="add-file-and-link-to-card"),
                 path("del-file-from-card/", views.del_file_from_card, name="del-file-from-card"),
 
                 path("search-role-board/", views.search_role_board, name="search-role-board"),

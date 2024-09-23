@@ -18,21 +18,21 @@ class ImageExtension(models.Model):
 
 class CardLink(models.Model):
     text = models.CharField(
-        max_length=200,
+        max_length=500,
         verbose_name="Имя ссылки",
         help_text="Введите ссылку",
         blank=True,
         null=True,
     )
     description = models.CharField(
-        max_length=200,
+        max_length=500,
         verbose_name="описание ссылки",
         help_text="Введите описание ссылки",
         blank=True,
         null=True,
     )
     favicon = models.CharField(
-        max_length=50,
+        max_length=200,
         verbose_name="Имя ссылки для фавикона",
         help_text="Введите ссылку для фавикона",
         blank=True,
