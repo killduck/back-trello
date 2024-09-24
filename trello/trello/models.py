@@ -2,6 +2,9 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 from django.db import models
 
+from django.db.models.signals import pre_delete
+from django.dispatch.dispatcher import receiver
+
 from .models_functions.upload_files_img import (
     upload_to_files,
     upload_to_images,
@@ -551,3 +554,9 @@ class Checkstep(models.Model):
 
     def __str__(self):
         return self.text
+
+# тут удаляем файл
+@receiver(pre_delete, sender=CardFile)
+def image_model_delete(sender, instance, **kwargs):
+    if instance.file_url.name:
+        instance.file_url.delete(False)

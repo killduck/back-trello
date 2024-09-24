@@ -42,6 +42,7 @@ urlpatterns = [
                 path("add-card-due-date-execute/", views.add_card_due_date_execute, name="add-card-due-date-execute"),
                 path("add-file-and-link-to-card/", views.add_file_and_link_to_card, name="add-file-and-link-to-card"),
                 path("del-file-from-card/", views.del_file_from_card, name="del-file-from-card"),
+                path("download-file-from-card/", views.download_file_from_card, name="download-file-from-card"),
                 path("del-link-from-card/", views.del_link_from_card, name="del-link-from-card"),
 
                 path("search-role-board/", views.search_role_board, name="search-role-board"),

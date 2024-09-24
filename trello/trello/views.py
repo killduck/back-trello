@@ -1,3 +1,4 @@
+import os
 from os.path import split
 
 from django.core.mail import EmailMultiAlternatives, get_connection
@@ -43,6 +44,8 @@ from .serializers import (
     ImageExtensionSerializer,
 )
 from .utils import SendMessage, PreparingMessage
+
+from django.http import FileResponse
 
 from .views_functions.sending_email import sending_email
 from .views_functions.take_favicon import take_favicon
@@ -151,6 +154,26 @@ def add_file_and_link_to_card(request):
     print(f'88__card_data => {card_data}')
 
     return Response(card_data, status=status.HTTP_200_OK)
+
+from django.http import HttpResponse
+@api_view(["GET", "POST"])
+# @permission_classes([IsAuthenticated])
+def download_file_from_card(request):
+    print(request)
+    # card_id = request.data['card_id']
+    file_id = request.data['file_id']
+
+    # file_link = CardFile.objects.get(id=file_id)
+    # print('165', file_link.file_url)
+    # response = FileResponse(open(file_link.file_url, "rb"))
+
+    uploaded_file = CardFile.objects.get(id=file_id)
+    response = HttpResponse(uploaded_file.file_url, content_type='application/force-download')
+    response['Content-Disposition'] = f'attachment; filename="{uploaded_file.name}"'
+    print(response)
+    return response
+
+
 
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
