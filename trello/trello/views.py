@@ -38,6 +38,7 @@ from .serializers import (
     CardUserSerializer,
     LabelSerializer, ActivitySerializer,
     UserSearchSerializer,
+    InvitUserDashboardSerializer,
 )
 from .utils import (
     Hash,
@@ -702,6 +703,9 @@ from django.db.models import Q
 
 class InvitUserBoardViewSet(viewsets.ModelViewSet):
 
+    # queryset = InvitUserDashboard.objects.all()
+    # serializer_class = InvitUserDashboardSerializer
+
     @action(
             detail=False,
             methods=['post',],
@@ -736,7 +740,7 @@ class InvitUserBoardViewSet(viewsets.ModelViewSet):
     @action(
             detail=False,
             methods=['post',],
-            permission_classes=(AllowAny,),
+            permission_classes=(IsAuthenticated,),
             url_path='invit-users',
     )
     def invit_users(self, request):
@@ -777,10 +781,33 @@ class InvitUserBoardViewSet(viewsets.ModelViewSet):
 
             send.get_send_email
 
-
         return Response(True, status=status.HTTP_200_OK)
 
+    @action(
+        detail=False,
+        methods=['post',],
+        permission_classes=(IsAuthenticated,),
+        url_path='list-invited-users',
+    )
+    def list_invited_users(self, request):
 
+        dashboard_id = request.data['dashboardId']
+
+        already_invited_users = User.objects.filter(user_dashboard_invate__dashboard=dashboard_id)  # выборку делаем через related_name
+        print('already_invited_users>>>', already_invited_users)
+        serializer = UserSerializer(already_invited_users, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    @action(
+        detail=False,
+        methods=['post',],
+        permission_classes=(IsAuthenticated,),
+        url_path='pending-confirmations',
+    )
+    def pending_confirmation(self, request):
+        pass
 
 
 # @api_view(["POST"])
