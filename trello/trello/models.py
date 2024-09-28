@@ -10,6 +10,44 @@ from .models_functions.upload_files_img import (
     upload_to_images,
 )
 
+class ServiceImages(models.Model):
+    name = models.CharField(
+        max_length=200,
+        verbose_name="Имя фото",
+        help_text="Введите имя фото",
+        blank=True,
+    )
+    size = models.IntegerField(
+        verbose_name="Размер фото",
+        help_text="Введите размер фото",
+        null=True,
+    )
+    extension = models.CharField(
+        max_length=50,
+        verbose_name="расширение фото",
+        help_text="Введите расширение фото",
+        blank=True,
+        null=True,
+    )
+    date_upload = models.DateTimeField(
+        auto_now=True,
+        auto_now_add=False,
+        blank=True,
+        null=True,
+    )
+    image_url = models.ImageField(
+        # upload_to=upload_to_images,
+        blank=True,
+        null=True,
+    )
+
+    class Meta:
+        verbose_name = "Служебное фото"
+        ordering = ["id"]
+
+    def __str__(self):
+        return self.type
+
 class ImageExtension(models.Model):
     type= models.CharField(
         max_length=50,
@@ -18,6 +56,12 @@ class ImageExtension(models.Model):
         blank=True,
         null=True,
     )
+    class Meta:
+        verbose_name = "Расширение фото"
+        ordering = ["id"]
+
+    def __str__(self):
+        return self.type
 
 class CardLink(models.Model):
     text = models.CharField(
@@ -57,6 +101,13 @@ class CardLink(models.Model):
         verbose_name="Карточка",
         help_text="Введите карточку к которой относится ссылка",
     )
+
+    class Meta:
+        verbose_name = "Ссылка карточки"
+        ordering = ["id"]
+
+    def __str__(self):
+        return self.text
 
 class CardImg(models.Model):
     card = models.ForeignKey(
@@ -103,6 +154,13 @@ class CardImg(models.Model):
         verbose_name="фото или нет",
     )
 
+    class Meta:
+        verbose_name = "Фото карточки"
+        ordering = ["id"]
+
+    def __str__(self):
+        return self.name
+
 
 class CardFile(models.Model):
     card = models.ForeignKey(
@@ -148,6 +206,14 @@ class CardFile(models.Model):
         default=False,
         verbose_name="фото или нет",
     )
+
+    class Meta:
+        verbose_name = "Файл карточки"
+        ordering = ["id"]
+
+    def __str__(self):
+        return self.name
+
 
 # Справочные материалы по API для компонентов системы аутентификации Django https://docs.djangoproject.com/en/5.0/ref/contrib/auth/
 class User(AbstractUser):
@@ -346,11 +412,11 @@ class Activity(models.Model):
 
     class Meta:
         verbose_name = "Действия"
-        verbose_name_plural = "действие"
+        verbose_name_plural = "Действие"
         ordering = ["id"]
 
     def __str__(self):
-        return self.text
+        return self.action
 
 
 class Card(models.Model):
@@ -492,7 +558,7 @@ class CardUser(models.Model):
         "User",
         on_delete=models.CASCADE,
         related_name="user_card",
-        verbose_name="Польователь",
+        verbose_name="Пользователь",
     )
 
     class Meta:

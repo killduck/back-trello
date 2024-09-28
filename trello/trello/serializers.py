@@ -4,8 +4,21 @@ from .models import (
     Card, Column, Dashboard, Role,
     DashboardUserRole, User, CardUser,
     Label, Activity, CardImg, CardFile,
-    ImageExtension, CardLink,
+    ImageExtension, CardLink, ServiceImages,
 )
+class ServiceImagesSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ServiceImages
+
+        fields = (
+            "id",
+            "name",
+            "size",
+            "extension",
+            "date_upload",
+            "image_url",
+        )
 
 class CardLinkSerializer(serializers.ModelSerializer):
 
