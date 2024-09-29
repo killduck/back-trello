@@ -40,100 +40,111 @@ from .serializers import (
 )
 from .utils import SendMessage, PreparingMessage
 
-# from django.http import FileResponse
-
+from .views_functions.add_file_link import add_file, add_link
 from .views_functions.sending_email import sending_email
 from .views_functions.take_favicon import take_favicon
 
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def add_file_and_link_to_card(request):
-    print('75', request.data, f'\n', request.POST,f'\n', request.FILES)
-    request = request.data
-    img_extensions = ImageExtensionSerializer(ImageExtension.objects.all(), many=True).data
-    image_bool = False
-    errors = False
+    print('51', request.data, f'\n', request.POST,f'\n', request.FILES)
+    # print('52', len(request.data['file']))
 
-    try:
-        file_list = request.getlist('file')
-        for file in file_list:
-            print('78__>>>', file.name.split('.')[-1])
-            extension=file.name.split('.')[-1]
+    # request = request.data
+    # img_extensions = ImageExtensionSerializer(ImageExtension.objects.all(), many=True).data
+    # image_bool = False
+    error_file = False
+    error_link = False
 
-            for img_extension in img_extensions:
-                if extension == img_extension['type']:
-                    print(f'89__ {extension, img_extension['type']}')
-                    image_bool = True
+    if len(request.data['file']) > 0:
+        print('59', len(request.data['file']))
+        error_file = add_file(request.data)
 
-            CardFile.objects.create(
-                card=Card.objects.get(id=request['card_id']),
-                name=file.name,
-                size=file.size,
-                extension=extension,
-                file_url=file,
-                image=image_bool,
-            )
-        errors = False
-    except Exception as err:
-        print(err)
-        errors = True
+    if len(request.data['link']) != 0 or len(request.data['linkDesc']) != 0:
+        print('64', len(request.data['link']), len(request.data['linkDesc']))
+        error_link = add_link(request.data)
 
-    try:
-        if len(request['link']) != 0 or len(request['linkDesc']) != 0:
+    # try:
+        # file_list = request.getlist('file')
+        # for file in file_list:
+        #     print('78__>>>', file.name.split('.')[-1])
+        #     extension=file.name.split('.')[-1]
+        #
+        #     for img_extension in img_extensions:
+        #         if extension == img_extension['type']:
+        #             print(f'89__ {extension, img_extension['type']}')
+        #             image_bool = True
+        #
+        #     CardFile.objects.create(
+        #         card=Card.objects.get(id=request['card_id']),
+        #         name=file.name,
+        #         size=file.size,
+        #         extension=extension,
+        #         file_url=file,
+        #         image=image_bool,
+        #     )
 
-            link_id = None
-            request_link_first_letter = None
+    #     errors = False
+    # except Exception as err:
+    #     print('83', err)
+    #     errors = True
+    #
+    # try:
+    #     if len(request['link']) != 0 or len(request['linkDesc']) != 0:
+    #
+    #         link_id = None
+    #         request_link_first_letter = None
+    #
+    #         if len(request['link']) != 0:
+    #             request_link = request['link']
+    #             # получаем фавикон
+    #             link_favicon = take_favicon(request_link)
+    #             # получаем последнюю букву из ссылки
+    #             request_link_first_letter = request['link'].split('://')[-1][0:1].upper()
+    #         else:
+    #             request_link = request['linkDesc']
+    #             # получаем фавикон
+    #             link_favicon = take_favicon(request_link)
+    #             # получаем последнюю букву из ссылки
+    #             request_link_first_letter = request['linkDesc'].split('://')[-1][0:1].upper()
+    #
+    #         if len(request['linkDesc']) != 0:
+    #             request_link_desc = request['linkDesc']
+    #         else:
+    #             request_link_desc = request['link']
+    #
+    #         try:
+    #             link_id = int(request['link_id'])
+    #         except Exception as err:
+    #             print(err)
+    #             errors = True
+    #
+    #         CardLink.objects.update_or_create(
+    #             id=link_id,
+    #             defaults={
+    #                 'text': request_link,
+    #                 'description': request_link_desc,
+    #                 'first_letter': request_link_first_letter,
+    #                 'favicon': link_favicon,
+    #                 'card': Card.objects.get(id=request['card_id']),
+    #             },
+    #             create_defaults={
+    #                 'text': request_link,
+    #                 'description': request_link_desc,
+    #                 'first_letter': request_link_first_letter,
+    #                 'favicon': link_favicon,
+    #                 'card': Card.objects.get(id=request['card_id']),
+    #             }
+    #         )
+    #     errors = False
+    # except Exception as err:
+    #     print(err)
+    #     errors = True
 
-            if len(request['link']) != 0:
-                request_link = request['link']
-                # получаем фавикон
-                link_favicon = take_favicon(request_link)
-                # получаем последнюю букву из ссылки
-                request_link_first_letter = request['link'].split('://')[-1][0:1].upper()
-            else:
-                request_link = request['linkDesc']
-                # получаем фавикон
-                link_favicon = take_favicon(request_link)
-                # получаем последнюю букву из ссылки
-                request_link_first_letter = request['linkDesc'].split('://')[-1][0:1].upper()
-
-            if len(request['linkDesc']) != 0:
-                request_link_desc = request['linkDesc']
-            else:
-                request_link_desc = request['link']
-
-            try:
-                link_id = int(request['link_id'])
-            except Exception as err:
-                print(err)
-                errors = True
-
-            CardLink.objects.update_or_create(
-                id=link_id,
-                defaults={
-                    'text': request_link,
-                    'description': request_link_desc,
-                    'first_letter': request_link_first_letter,
-                    'favicon': link_favicon,
-                    'card': Card.objects.get(id=request['card_id']),
-                },
-                create_defaults={
-                    'text': request_link,
-                    'description': request_link_desc,
-                    'first_letter': request_link_first_letter,
-                    'favicon': link_favicon,
-                    'card': Card.objects.get(id=request['card_id']),
-                }
-            )
-        errors = False
-    except Exception as err:
-        print(err)
-        errors = True
-
-    card_data = CardSerializer(Card.objects.filter(id=request['card_id']), many=True).data[0]
+    card_data = CardSerializer(Card.objects.filter(id=request.data['card_id']), many=True).data[0]
     # print(f'88__card_data => {card_data['card_file']}')
     # print(f'88__card_data => {card_data}')
-    if errors:
+    if error_file and error_link:
         return Response(False, status=status.HTTP_404_NOT_FOUND)
     return Response(card_data, status=status.HTTP_200_OK)
 

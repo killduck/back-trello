@@ -16,7 +16,7 @@ def take_favicon(url):
         print(err)
         return None
 
-    soup = BeautifulSoup(response.data)
+    soup = BeautifulSoup(response.data, features="html.parser")
 
     icon_link = None
 
@@ -24,7 +24,7 @@ def take_favicon(url):
         icon_link = soup.find("link", rel="shortcut icon")
     else:
         icon_link = soup.find("link", rel="icon")
-    print('21', icon_link)
+    print('27', icon_link)
 
     try:
         icon = icon_link['href']
@@ -33,12 +33,12 @@ def take_favicon(url):
         else:
             favicon = f'{parsed_url.scheme}://{parsed_url.host}{icon}'
 
-        print('21', favicon)
+        print('36', favicon)
         if favicon:
          return favicon
         return None
     except Exception as err:
-        print('31', err)
+        print('41', err)
         return None
 
 
