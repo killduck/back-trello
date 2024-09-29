@@ -7,36 +7,53 @@ from bs4 import BeautifulSoup
 class AddFileAndLink:
     request = None
     image_bool = False
-    img_extensions = ImageExtensionSerializer(ImageExtension.objects.all(), many=True).data
-
+    img_extensions = None
+    card_id = None
     link_id = None
     request_link_first_letter = None
-
     icon_link = None
     request_link = None
-
+    request_link_desc = None
+    link_favicon = None
     error_file = None
     error_link = None
 
     def __init__(self, request):
-        self.request = request
-        self.add_file()
-        self.add_link()
+        try:
+            self.request = request.data
+
+            if self.request['card_id']:
+                self.card_id = Card.objects.get(id=self.request['card_id'])
+
+            if len(self.request['file']) > 0:
+                print(f'25__ file => {self.request['file']}')
+                self.add_file()
+
+            if len(self.request['link']) != 0 or len(self.request['linkDesc']) != 0:
+                print(f'29__ link => {self.request['link']}, linkDesc => {self.request['linkDesc']}')
+                self.add_link()
+
+        except Exception as err:
+            print('24__ request.data', err)
+            self.error_file = True
+            return
 
     def add_file(self):
         try:
             file_list = self.request.getlist('file')
+            self.img_extensions = ImageExtensionSerializer(ImageExtension.objects.all(), many=True).data
+
             for file in file_list:
-                print('78__>>>', file.name.split('.')[-1])
+                print(f'36__ => {file.name.split('.')[-1]}')
                 request_file_extension = file.name.split('.')[-1]
 
                 for img_extension in self.img_extensions:
                     if request_file_extension == img_extension['type']:
-                        print(f'89__ {request_file_extension, img_extension['type']}')
+                        print(f'41__ {request_file_extension, img_extension['type']}')
                         self.image_bool = True
 
                 CardFile.objects.create(
-                    card=Card.objects.get(id=self.request['card_id']),
+                    card=self.card_id,
                     name=file.name,
                     size=file.size,
                     extension=request_file_extension,
@@ -46,28 +63,28 @@ class AddFileAndLink:
 
             self.error_file = False
         except Exception as err:
-            print('add_file __41', err)
+            print('55__ add_file', err)
             self.error_file = True
 
     def add_link(self):
         try:
             if len(self.request['link']) != 0:
                 self.request_link = self.request['link']
-                # получаем фавикон
-                link_favicon = self.take_favicon()
+                # получаем favicon
+                self.link_favicon = self.take_favicon()
                 # получаем последнюю букву из ссылки
-                request_link_first_letter = self.request['link'].split('://')[-1][0:1].upper()
+                self.request_link_first_letter = self.request['link'].split('://')[-1][0:1].upper()
             else:
                 self.request_link = self.request['linkDesc']
-                # получаем фавикон
-                link_favicon = self.take_favicon()
+                # получаем favicon
+                self.link_favicon = self.take_favicon()
                 # получаем последнюю букву из ссылки
-                request_link_first_letter = self.request['linkDesc'].split('://')[-1][0:1].upper()
+                self.request_link_first_letter = self.request['linkDesc'].split('://')[-1][0:1].upper()
 
             if len(self.request['linkDesc']) != 0:
-                request_link_desc = self.request['linkDesc']
+                self.request_link_desc = self.request['linkDesc']
             else:
-                request_link_desc = self.request['link']
+                self.request_link_desc = self.request['link']
 
             try:
                 if self.request['link_id'] != '':
@@ -80,23 +97,23 @@ class AddFileAndLink:
                 id=self.link_id,
                 defaults={
                     'text': self.request_link,
-                    'description': request_link_desc,
-                    'first_letter': request_link_first_letter,
-                    'favicon': link_favicon,
-                    'card': Card.objects.get(id=self.request['card_id']),
+                    'description': self.request_link_desc,
+                    'first_letter': self.request_link_first_letter,
+                    'favicon': self.link_favicon,
+                    'card': self.card_id,
                 },
                 create_defaults={
                     'text': self.request_link,
-                    'description': request_link_desc,
-                    'first_letter': request_link_first_letter,
-                    'favicon': link_favicon,
-                    'card': Card.objects.get(id=self.request['card_id']),
+                    'description': self.request_link_desc,
+                    'first_letter': self.request_link_first_letter,
+                    'favicon': self.link_favicon,
+                    'card': self.card_id,
                 }
             )
 
             self.error_link = False
         except Exception as err:
-            print('add_link __95', err)
+            print('105__ add_link', err)
             self.error_link = True
 
     def take_favicon(self):
@@ -120,7 +137,7 @@ class AddFileAndLink:
             icon_link = soup.find("link", rel="shortcut icon")
         else:
             icon_link = soup.find("link", rel="icon")
-        print('27', icon_link)
+        # print(f'129__ {icon_link}')
 
         try:
             icon = icon_link['href']
@@ -128,19 +145,10 @@ class AddFileAndLink:
                 favicon = f'{icon}'
             else:
                 favicon = f'{parsed_url.scheme}://{parsed_url.host}{icon}'
-
-            print('36', favicon)
+            # print(f'138__ {favicon}')
             if favicon:
                 return favicon
             return None
         except Exception as err:
-            print('41', err)
+            print(f'143__ {err}')
             return None
-
-
-# add_error = AddFileAndLink(request.data)
-# print(f'error __69 => {add_error}')
-#
-# if add_error.error_file and add_error.error_link:
-#     return Response(False, status=status.HTTP_404_NOT_FOUND)
-# return Response(card_data, status=status.HTTP_200_OK)
