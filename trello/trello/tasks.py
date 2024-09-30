@@ -8,10 +8,11 @@ from .serializers import CardSerializer, UserSerializer
 from .views_functions.sending_email import sending_email
 
 @app.task # регистрируем таску
-def repeat_order_make():
+def checking_expired_cards():
     count = 0
     datetime_now = datetime.now().strftime("%Y-%m-%dT%H:%M:00")
-    datetime_3_hours_before = (datetime.now() - timedelta(hours=3)).strftime("%Y-%m-%dT%H:%M:00")
+    datetime_3_hours_before = (datetime.now() - timedelta(minutes=30)).strftime("%Y-%m-%dT%H:%M:00")
+    print('15', datetime_3_hours_before)
     cards_with_end_date = CardSerializer(Card.objects.filter(date_end__isnull=False), many=True).data
     for card in cards_with_end_date:
         if datetime_3_hours_before < card['date_end'] <= datetime_now:

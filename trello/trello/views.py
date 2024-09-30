@@ -72,8 +72,8 @@ def download_file_from_card(request):
         response['Content-Disposition'] = f'attachment; filename="{uploaded_file.name}"'
         print(response)
         return response
-    except Exception as err:
-        print(f'error => {err}')
+    except Exception as ex:
+        print(f'error => {ex}')
         return Response(False, status=status.HTTP_404_NOT_FOUND)
 
 
@@ -275,13 +275,14 @@ def del_card_activity(request):
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def add_card_due_date(request):
+    # print(request.data)
     if request.data['card_id'] and request.data['end_date_time']:
         card_id = request.data['card_id']
         end_date_time = datetime.strptime(request.data['end_date_time'], "%d-%m-%Y %H:%M:%S")
         try:
             Card.objects.filter(id=card_id).update(date_end=end_date_time)
-        except:
-            print("если что-то сюда прилетит, то будем разбираться")
+        except Exception as ex:
+            print("если что-то сюда прилетит, то будем разбираться", ex)
             return Response(False, status=status.HTTP_404_NOT_FOUND)
 
         queryset = Card.objects.all().filter(id=card_id)
@@ -323,8 +324,8 @@ def add_card_due_date_execute(request):
         elif card_execute == 'false':
             card_execute = False
         Card.objects.filter(id=card_id).update(execute=card_execute)
-    except Exception as err:
-        print("если что-то сюда прилетит, то будем разбираться", err)
+    except Exception as ex:
+        print("если что-то сюда прилетит, то будем разбираться", ex)
         return Response(False, status=status.HTTP_404_NOT_FOUND)
 
     queryset = Card.objects.filter(id=card_id)
@@ -443,8 +444,8 @@ def swap_cards(request):
                 address_mail = card_users_data['email']
                 sending_email(subject_email, text_email, address_mail)
             print("обновили порядок карточек в БД")
-    except Exception as err:
-        print(f'если что-то сюда прилетит, то будем разбираться: \n {err}')
+    except Exception as ex:
+        print(f'если что-то сюда прилетит, то будем разбираться: \n {ex}')
         return Response(False, status=status.HTTP_404_NOT_FOUND)
 
     dashboard_id = request.data["dashboardId"]

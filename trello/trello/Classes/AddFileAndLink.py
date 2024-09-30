@@ -33,8 +33,8 @@ class AddFileAndLink:
                 print(f'29__ link => {self.request['link']}, linkDesc => {self.request['linkDesc']}')
                 self.add_link()
 
-        except Exception as err:
-            print('24__ request.data', err)
+        except Exception as ex:
+            print('24__ request.data', ex)
             self.error_file = True
             return
 
@@ -62,8 +62,8 @@ class AddFileAndLink:
                 )
 
             self.error_file = False
-        except Exception as err:
-            print('55__ add_file', err)
+        except Exception as ex:
+            print('55__ add_file', ex)
             self.error_file = True
 
     def add_link(self):
@@ -89,8 +89,8 @@ class AddFileAndLink:
             try:
                 if self.request['link_id'] != '':
                     self.link_id = int(self.request['link_id'])
-            except Exception as err:
-                print(f'нет "link_id" или не верный формат: {self.link_id}', err)
+            except Exception as ex:
+                print(f'нет "link_id" или не верный формат: {self.link_id}', ex)
                 self.error_link = True
 
             CardLink.objects.update_or_create(
@@ -112,23 +112,23 @@ class AddFileAndLink:
             )
 
             self.error_link = False
-        except Exception as err:
-            print('105__ add_link', err)
+        except Exception as ex:
+            print('105__ add_link', ex)
             self.error_link = True
 
     def take_favicon(self):
         try:
             parsed_url = urllib3.util.parse_url(self.request_link)
-        except Exception as err:
-            print(err)
+        except Exception as ex:
+            print(ex)
             return None
 
         http = urllib3.PoolManager()
 
         try:
             response = http.request('GET', self.request_link)
-        except Exception as err:
-            print(err)
+        except Exception as ex:
+            print(ex)
             return None
 
         soup = BeautifulSoup(response.data, features="html.parser")
@@ -149,6 +149,6 @@ class AddFileAndLink:
             if favicon:
                 return favicon
             return None
-        except Exception as err:
-            print(f'143__ {err}')
+        except Exception as ex:
+            print(f'143__ {ex}')
             return None
