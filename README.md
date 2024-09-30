@@ -166,6 +166,8 @@ python manage.py changepassword "указать email"
 ```
 Спартуем "django_celery_beat":
 
+Справки: https://django.fun/docs/celery/5.1/userguide/periodic-tasks/
+
 Возможно, вчначале понадобятся миграции: python manage.py migrate
 
 В водим поочереди команды в разных терминалах:

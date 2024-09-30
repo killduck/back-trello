@@ -12,8 +12,8 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {
     'every': {
         'task': 'trello.tasks.checking_expired_cards',
-        # по умолчанию выполняет каждые 30 мин., гибко настраивается
-        # 'schedule': crontab(hour='*/1'),
-        'schedule': crontab(minute='*/30'),
+        # по умолчанию выполняет каждый час.
+        # 'schedule': crontab(minute='*/1'),
+        'schedule': crontab(minute='0', hour='*/1'),
     },
 }

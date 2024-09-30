@@ -11,11 +11,10 @@ from .views_functions.sending_email import sending_email
 def checking_expired_cards():
     count = 0
     datetime_now = datetime.now().strftime("%Y-%m-%dT%H:%M:00")
-    datetime_3_hours_before = (datetime.now() - timedelta(minutes=30)).strftime("%Y-%m-%dT%H:%M:00")
-    print('15', datetime_3_hours_before)
+    datetime_earlier = (datetime.now() - timedelta(hours=1)).strftime("%Y-%m-%dT%H:%M:00")
     cards_with_end_date = CardSerializer(Card.objects.filter(date_end__isnull=False), many=True).data
     for card in cards_with_end_date:
-        if datetime_3_hours_before < card['date_end'] <= datetime_now:
+        if datetime_earlier < card['date_end'] <= datetime_now:
             card_users = CardUser.objects.values('user').filter(card_id=card['id'])
             card_users_data = UserSerializer(User.objects.filter(id__in=card_users), many=True).data
             for user in card_users_data:

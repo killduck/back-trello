@@ -57,7 +57,7 @@ INSTALLED_APPS = [
     "corsheaders",  # Подключаем библиотеку/приложение django-cors-headers
     "trello",
     "django_seed",
-    # 'django_celery_beat',
+    # 'django_celery_beat', # это по ходу пока не нужно...
 ]
 
 
@@ -225,7 +225,7 @@ CELERY_RESULT_SERIALIZER = "json"
 
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
-# CELERY_BEAT_SCHEDULER='django_celery_beat.schedulers:DatabaseScheduler' это по ходу не нужно...
+# CELERY_BEAT_SCHEDULER='django_celery_beat.schedulers:DatabaseScheduler' # это по ходу пока не нужно...
 
 # Actual directory user files go to
 MEDIA_ROOT = BASE_DIR / 'media_backend'
