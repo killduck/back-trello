@@ -1,36 +1,33 @@
+import os
+from os import pread
+from os.path import split
+
 from django.core.mail import EmailMultiAlternatives, get_connection
 from django.template.loader import render_to_string
-
-from datetime import datetime
-
+from django.http import HttpResponse
 from django.conf import settings
 from django.shortcuts import get_object_or_404, get_list_or_404
 
-from rest_framework import status
-from rest_framework.decorators import (
-    api_view,
-    permission_classes,
-)
+from datetime import datetime
 
+from rest_framework import status
+from rest_framework.decorators import (api_view, permission_classes,)
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
+from .Classes.AddFileAndLink import AddFileAndLink
 from .models import (
-    Card,
-    Column,
-    Dashboard,
-    DashboardUserRole,
-    User,
-    CardUser,
-    Role,
-    Label, Activity,
+    Card, Column,
+    Dashboard, DashboardUserRole,
+    User, CardUser,
+    Role, Label, Activity,
+    CardImg, CardFile,
+    ImageExtension, CardLink,
 )
 
-from .permissions import (
-   IsUserHasRole,
-)
+from .permissions import (IsUserHasRole)
 from .serializers import (
     CardSerializer,
     ColumnSerializer,
@@ -39,10 +36,77 @@ from .serializers import (
     UserSerializer,
     CardUserSerializer,
     LabelSerializer, ActivitySerializer,
+    CardImgSerializer, CardFileSerializer,
+    ImageExtensionSerializer,
 )
 from .utils import SendMessage, PreparingMessage
 
+from .views_functions.add_file_link import add_file, add_link
 from .views_functions.sending_email import sending_email
+from .views_functions.take_favicon import take_favicon
+
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
+def add_file_and_link_to_card(request):
+    # print('51', request.data, f'\n', request.POST,f'\n', request.FILES)
+
+    add_error = AddFileAndLink(request)
+    # print(f'error __54 => {vars(add_error)}')
+
+    card_data = CardSerializer(Card.objects.filter(id=request.data['card_id']), many=True).data[0]
+    # print(f'88__card_data => {card_data['card_file']}')
+    # print(f'88__card_data => {card_data}')
+    if add_error.error_file and add_error.error_link:
+        return Response(False, status=status.HTTP_404_NOT_FOUND)
+    return Response(card_data, status=status.HTTP_200_OK)
+
+
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
+def download_file_from_card(request):
+    # print(request)
+    try:
+        file_id = int(request.data['file_id'])
+        uploaded_file = CardFile.objects.get(id=file_id)
+        response = HttpResponse(uploaded_file.file_url, content_type='application/force-download')
+        response['Content-Disposition'] = f'attachment; filename="{uploaded_file.name}"'
+        print(response)
+        return response
+    except Exception as ex:
+        print(f'error => {ex}')
+        return Response(False, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
+def del_file_from_card(request):
+    print(request.data)
+    try:
+        card_id = request.data["card_id"]
+        file_id = request.data["file_id"]
+        if card_id and file_id:
+            CardFile.objects.filter(id=file_id).delete()
+
+            card_data = CardSerializer(Card.objects.filter(id=card_id), many=True).data[0]
+            return Response(card_data, status=status.HTTP_200_OK)
+    except:
+        return Response(False, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
+def del_link_from_card(request):
+    print(request.data)
+    try:
+        card_id = request.data["card_id"]
+        link_id = request.data["link_id"]
+        if card_id and link_id:
+            CardLink.objects.filter(id=link_id).delete()
+
+            card_data = CardSerializer(Card.objects.filter(id=card_id), many=True).data[0]
+            return Response(card_data, status=status.HTTP_200_OK)
+    except:
+        return Response(False, status=status.HTTP_404_NOT_FOUND)
 
 
 # Кастомное представление, что бы была возможность возвращать в Response не только Token
@@ -92,9 +156,14 @@ def label_data(request):
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def add_label_to_card(request):
-    if request.data['card_id'] and request.data['label_id'] or (request.data['label_id'] is None):
+    print(f'172__{request.data}')
+    if request.data['card_id'] and request.data['label_id']:
         card_id = request.data['card_id']
-        label_id = request.data['label_id']
+        if request.data['label_id'] == 'null':
+            label_id = None
+        else:
+            label_id = request.data['label_id']
+
         try:
             Card.objects.filter(id=card_id).update(label_id=label_id)
         except:
@@ -206,13 +275,14 @@ def del_card_activity(request):
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def add_card_due_date(request):
+    # print(request.data)
     if request.data['card_id'] and request.data['end_date_time']:
         card_id = request.data['card_id']
         end_date_time = datetime.strptime(request.data['end_date_time'], "%d-%m-%Y %H:%M:%S")
         try:
             Card.objects.filter(id=card_id).update(date_end=end_date_time)
-        except:
-            print("если что-то сюда прилетит, то будем разбираться")
+        except Exception as ex:
+            print("если что-то сюда прилетит, то будем разбираться", ex)
             return Response(False, status=status.HTTP_404_NOT_FOUND)
 
         queryset = Card.objects.all().filter(id=card_id)
@@ -245,13 +315,17 @@ def del_card_due_date(request):
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def add_card_due_date_execute(request):
-    # print(request.data)
+    print(request.data)
     try:
         card_id = request.data['card_id']
         card_execute = request.data['card_execute']
+        if card_execute == 'true':
+            card_execute = True
+        elif card_execute == 'false':
+            card_execute = False
         Card.objects.filter(id=card_id).update(execute=card_execute)
-    except:
-        print("если что-то сюда прилетит, то будем разбираться")
+    except Exception as ex:
+        print("если что-то сюда прилетит, то будем разбираться", ex)
         return Response(False, status=status.HTTP_404_NOT_FOUND)
 
     queryset = Card.objects.filter(id=card_id)
@@ -335,7 +409,7 @@ def swap_columns(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def swap_cards(request):
-    # print(request.data)
+    print('488', request.data)
     try:
         column_name_start = Card.objects.filter(id=request.data['card_id'])[0].column
         for card in request.data["order_cards"]:
@@ -370,8 +444,8 @@ def swap_cards(request):
                 address_mail = card_users_data['email']
                 sending_email(subject_email, text_email, address_mail)
             print("обновили порядок карточек в БД")
-    except Exception as err:
-        print(f'если что-то сюда прилетит, то будем разбираться: \n {err}')
+    except Exception as ex:
+        print(f'если что-то сюда прилетит, то будем разбираться: \n {ex}')
         return Response(False, status=status.HTTP_404_NOT_FOUND)
 
     dashboard_id = request.data["dashboardId"]
@@ -412,7 +486,7 @@ def create_column(request):
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def create_card(request):
-
+    # print(request.data)
     card_column = request.data["column"]
     last_card_in_column = Card.objects.filter(column=card_column).last()
 

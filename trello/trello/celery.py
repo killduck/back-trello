@@ -11,8 +11,9 @@ app.autodiscover_tasks()
 # заносим таски в очередь
 app.conf.beat_schedule = {
     'every': {
-        'task': 'trello.tasks.repeat_order_make',
-        'schedule': crontab(hour='*/3'),  # по умолчанию выполняет каждую минуту, очень гибко настраивается
+        'task': 'trello.tasks.checking_expired_cards',
+        # по умолчанию выполняет каждый час.
         # 'schedule': crontab(minute='*/1'),
+        'schedule': crontab(minute='0', hour='*/1'),
     },
 }

@@ -166,6 +166,8 @@ python manage.py changepassword "указать email"
 ```
 Спартуем "django_celery_beat":
 
+Справки: https://django.fun/docs/celery/5.1/userguide/periodic-tasks/
+
 Возможно, вчначале понадобятся миграции: python manage.py migrate
 
 В водим поочереди команды в разных терминалах:
@@ -177,7 +179,7 @@ python manage.py changepassword "указать email"
 3. celery -A trello worker -l info (стартуем Сelery worker)
     - возможно: celery -A trello worker -l info -O fair .
 4. celery -A trello beat -l info (стартуем Сelery beat)
-
+celery -A trello beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
 время для рассылки можно изменить в файле "celery.py" через "schedule".
 
 ```
