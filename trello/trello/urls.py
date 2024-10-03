@@ -47,8 +47,11 @@ urlpatterns = [
 
                 path("search-role-board/", views.search_role_board, name="search-role-board"),
                 path("change-role-board/", views.change_role_board, name="change-role-board"),
-            ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+            ]
         ),
     ),
     path("admin/", admin.site.urls),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
