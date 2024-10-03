@@ -226,8 +226,10 @@ CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 # CELERY_BEAT_SCHEDULER='django_celery_beat.schedulers:DatabaseScheduler' # это по ходу пока не нужно...
 
 # Actual directory user files go to
-MEDIA_ROOT = BASE_DIR / 'media_backend'
+MEDIA_ROOT = "/var/www/python31/media_backend/"
+
+if DEBUG:
+    MEDIA_ROOT = BASE_DIR / 'media_backend'
 
 # URL used to access the media
 MEDIA_URL = '/media_backend/'
-# MEDIA_URL = 'static/'
