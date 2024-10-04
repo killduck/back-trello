@@ -166,7 +166,7 @@ USE_TZ = False  # при True глючит загрузка seedов модел�
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = '/static_backend/'
-# STATICFILES_DIRS = [BASE_DIR / 'static',]
+STATICFILES_DIRS = [BASE_DIR / 'static',]
 STATIC_ROOT = BASE_DIR / 'static_backend'
 
 
