@@ -200,7 +200,7 @@ def add_card_description(request):
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def add_card_activity(request):
-    # print(f'129__ {request.data}')
+    # print(f'203__ {request.data}')
     if request.data['card_id'] and request.data['author_id'] and request.data['comment']:
         card_users = CardUserSerializer(
             CardUser.objects.values('user_id').filter(card_id=request.data['card_id']).
@@ -236,22 +236,28 @@ def add_card_activity(request):
 
         card_data = CardSerializer(Card.objects.filter(id=request.data['card_id']), many=True).data[0]
         comment_date = datetime.strptime(mail_data["date"], "%Y-%m-%dT%H:%M:%S.%f")
-        comment_date = comment_date.strftime("%Y.%m.%d %H:%M:%S")
-        comment_text = mail_data["comment"][3: -4]
+        comment_date_nice_format = comment_date.strftime("%Y.%m.%d %H:%M:%S")
+
+        if mail_data["comment"] is not None:
+            comment_text = f'Текст комментария: \n\"{mail_data["comment"][3: -4]}\"'
+        else:
+            comment_text = f'Текст комментария: нет"'
+
         for card_user in card_users:
             card_users_data = UserSerializer(User.objects.filter(id=card_user['user_id']), many=True).data[0]
 
             subject_email = f'Изменение в карточке \"{card_data["name"]}\"'
             text_email = (f'{mail_data["author"]["first_name"]} '
                           f'{mail_data["author"]["last_name"]} '
-                          f'{action_text}(а) комментарий, созданный '
-                          f'{comment_date} в карточке \"{card_data["name"]}\".\n'
+                          f'{action_text}(а) комментарий, '
+                          f'созданный {comment_date_nice_format} '
+                          f'в карточке \"{card_data["name"]}\".\n'
                           f'Текст комментария: \n\"{comment_text}\"')
             address_mail = card_users_data['email']
             sending_email(subject_email, text_email, address_mail)
 
         ''' для отправки на фронт в развёрнутом порядке '''
-        queryset_activity = Activity.objects.filter(card_id=request.data['card_id']).reverse()
+        queryset_activity = Activity.objects.filter(card_id=request.data['card_id'])
         serializer_activity = ActivitySerializer(queryset_activity, many=True).data
 
         return Response(serializer_activity)
