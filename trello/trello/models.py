@@ -413,7 +413,7 @@ class Activity(models.Model):
     class Meta:
         verbose_name = "Действия"
         verbose_name_plural = "Действие"
-        ordering = ["id"]
+        ordering = ["-id"]
 
     def __str__(self):
         return self.action
