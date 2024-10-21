@@ -807,7 +807,17 @@ class InvitUserBoardViewSet(viewsets.ModelViewSet):
         url_path='pending-confirmations',
     )
     def pending_confirmation(self, request):
-        pass
+        invit_hash = request.data['alias']
+
+        # find_invite = InvitUserDashboard.objects.filter(hash=invit_hash)
+        find_invite = get_object_or_404(InvitUserDashboard, hash=invit_hash)
+
+        if find_invite:
+            print(find_invite.dashboard.img)
+            return Response(True, status=status.HTTP_200_OK)
+
+
+        return Response(False)
 
 
 # @api_view(["POST"])
