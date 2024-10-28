@@ -2,9 +2,12 @@ from datetime import datetime
 
 from django.conf import settings
 from django.shortcuts import get_object_or_404, get_list_or_404
+from django.db.models import Q
 
 from rest_framework import status
+from rest_framework import viewsets
 from rest_framework.decorators import (
+    action,
     api_view,
     permission_classes,
 )
@@ -696,11 +699,6 @@ def change_role_board(request):
     return Response(False, status=status.HTTP_404_NOT_FOUND)
 
 
-
-from rest_framework.decorators import action
-from rest_framework import viewsets
-from django.db.models import Q
-
 class InvitUserBoardViewSet(viewsets.ModelViewSet):
 
     # queryset = InvitUserDashboard.objects.all()
@@ -794,7 +792,7 @@ class InvitUserBoardViewSet(viewsets.ModelViewSet):
         dashboard_id = request.data['dashboardId']
 
         already_invited_users = User.objects.filter(user_dashboard_invate__dashboard=dashboard_id)  # выборку делаем через related_name
-        print('already_invited_users>>>', already_invited_users)
+
         serializer = UserSerializer(already_invited_users, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -809,15 +807,31 @@ class InvitUserBoardViewSet(viewsets.ModelViewSet):
     def pending_confirmation(self, request):
         invit_hash = request.data['alias']
 
-        # find_invite = InvitUserDashboard.objects.filter(hash=invit_hash)
-        find_invite = get_object_or_404(InvitUserDashboard, hash=invit_hash)
+        find_invite = InvitUserDashboard.objects.filter(hash=invit_hash).first()
+
+        role_participant = get_object_or_404(Role, name='participant')
+        # print('find_invite>>>', find_invite.dashboard.id, find_invite.user.id)
+        print('role>>>', role_participant)
 
         if find_invite:
-            print(find_invite.dashboard.img)
-            return Response(True, status=status.HTTP_200_OK)
+
+            DashboardUserRole.objects.create(
+            dashboard=find_invite.dashboard,
+            user=find_invite.user,
+            role=role_participant
+            )
+
+            find_invite.delete()
+
+            response_data = {
+                'status': True,
+                'board_name': find_invite.dashboard.name,
+            }
+
+            return Response(response_data, status=status.HTTP_200_OK)
 
 
-        return Response(False)
+        return Response({'status': False})
 
 
 # @api_view(["POST"])
