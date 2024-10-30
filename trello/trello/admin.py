@@ -4,7 +4,9 @@ from django.contrib import admin
 from .models import (
     Card,
     Column,
-    User
+    User,
+    CardFile,
+    Dashboard,
 )
 
 
@@ -45,6 +47,7 @@ class UserAdmin(admin.ModelAdmin):
         "email",
         "first_name",
         "last_name",
+        "img",
         "password",
         "is_active",
         "is_staff",
@@ -56,3 +59,32 @@ class UserAdmin(admin.ModelAdmin):
         "email",
     )
     empty_value_display = settings.EMPTY_VALUE_DISPLAY
+
+
+@admin.register(CardFile)
+class CardFileAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "card",
+        "name",
+        "size",
+        "extension",
+        "date_upload",
+        "file_url",
+        "image" 
+    )
+    search_fields = ("name",)
+
+
+@admin.register(Dashboard)
+class DashboardAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "name",
+        "img" 
+    )
+    search_fields = ("name",)
+    list_filter = (
+        "name",
+    )
+

@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     "corsheaders",  # Подключаем библиотеку/приложение django-cors-headers
     "trello",
     "django_seed",
+    # 'django_celery_beat', # это по ходу пока не нужно...
 ]
 
 
@@ -206,3 +207,27 @@ MAIL_MESSAGE = {
     'add_dashboard': f'Вас приглашают стать учаcтником доски. Пройдите по ссылке https://top-python31.ru/invit-board-confirm/',
     'deadline': f'У вас просрочена задача ',
 }
+
+REDIS_HOST = "127.0.0.1"
+REDIS_PORT = "6379"
+
+CELERY_BROKER_URL = "redis://" + REDIS_HOST + ":" + REDIS_PORT
+CELERY_BROKER_TRANSPORT_OPTIONS = {"visibility_timeout": 3600}
+CELERY_RESULT_BACKEND = "redis://" + REDIS_HOST + ":" + REDIS_PORT
+
+CELERY_ACCEPT_CONTENT = ["application/json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+
+# CELERY_BEAT_SCHEDULER='django_celery_beat.schedulers:DatabaseScheduler' # это по ходу пока не нужно...
+
+# Actual directory user files go to
+MEDIA_ROOT = "/var/www/python31/media_backend/"
+
+if DEBUG:
+    MEDIA_ROOT = BASE_DIR / 'media_backend'
+
+# URL used to access the media
+MEDIA_URL = '/media_backend/'

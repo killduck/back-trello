@@ -1,20 +1,95 @@
 from rest_framework import serializers
 
 from .models import (
+    Activity,
     Card,
+    CardFile,
+    CardImg,
+    CardLink,
+    CardUser,
     Column,
     Dashboard,
-    Role,
     DashboardUserRole,
-    User,
-    CardUser,
-    Label,
-    Activity,
+    ImageExtension,
     InvitUserDashboard,
+    Label,
+    Role,
+    ServiceImages,
+    User,
 )
 
 
+class ServiceImagesSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ServiceImages
+
+        fields = (
+            "id",
+            "name",
+            "size",
+            "extension",
+            "date_upload",
+            "image_url",
+        )
+
+class CardLinkSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CardLink
+
+        fields = (
+            "id",
+            "text",
+            "description",
+            "first_letter",
+            "favicon",
+            "card_id",
+        )
+
+class CardImgSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CardImg
+
+        fields = (
+            "id",
+            "card_id",
+            "name",
+            "size",
+            "extension",
+            "date_upload",
+            "image_url",
+        )
+
+class ImageExtensionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ImageExtension
+
+        fields = (
+            "id",
+            "type",
+        )
+
+
+class CardFileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CardFile
+
+        fields = (
+            "id",
+            "card_id",
+            "name",
+            "size",
+            "extension",
+            "date_upload",
+            "file_url",
+            "image",
+        )
+
 class CardUserSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = CardUser
 
@@ -94,6 +169,9 @@ class CardSerializer(serializers.ModelSerializer):
 
     label = LabelSerializer(many=False)
     activity = ActivitySerializer(many=True)
+    card_img = CardImgSerializer(many=True)
+    card_file = CardFileSerializer(many=True)
+    card_link = CardLinkSerializer(many=True)
 
     class Meta:
         model = Card
@@ -105,9 +183,13 @@ class CardSerializer(serializers.ModelSerializer):
             "column",
             "date_start",
             "date_end",
+            "execute",
             "label",
             "description",
             "activity",
+            "card_img",
+            "card_file",
+            "card_link",
         )
 
 

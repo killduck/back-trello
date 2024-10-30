@@ -2,8 +2,220 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 from django.db import models
 
+from django.db.models.signals import pre_delete
+from django.dispatch.dispatcher import receiver
 
-# Cправочные материалы по API для компонентов системы аутентификации Django https://docs.djangoproject.com/en/5.0/ref/contrib/auth/
+from .models_functions.upload_files_img import (
+    upload_to_files,
+    upload_to_images,
+)
+
+class ServiceImages(models.Model):
+    name = models.CharField(
+        max_length=200,
+        verbose_name="Имя фото",
+        help_text="Введите имя фото",
+        blank=True,
+    )
+    size = models.IntegerField(
+        verbose_name="Размер фото",
+        help_text="Введите размер фото",
+        null=True,
+    )
+    extension = models.CharField(
+        max_length=50,
+        verbose_name="расширение фото",
+        help_text="Введите расширение фото",
+        blank=True,
+        null=True,
+    )
+    date_upload = models.DateTimeField(
+        auto_now=True,
+        auto_now_add=False,
+        blank=True,
+        null=True,
+    )
+    image_url = models.ImageField(
+        # upload_to=upload_to_images,
+        blank=True,
+        null=True,
+    )
+
+    class Meta:
+        verbose_name = "Служебное фото"
+        ordering = ["id"]
+
+    def __str__(self):
+        return self.type
+
+class ImageExtension(models.Model):
+    type= models.CharField(
+        max_length=50,
+        verbose_name="Расширение фото",
+        help_text="Введите расширение фото",
+        blank=True,
+        null=True,
+    )
+    class Meta:
+        verbose_name = "Расширение фото"
+        ordering = ["id"]
+
+    def __str__(self):
+        return self.type
+
+class CardLink(models.Model):
+    text = models.CharField(
+        max_length=500,
+        verbose_name="Имя ссылки",
+        help_text="Введите ссылку",
+        blank=True,
+        null=True,
+    )
+    description = models.CharField(
+        max_length=500,
+        verbose_name="описание ссылки",
+        help_text="Введите описание ссылки",
+        blank=True,
+        null=True,
+    )
+    favicon = models.CharField(
+        max_length=200,
+        verbose_name="Имя ссылки для фавикона",
+        help_text="Введите ссылку для фавикона",
+        blank=True,
+        null=True,
+    )
+    first_letter = models.CharField(
+        max_length=10,
+        verbose_name="первая буква ссылки",
+        help_text="Введите первую букву ссылки",
+        blank=True,
+        null=True,
+    )
+    card = models.ForeignKey(
+        "Card",
+        on_delete=models.CASCADE,
+        related_name="card_link",
+        blank=True,
+        null=False,
+        verbose_name="Карточка",
+        help_text="Введите карточку к которой относится ссылка",
+    )
+
+    class Meta:
+        verbose_name = "Ссылка карточки"
+        ordering = ["id"]
+
+    def __str__(self):
+        return self.text
+
+class CardImg(models.Model):
+    card = models.ForeignKey(
+        "Card",
+        on_delete=models.CASCADE,
+        related_name="card_img",
+        blank=True,
+        null=False,
+        verbose_name="Карточка",
+        help_text="Введите карточку к которой относится фото",
+    )
+    name = models.CharField(
+        max_length=50,
+        verbose_name="Имя фото",
+        help_text="Введите имя фото",
+        blank=True,
+        null=True,
+    )
+    size = models.IntegerField(
+        verbose_name="Размер фото",
+        help_text="Введите размер фото",
+        null=True,
+    )
+    extension = models.CharField(
+        max_length=50,
+        verbose_name="расширение фото",
+        help_text="Введите расширение фото",
+        blank=True,
+        null=True,
+    )
+    date_upload = models.DateTimeField(
+        auto_now=True,
+        auto_now_add=False,
+        blank=True,
+        null=True,
+    )
+    image_url = models.ImageField(
+        upload_to=upload_to_images,
+        blank=True,
+        null=True,
+    )
+    image = models.BooleanField(
+        default=True,
+        verbose_name="фото или нет",
+    )
+
+    class Meta:
+        verbose_name = "Фото карточки"
+        ordering = ["id"]
+
+    def __str__(self):
+        return self.name
+
+
+class CardFile(models.Model):
+    card = models.ForeignKey(
+        "Card",
+        on_delete=models.CASCADE,
+        related_name="card_file",
+        blank=True,
+        null=False,
+        verbose_name="Карточка",
+        help_text="Введите карточку к которой относится файл",
+    )
+    name = models.CharField(
+        max_length=50,
+        verbose_name="Имя файла",
+        help_text="Введите имя файла",
+        blank=True,
+        null=True,
+    )
+    size = models.IntegerField(
+        verbose_name="Размер файла",
+        help_text="Введите размер к файла",
+        null=True,
+    )
+    extension = models.CharField(
+        max_length=50,
+        verbose_name="расширение файла",
+        help_text="Введите расширение файла",
+        blank=True,
+        null=True,
+    )
+    date_upload = models.DateTimeField(
+        auto_now=True,
+        auto_now_add=False,
+        blank=True,
+        null=True,
+    )
+    file_url = models.FileField(
+        upload_to=upload_to_files,
+        blank=True,
+        null=True,
+    )
+    image = models.BooleanField(
+        default=False,
+        verbose_name="фото или нет",
+    )
+
+    class Meta:
+        verbose_name = "Файл карточки"
+        ordering = ["id"]
+
+    def __str__(self):
+        return self.name
+
+
+# Справочные материалы по API для компонентов системы аутентификации Django https://docs.djangoproject.com/en/5.0/ref/contrib/auth/
 class User(AbstractUser):
     """Переопределяем стандартную модель User."""
 
@@ -200,11 +412,11 @@ class Activity(models.Model):
 
     class Meta:
         verbose_name = "Действия"
-        verbose_name_plural = "действие"
-        ordering = ["id"]
+        verbose_name_plural = "Действие"
+        ordering = ["-id"]
 
     def __str__(self):
-        return self.text
+        return self.action
 
 
 class Card(models.Model):
@@ -239,6 +451,10 @@ class Card(models.Model):
         auto_now_add=False,
         blank=True,
         null=True,
+    )
+    execute = models.BooleanField(
+        default=False,
+        verbose_name="выполнить до срока",
     )
     label = models.ForeignKey(
         "Label",
@@ -342,7 +558,7 @@ class CardUser(models.Model):
         "User",
         on_delete=models.CASCADE,
         related_name="user_card",
-        verbose_name="Польователь",
+        verbose_name="Пользователь",
     )
 
     class Meta:
@@ -404,6 +620,13 @@ class Checkstep(models.Model):
 
     def __str__(self):
         return self.text
+
+
+# тут удаляем файл
+@receiver(pre_delete, sender=CardFile)
+def image_model_delete(sender, instance, **kwargs):
+    if instance.file_url.name:
+        instance.file_url.delete(False)
 
 
 class InvitUserDashboard(models.Model):

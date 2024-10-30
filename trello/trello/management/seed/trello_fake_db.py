@@ -2,7 +2,10 @@ from trello.models import (
     Column, Card,
     Dashboard, DashboardUserRole,
     Role, User, Label, Activity,
+    ImageExtension, ServiceImages
 )
+
+# from trello.trello.models import
 
 tables = [
     {
@@ -46,12 +49,12 @@ tables = [
             {
                 "id": 1,
                 "name": "Diplom 31",
-                "img": "background_desert.webp"
+                "img": "img/background_desert.webp"
             },
             {
                 "id": 2,
                 "name": "Тестовая доска",
-                "img": "Background_blue.svg"
+                "img": "img/Background_blue.svg"
             },
         ],
     },
@@ -103,7 +106,7 @@ tables = [
                 "is_staff": False,
                 "is_superuser": False,
                 "password": "Raa78",
-                "img": "Andrey.png",
+                "img": "img/users/Andrey.png",
             },
             {
                 "id": 3,
@@ -115,7 +118,7 @@ tables = [
                 "is_staff": False,
                 "is_superuser": False,
                 "password": "ilya616",
-                "img": "Ilya_ava.png",
+                "img": "img/users/Ilya_ava.png",
             },
             {
                 "id": 4,
@@ -127,7 +130,7 @@ tables = [
                 "is_staff": False,
                 "is_superuser": False,
                 "password": "killduck",
-                "img": "leo_ava.png",
+                "img": "img/users/leo_ava.png",
             },
             {
                 "id": 5,
@@ -139,7 +142,7 @@ tables = [
                 "is_staff": True,
                 "is_superuser": True,
                 "password": 'admin',
-                "img": "",
+                "img": None,
             },
             {
                 "id": 6,
@@ -151,7 +154,7 @@ tables = [
                 "is_staff": False,
                 "is_superuser": False,
                 "password": 'vasya',
-                "img": "",
+                "img": None,
             },
         ],
     },
@@ -276,14 +279,14 @@ tables = [
                 # "comment": "asdafff",
                 "action": "оставил комментарий",
             },
-{
+            {
                 "id": 2,
                 "author": User(id=5),
                 "card": Card(id=5),
                 "comment": None,
                 "action": "присоединился(-лась) к этой карточке",
             },
-{
+            {
                 "id": 3,
                 "author": User(id=2),
                 "card": Card(id=5),
@@ -291,5 +294,109 @@ tables = [
                 "action": "оставил комментарий",
             },
         ]
-    }
+    },
+    {
+        "table_name": ImageExtension,
+        "table_dada": [
+            {
+                "id": 1,
+                "type": "jpg",
+            },
+            {
+                "id": 2,
+                "type": "png",
+            },
+            {
+                "id": 3,
+                "type": "bmp",
+            },
+            {
+                "id": 4,
+                "type": "gif",
+            },
+            {
+                "id": 5,
+                "type": "ico",
+            },
+            {
+                "id": 6,
+                "type": "jpeg",
+            },
+            {
+                "id": 7,
+                "type": "webp",
+            },
+        ],
+    },
+    {
+        "table_name": ServiceImages,
+        "table_dada": [
+            {
+                "id": 1,
+                "name": "404_01.png",
+                "extension": "png",
+                "image_url": "img/404/404_01.png",
+            },
+            {
+                "id": 2,
+                "name": "404_02.png",
+                "extension": "png",
+                "image_url": "img/404/404_02.png",
+            },
+            {
+                "id": 3,
+                "name": "404_03.png",
+                "extension": "png",
+                "image_url": "img/404/404_03.png",
+            },
+            {
+                "id": 4,
+                "name": "404_04.png",
+                "extension": "png",
+                "image_url": "img/404/404_04.png",
+            },
+            {
+                "id": 5,
+                "name": "404_05.png",
+                "extension": "png",
+                "image_url": "img/404/404_05.png",
+            },
+            {
+                "id": 6,
+                "name": "404_06.png",
+                "extension": "png",
+                "image_url": "img/404/404_06.png",
+            },
+            {
+                "id": 7,
+                "name": "404_07.png",
+                "extension": "png",
+                "image_url": "img/404/404_07.png",
+            },
+            {
+                "id": 8,
+                "name": "404_08.png",
+                "extension": "png",
+                "image_url": "img/404/404_08.png",
+            },
+            {
+                "id": 9,
+                "name": "404_09.png",
+                "extension": "png",
+                "image_url": "img/404/404_09.png",
+            },
+            {
+                "id": 10,
+                "name": "404_10.png",
+                "extension": "png",
+                "image_url": "img/404/404_10.png",
+            },
+            {
+                "id": 11,
+                "name": "404_11.png",
+                "extension": "png",
+                "image_url": "img/404/404_11.png",
+            },
+        ],
+    },
 ]
