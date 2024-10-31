@@ -101,7 +101,7 @@ tables = [
                 "username": "Raa78",
                 "first_name": "Андрей",
                 "last_name": "Рубцов",
-                "email": "Raa78@mail.ru",
+                "email": "rubtsov1978@gmail.com",
                 "is_active": True,
                 "is_staff": False,
                 "is_superuser": False,

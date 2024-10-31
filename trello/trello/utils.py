@@ -1,8 +1,11 @@
 from django.conf import settings
 
-from django.core.mail import send_mail
+from django.core.mail import send_mail, get_connection
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+
+from abc import ABC, abstractmethod
+import hashlib
 
 
 class PreparingMessage:
@@ -58,7 +61,10 @@ class SendMessage:
 
         html_content = render_to_string('mail_template.html', {'data': self.__letter['text_letter']})
 
+        connection = get_connection()
+        connection.open()
         self.__send(html_content)
+        connection.close()
 
     @property
     def get_write_to_file(self):
@@ -71,11 +77,31 @@ class SendMessage:
         self.__send()
 
 
-class HashMessage:
+class Hashing(ABC):
 
-    def __init__(self, message):
-        self.__message = message
+    def __init__(self, data):
+        self.__data = data
+
+
+class Hash(Hashing):
+    """
+    Образец создания instance класса
+    instance = Hash(message)
+    instance.get_hash_sha256
+    """
 
     @property
-    def get_hash_message(self):
-        pass
+    def get_hash_md5(self):
+
+        hash = hashlib.new('md5')
+        hash.update(self._Hashing__data.encode())
+        hash_data = hash.hexdigest()
+        return hash_data
+
+    @property
+    def get_hash_sha256(self):
+
+        hash = hashlib.new('sha256')
+        hash.update(self._Hashing__data.encode())
+        hash_data = hash.hexdigest()
+        return hash_data

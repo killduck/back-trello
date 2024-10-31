@@ -621,8 +621,43 @@ class Checkstep(models.Model):
     def __str__(self):
         return self.text
 
+
 # тут удаляем файл
 @receiver(pre_delete, sender=CardFile)
 def image_model_delete(sender, instance, **kwargs):
     if instance.file_url.name:
         instance.file_url.delete(False)
+
+
+class InvitUserDashboard(models.Model):
+    """Модель для приглашения юзеров на доску."""
+
+    dashboard = models.ForeignKey(
+        "Dashboard",
+        on_delete=models.CASCADE,
+        related_name="dashboard_user_invait",
+        verbose_name="Дашборд",
+    )
+    user = models.ForeignKey(
+        "User",
+        on_delete=models.CASCADE,
+        related_name="user_dashboard_invate",
+        verbose_name="Пользователь",
+    )
+    hash = models.TextField(
+        verbose_name="Значение хэша",
+        help_text="Введите значение хэша",
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['dashboard', 'user'],
+                name='unique_dashboard_user_hash'
+            )
+        ]
+
+    def __str__(self):
+        return (
+            f'На дашборд={self.dashboard.name} приглашен пользователь={self.user.username}.'
+        )

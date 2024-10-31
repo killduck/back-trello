@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 from os import pread
 from os.path import split
@@ -7,11 +8,18 @@ from django.template.loader import render_to_string
 from django.http import HttpResponse
 from django.conf import settings
 from django.shortcuts import get_object_or_404, get_list_or_404
+from django.db.models import Q
 
-from datetime import datetime
 
 from rest_framework import status
-from rest_framework.decorators import (api_view, permission_classes,)
+from rest_framework import viewsets
+from rest_framework.decorators import (
+    action,
+    api_view,
+    permission_classes,
+)
+
+
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -19,31 +27,47 @@ from rest_framework.response import Response
 
 from .Classes.AddFileAndLink import AddFileAndLink
 from .models import (
-    Card, Column,
-    Dashboard, DashboardUserRole,
-    User, CardUser,
-    Role, Label, Activity,
-    CardImg, CardFile,
-    ImageExtension, CardLink,
+    Activity,
+    Card,
+    CardFile,
+    CardImg,
+    CardLink,
+    CardUser,
+    Column,
+    Dashboard,
+    DashboardUserRole,
+    InvitUserDashboard,
+    ImageExtension,
+    Label,
+    Role,
+    User,
 )
 
 from .permissions import (IsUserHasRole)
 from .serializers import (
+    ActivitySerializer,
     CardSerializer,
+    CardUserSerializer,
+    CardImgSerializer,
+    CardFileSerializer,
     ColumnSerializer,
     DashboardSerializer,
     DashboardUserRoleSerializer,
-    UserSerializer,
-    CardUserSerializer,
-    LabelSerializer, ActivitySerializer,
-    CardImgSerializer, CardFileSerializer,
+    InvitUserDashboardSerializer,
     ImageExtensionSerializer,
+    LabelSerializer,
+    UserSearchSerializer,
+    UserSerializer,
 )
-from .utils import SendMessage, PreparingMessage
-
+from .utils import (
+    Hash,
+    PreparingMessage,
+    SendMessage,
+)
 from .views_functions.add_file_link import add_file, add_link
 from .views_functions.sending_email import sending_email
 from .views_functions.take_favicon import take_favicon
+
 
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
@@ -892,7 +916,7 @@ def change_role_board(request):
     count_admins_on_board = DashboardUserRole.objects.filter(dashboard_id = active_boards,
                                                       role__name = 'admin').count()
 
-    print('changeable_user_role>>>', changeable_user_role)
+    # print('changeable_user_role>>>', changeable_user_role)
 
     if (request.data['action'] == 'add_admin' and
         user_auth_role == 'admin'):
@@ -911,18 +935,149 @@ def change_role_board(request):
 
     if request.data['action'] == 'del_user':
         if changeable_user_role == 'admin' and not user_auth_role == "admin":
-            print('?????')
-            pass
-
+            print('???')
+            return Response(False, status=status.HTTP_404_NOT_FOUND)
         users_on_board.delete()
         return Response(True,status=status.HTTP_200_OK)
 
     return Response(False, status=status.HTTP_404_NOT_FOUND)
 
 
+class InvitUserBoardViewSet(viewsets.ModelViewSet):
+
+    # queryset = InvitUserDashboard.objects.all()
+    # serializer_class = InvitUserDashboardSerializer
+
+    @action(
+            detail=False,
+            methods=['post',],
+            permission_classes=(IsAuthenticated,),
+            url_path='select-users',
+    )
+    def select_users(self, request):
+        data_to_search = request.data['fieldData'].strip().lower()
+
+        dashboard = request.data['dashboardId']
+
+        # Пользователи, которые есть на доске
+        users_on_board = DashboardUserRole.objects.filter(dashboard_id = dashboard).values('user__username')
+
+        # Пользователи, которые приглашены на доску
+        already_invited_users = InvitUserDashboard.objects.filter(dashboard_id = dashboard).values('user__username')
+
+        search_result = []
+
+        if len(data_to_search) < 1:
+            return Response(search_result, status=status.HTTP_200_OK)
+
+        search_result = User.objects.filter(
+            Q(username__icontains=data_to_search) |
+            Q(email__icontains=data_to_search)
+        ).exclude(username__in=users_on_board).exclude(username__in=already_invited_users).values('username', 'email')
+
+        serializer = UserSearchSerializer(search_result, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(
+            detail=False,
+            methods=['post',],
+            permission_classes=(IsAuthenticated,),
+            url_path='invit-users',
+    )
+    def invit_users(self, request):
+        request = request.data
+
+        list_of_invited_users = request['selectedOption']
+
+        if not list_of_invited_users:
+            return Response('No user', status=status.HTTP_204_NO_CONTENT)
+
+
+        # получаем имя доски для добавления в строку для хэширования
+        dashboard_name = Dashboard.objects.filter(id=request['dashboardId']).values_list('name', flat=True).first()
+
+        # print('invit_users>>>', list_of_invited_users, dashboard_name)
+        for user in list_of_invited_users:
+            user_id = User.objects.filter(username = user['username']).values_list('id', flat=True).first()
+
+            hash = Hash(dashboard_name + user['email'])
+            hash_message = hash.get_hash_sha256
+
+            InvitUserDashboard.objects.create(
+            dashboard_id=int(request['dashboardId']),
+            user_id=user_id,
+            hash=hash_message,
+            )
+
+            message = PreparingMessage(
+                subject_letter = 'Приглашение на доску',
+                text_letter = hash_message,
+                template = 'add_dashboard'
+            )
+
+            send = SendMessage(
+            letter = message.get_message,
+            addres_mail = [user['email']]
+            )
+
+            send.get_send_email
+
+        return Response(True, status=status.HTTP_200_OK)
+
+    @action(
+        detail=False,
+        methods=['post',],
+        permission_classes=(IsAuthenticated,),
+        url_path='list-invited-users',
+    )
+    def list_invited_users(self, request):
+
+        dashboard_id = request.data['dashboardId']
+
+        already_invited_users = User.objects.filter(user_dashboard_invate__dashboard=dashboard_id)  # выборку делаем через related_name
+
+        serializer = UserSerializer(already_invited_users, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    @action(
+        detail=False,
+        methods=['post',],
+        permission_classes=(IsAuthenticated,),
+        url_path='pending-confirmations',
+    )
+    def pending_confirmation(self, request):
+        invit_hash = request.data['alias']
+
+        find_invite = InvitUserDashboard.objects.filter(hash=invit_hash).first()
+
+        role_participant = get_object_or_404(Role, name='participant')
+
+        if find_invite:
+
+            DashboardUserRole.objects.create(
+            dashboard=find_invite.dashboard,
+            user=find_invite.user,
+            role=role_participant
+            )
+
+            find_invite.delete()
+
+            response_data = {
+                'status': True,
+                'board_name': find_invite.dashboard.name,
+            }
+
+            return Response(response_data, status=status.HTTP_200_OK)
+
+
+        return Response({'status': False})
+
+
 # @api_view(["POST"])
 # @permission_classes([AllowAny])
-# def test_view(request):
+# def test_mail(request):
 
 #     {
 #         "subject_letter":"Моя тема",
@@ -941,6 +1096,7 @@ def change_role_board(request):
 #     request = request.data
 
 #     if request:
+#         print('views test_mail>>>', request)
 #         message = PreparingMessage(
 #             subject_letter = request.get('subject_letter', ''),
 #             text_letter = request.get('text_letter', ''),
@@ -953,9 +1109,41 @@ def change_role_board(request):
 #         )
 
 #         send.get_send_email
-#         send.get_write_to_file
-#         send.get_output_to_console
+#         # send.get_write_to_file
+#         # send.get_output_to_console
 
 #         return Response(True)
 
 #     return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+# from django.core.mail import EmailMultiAlternatives, get_connection
+# from django.template.loader import render_to_string
+
+# @api_view(["GET"])
+# @permission_classes([AllowAny])
+# def test_mail(request):
+
+#     subject = 'Тестовая отправка через EmailMultiAlternatives класс'
+
+#     text_content  = 'Данная отправка произведена через встроенный в Django EmailMultiAlternatives класс.'
+
+#     html_content  = render_to_string('mail_template.html', {'data': text_content })
+
+#     settings.EMAIL_BACKEND = settings.METHOD['smtp']
+
+#     connection = get_connection()
+#     connection.open()
+
+#     email = EmailMultiAlternatives(
+#         subject,
+#         text_content ,
+#         from_email = settings.EMAIL_HOST_USER,
+#         to=['rubtsov1978@gmail.com'],
+#         )
+#     email.attach_alternative(html_content,"text/html")
+#     email.send()
+
+#     connection.close()
+
+#     return Response(True, status=status.HTTP_200_OK)

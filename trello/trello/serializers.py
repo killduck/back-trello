@@ -1,11 +1,24 @@
 from rest_framework import serializers
 
 from .models import (
-    Card, Column, Dashboard, Role,
-    DashboardUserRole, User, CardUser,
-    Label, Activity, CardImg, CardFile,
-    ImageExtension, CardLink, ServiceImages,
+    Activity,
+    Card,
+    CardFile,
+    CardImg,
+    CardLink,
+    CardUser,
+    Column,
+    Dashboard,
+    DashboardUserRole,
+    ImageExtension,
+    InvitUserDashboard,
+    Label,
+    Role,
+    ServiceImages,
+    User,
 )
+
+
 class ServiceImagesSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -224,6 +237,31 @@ class DashboardSerializer(serializers.ModelSerializer):
             'img',
             'column',
             'dashboard_user_role',
+        )
+
+
+class UserSearchSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+
+
+        fields = (
+            "id",
+            "username",
+            "email",
+        )
+
+class InvitUserDashboardSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = InvitUserDashboard
+
+        fields = (
+            "id",
+            "dashboard",
+            "user",
+            "hash",
         )
 
 
