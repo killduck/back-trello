@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "corsheaders",  # Подключаем библиотеку/приложение django-cors-headers
+    'djoser',  # Бибилиотека для работы с user-ами
     "trello",
     "django_seed",
     # 'django_celery_beat', # это по ходу пока не нужно...

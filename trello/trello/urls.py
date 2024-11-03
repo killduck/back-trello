@@ -54,6 +54,8 @@ urlpatterns = [
                 path("search-role-board/", views.search_role_board, name="search-role-board"),
                 path("change-role-board/", views.change_role_board, name="change-role-board"),
                 # path("test-mail", views.test_mail,),
+                # path('reg/', include([])),
+                path('auth/', include('djoser.urls')),
             ]
         ),
     ),
