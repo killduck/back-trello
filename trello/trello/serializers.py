@@ -185,6 +185,7 @@ class CardSerializer(serializers.ModelSerializer):
             "date_end",
             "execute",
             "label",
+            "label_text",
             "description",
             "activity",
             "card_img",

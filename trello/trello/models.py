@@ -465,6 +465,12 @@ class Card(models.Model):
         verbose_name="Метка",
         help_text="Введите цветовую метку",
     )
+    label_text = models.CharField(
+        max_length=100,
+        verbose_name="Текст для метки",
+        help_text="Введите текст метки",
+        null=True,
+    )
     description = models.TextField(
         verbose_name="Текст описания карточки",
         help_text="Введите текст",
