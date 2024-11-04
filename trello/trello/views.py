@@ -1075,6 +1075,47 @@ class InvitUserBoardViewSet(viewsets.ModelViewSet):
         return Response({'status': False})
 
 
+class СheckRegistrationUserViewSet(viewsets.ModelViewSet):
+
+
+    @action(
+            detail=False,
+            methods=['post',],
+            permission_classes=(AllowAny,),
+            url_path='check-username',
+    )
+
+    def check_username(self, request):
+        data_to_search = request.data['fieldNickNameData'].strip()
+
+        search_result = User.objects.filter(username=data_to_search)
+
+
+        response_data = {
+                'status': None,
+                'nick_name': None,
+                'message': None,
+        }
+
+
+        if search_result:
+
+            response_data['status'] = False
+            response_data['nick_name'] = data_to_search,
+            response_data['message'] = 'Такой ник уже есть',
+
+            return Response(response_data, status=status.HTTP_200_OK)
+
+        response_data['status'] = True
+
+        response_data['nick_name'] = data_to_search,
+
+        response_data['message'] = 'Ник свободен',
+
+        return Response(response_data, status=status.HTTP_200_OK)
+
+
+
 # @api_view(["POST"])
 # @permission_classes([AllowAny])
 # def test_mail(request):
