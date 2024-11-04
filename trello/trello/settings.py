@@ -72,6 +72,10 @@ REST_FRAMEWORK = {
     ]
 }
 
+DJOSER = {
+    "USER_CREATE_PASSWORD_RETYPE": True,
+}
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
