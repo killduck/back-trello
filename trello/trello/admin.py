@@ -7,6 +7,7 @@ from .models import (
     User,
     CardFile,
     Dashboard,
+    DashboardUserRole,
 )
 
 
@@ -71,7 +72,7 @@ class CardFileAdmin(admin.ModelAdmin):
         "extension",
         "date_upload",
         "file_url",
-        "image" 
+        "image"
     )
     search_fields = ("name",)
 
@@ -81,10 +82,23 @@ class DashboardAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "name",
-        "img" 
+        "img"
     )
     search_fields = ("name",)
     list_filter = (
         "name",
     )
 
+
+@admin.register(DashboardUserRole)
+class DashboardUserRoleAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "dashboard",
+        "user",
+        "role"
+
+    )
+    list_filter = (
+        "dashboard",
+    )

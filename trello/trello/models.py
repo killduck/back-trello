@@ -537,6 +537,8 @@ class DashboardUserRole(models.Model):
     )
 
     class Meta:
+        verbose_name = "роли юзеров на доске"
+        verbose_name_plural = "Роли Пользователей на Доске"
         constraints = [
             models.UniqueConstraint(
                 fields=['dashboard', 'user'],

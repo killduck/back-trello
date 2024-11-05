@@ -10,6 +10,7 @@ from . import views
 
 router = SimpleRouter()
 router.register('invit-board', views.InvitUserBoardViewSet, basename='invit-board')
+router.register('check-reg-user', views.СheckRegistrationUserViewSet, basename='check-reg-user')
 
 
 urlpatterns = [
@@ -50,10 +51,10 @@ urlpatterns = [
                 path("del-file-from-card/", views.del_file_from_card, name="del-file-from-card"),
                 path("download-file-from-card/", views.download_file_from_card, name="download-file-from-card"),
                 path("del-link-from-card/", views.del_link_from_card, name="del-link-from-card"),
-
                 path("search-role-board/", views.search_role_board, name="search-role-board"),
                 path("change-role-board/", views.change_role_board, name="change-role-board"),
-                # path("test-mail", views.test_mail,),
+
+                path('auth/', include('djoser.urls')),
             ]
         ),
     ),
