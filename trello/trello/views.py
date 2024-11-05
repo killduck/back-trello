@@ -1,15 +1,7 @@
 from datetime import datetime
-import os
-from os import pread
-from os.path import split
-
-from django.core.mail import EmailMultiAlternatives, get_connection
-from django.template.loader import render_to_string
 from django.http import HttpResponse
-from django.conf import settings
 from django.shortcuts import get_object_or_404, get_list_or_404
 from django.db.models import Q
-
 
 from rest_framework import status
 from rest_framework import viewsets
@@ -18,7 +10,6 @@ from rest_framework.decorators import (
     api_view,
     permission_classes,
 )
-
 
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -72,29 +63,20 @@ from .views_functions.take_favicon import take_favicon
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def add_file_and_link_to_card(request):
-    # print('51', request.data, f'\n', request.POST,f'\n', request.FILES)
-
     add_error = AddFileAndLink(request)
-    # print(f'error __54 => {vars(add_error)}')
-
     card_data = CardSerializer(Card.objects.filter(id=request.data['card_id']), many=True).data[0]
-    # print(f'88__card_data => {card_data['card_file']}')
-    # print(f'88__card_data => {card_data}')
     if add_error.error_file and add_error.error_link:
         return Response(False, status=status.HTTP_404_NOT_FOUND)
     return Response(card_data, status=status.HTTP_200_OK)
 
-
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def download_file_from_card(request):
-    # print(request)
     try:
         file_id = int(request.data['file_id'])
         uploaded_file = CardFile.objects.get(id=file_id)
         response = HttpResponse(uploaded_file.file_url, content_type='application/force-download')
         response['Content-Disposition'] = f'attachment; filename="{uploaded_file.name}"'
-        print(response)
         return response
     except Exception as ex:
         print(f'error => {ex}')
@@ -104,7 +86,6 @@ def download_file_from_card(request):
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def del_file_from_card(request):
-    print(request.data)
     try:
         card_id = request.data["card_id"]
         file_id = request.data["file_id"]
@@ -120,7 +101,6 @@ def del_file_from_card(request):
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def del_link_from_card(request):
-    print(request.data)
     try:
         card_id = request.data["card_id"]
         link_id = request.data["link_id"]
@@ -180,18 +160,23 @@ def label_data(request):
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def add_label_to_card(request):
-    print(f'172__{request.data}')
-    if request.data['card_id'] and request.data['label_id']:
+    if request.data['card_id'] and request.data['label_id'] and request.data['label_text']:
         card_id = request.data['card_id']
         if request.data['label_id'] == 'null':
             label_id = None
+            label_text = None
         else:
             label_id = request.data['label_id']
 
+            if request.data['label_text'] == 'null':
+                label_text = None
+            else:
+                label_text = request.data['label_text']
+
         try:
-            Card.objects.filter(id=card_id).update(label_id=label_id)
-        except:
-            print("если что-то сюда прилетит, то будем разбираться")
+            Card.objects.filter(id=card_id).update(label_id=label_id, label_text=label_text)
+        except Exception as ex:
+            print(f"если что-то сюда прилетит, то будем разбираться, {ex}")
             return Response(False, status=status.HTTP_404_NOT_FOUND)
 
         queryset = Card.objects.all().filter(id=card_id)
@@ -204,7 +189,6 @@ def add_label_to_card(request):
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def add_card_description(request):
-    # print(request.data)
     if request.data['card_id'] and request.data['description'] or (request.data['description'] is None):
         card_id = request.data['card_id']
         description = request.data['description']
@@ -224,7 +208,6 @@ def add_card_description(request):
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def add_card_activity(request):
-    # print(f'203__ {request.data}')
     if request.data['card_id'] and request.data['author_id'] and request.data['comment']:
         card_users = CardUserSerializer(
             CardUser.objects.values('user_id').filter(card_id=request.data['card_id']).
@@ -292,7 +275,6 @@ def add_card_activity(request):
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def del_card_activity(request):
-    # print(request.data)
     try:
         id_comment = request.data["comment_id"]
         Activity.objects.filter(id=id_comment).delete()
@@ -305,7 +287,6 @@ def del_card_activity(request):
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def add_card_due_date(request):
-    # print(request.data)
     if request.data['card_id'] and request.data['end_date_time']:
         card_id = request.data['card_id']
         end_date_time = datetime.strptime(request.data['end_date_time'], "%d-%m-%Y %H:%M:%S")
@@ -325,7 +306,6 @@ def add_card_due_date(request):
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def del_card_due_date(request):
-    # print(request.data)
     if request.data['card_id']:
         card_id = request.data['card_id']
         try:
@@ -345,7 +325,6 @@ def del_card_due_date(request):
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def add_card_due_date_execute(request):
-    print(request.data)
     try:
         card_id = request.data['card_id']
         card_execute = request.data['card_execute']
@@ -366,14 +345,12 @@ def add_card_due_date_execute(request):
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def user(request):
-
     auth_user = request.user.id
 
     queryset = get_object_or_404(User, id=auth_user)
     serializer = UserSerializer(queryset, many=False)
 
     return Response(serializer.data)
-
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
@@ -387,11 +364,9 @@ def token_destroy(request):
         status=status.HTTP_200_OK
     )
 
-
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def columns(request):
-
     dashboard_id = request.data["dashboardId"]
 
     queryset = Column.objects.all().filter(dashboard=dashboard_id)
@@ -399,11 +374,9 @@ def columns(request):
 
     return Response(serializer.data)
 
-
 @api_view(["GET", "POST"])
 @permission_classes([IsUserHasRole])  # кастомный пермишен, что бы пользователь не смог через URL получить доступ к доске, где у него нет прав/ролей
 def dashboards(request):
-
     auth_user = request.user.id
 
     if request.method == "POST":
@@ -416,11 +389,9 @@ def dashboards(request):
     serializer = DashboardSerializer(queryset, many=True)
     return Response(serializer.data)
 
-
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def swap_columns(request):
-
     dashboard_id = request.data["dashboardId"]
 
     try:
@@ -435,11 +406,9 @@ def swap_columns(request):
     serializer = ColumnSerializer(queryset, many=True)
     return Response(serializer.data)
 
-
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def swap_cards(request):
-    print('488', request.data)
     try:
         column_name_start = Card.objects.filter(id=request.data['card_id'])[0].column
         for card in request.data["order_cards"]:
@@ -485,7 +454,6 @@ def swap_cards(request):
     serializer = CardSerializer(queryset, many=True)
     return Response(serializer.data)
 
-
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def create_column(request):
@@ -512,11 +480,9 @@ def create_column(request):
     serializer = ColumnSerializer(new_add_column)
     return Response(serializer.data)
 
-
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def create_card(request):
-    # print(request.data)
     card_column = request.data["column"]
     last_card_in_column = Card.objects.filter(column=card_column).last()
 
@@ -542,7 +508,6 @@ def create_card(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def delete_column(request):
-    # print(request.data)
     try:
         id_column_deleted = request.data["id_column"]
         if id_column_deleted:
@@ -550,7 +515,6 @@ def delete_column(request):
     except:
         return Response(False, status=status.HTTP_404_NOT_FOUND)
     return Response(True, status=status.HTTP_200_OK)
-
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
@@ -563,12 +527,10 @@ def delete_card(request):
         return Response(False, status=status.HTTP_404_NOT_FOUND)
     return Response(True, status=status.HTTP_200_OK)
 
-
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def take_data_column(request):
     auth_user = request.user.id
-    # print(request.data)
     if request.data['id']:
         column_id = request.data['id']
         queryset = Column.objects.all().filter(id=column_id)
@@ -583,7 +545,6 @@ def take_data_column(request):
         )
     else:
         return Response(False, status=status.HTTP_404_NOT_FOUND)
-
 
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
@@ -610,7 +571,6 @@ def take_data_card(request):
     else:
         return Response(False, status=status.HTTP_404_NOT_FOUND)
 
-
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def new_data_card(request):
@@ -629,7 +589,6 @@ def new_data_card(request):
         return Response(serializer.data)
     else:
         return Response(False, status=status.HTTP_404_NOT_FOUND)
-
 
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
@@ -650,7 +609,6 @@ def new_data_column(request):
     else:
         return Response(False, status=status.HTTP_404_NOT_FOUND)
 
-
 @api_view(["GET", "POST"])
 @permission_classes([IsUserHasRole])
 def dashboard_role(request):
@@ -658,11 +616,9 @@ def dashboard_role(request):
     serializer = DashboardUserRoleSerializer(queryset, many=True)
     return Response(serializer.data)
 
-
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def card_user_update(request):
-    # print(request.data)
     if request.data['user_id'] and request.data['card_id']:
         user_id = request.data['user_id']
         card_id = request.data['card_id']
@@ -715,7 +671,6 @@ def card_user_update(request):
     else:
         return Response(False, status=status.HTTP_404_NOT_FOUND)
 
-
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def card_user_delete(request):
@@ -728,7 +683,6 @@ def card_user_delete(request):
         get_object_or_404() выкинет автоматом 404
     """
     # TODO Если нет возражений, комментарий-пояснение можно удалить
-    # print(request.data)
     user_id = request.data.get('user_id', False)
     card_id = request.data.get('card_id', False)
 
@@ -807,7 +761,6 @@ def dashboard_user(request):
 
     return Response(False, status=status.HTTP_404_NOT_FOUND)
 
-
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def send_mail(request):
@@ -855,28 +808,20 @@ def send_mail(request):
 
     return Response(status=status.HTTP_404_NOT_FOUND)
 
-
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def search_role_board(request):
-    # print('search_role_board>>>', request.data)
-
     user_auth_id = request.user.id
     user_card_id = request.data['user_id']
     active_boards = request.data['dashboard_id']
-
     users_on_board = DashboardUserRole.objects.filter(dashboard_id = active_boards)
 
     try:
 
         role_auth_user = users_on_board.filter(user_id=user_auth_id).values('role__name').first()['role__name']
-
         role_card_user = users_on_board.filter(user_id=user_card_id).values('role__name').first()['role__name']
-
         count_user_on_board = users_on_board.count()
-
         count_admin_on_board = users_on_board.filter(role__name = 'admin').count()
-
 
         role_parameters = {
             'user_auth_id': user_auth_id,
@@ -891,32 +836,20 @@ def search_role_board(request):
     except:
         return Response(False)
 
-
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def change_role_board(request):
-
     user_id = request.data['user_id']
-
     active_boards = request.data['dashboard_id']
-
     users_on_board = DashboardUserRole.objects.filter(dashboard_id = active_boards,
                                                       user_id = user_id)
-
     changeable_user_role = users_on_board.first().role.name
-
-
     user_auth_id = request.user.id
-
     user_auth_on_board = DashboardUserRole.objects.filter(dashboard_id = active_boards,
                                                       user_id = user_auth_id).first()
-
     user_auth_role = user_auth_on_board.role.name
-
     count_admins_on_board = DashboardUserRole.objects.filter(dashboard_id = active_boards,
                                                       role__name = 'admin').count()
-
-    # print('changeable_user_role>>>', changeable_user_role)
 
     if (request.data['action'] == 'add_admin' and
         user_auth_role == 'admin'):
@@ -935,13 +868,11 @@ def change_role_board(request):
 
     if request.data['action'] == 'del_user':
         if changeable_user_role == 'admin' and not user_auth_role == "admin":
-            print('???')
             return Response(False, status=status.HTTP_404_NOT_FOUND)
         users_on_board.delete()
         return Response(True,status=status.HTTP_200_OK)
 
     return Response(False, status=status.HTTP_404_NOT_FOUND)
-
 
 class InvitUserBoardViewSet(viewsets.ModelViewSet):
 
@@ -1040,7 +971,6 @@ class InvitUserBoardViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
     @action(
         detail=False,
         methods=['post',],
@@ -1049,28 +979,22 @@ class InvitUserBoardViewSet(viewsets.ModelViewSet):
     )
     def pending_confirmation(self, request):
         invit_hash = request.data['alias']
-
         find_invite = InvitUserDashboard.objects.filter(hash=invit_hash).first()
-
         role_participant = get_object_or_404(Role, name='participant')
 
         if find_invite:
-
             DashboardUserRole.objects.create(
             dashboard=find_invite.dashboard,
             user=find_invite.user,
             role=role_participant
             )
-
             find_invite.delete()
-
             response_data = {
                 'status': True,
                 'board_name': find_invite.dashboard.name,
             }
 
             return Response(response_data, status=status.HTTP_200_OK)
-
 
         return Response({'status': False})
 
@@ -1113,78 +1037,3 @@ class СheckRegistrationUserViewSet(viewsets.ModelViewSet):
         response_data['message'] = 'Ник свободен',
 
         return Response(response_data, status=status.HTTP_200_OK)
-
-
-
-# @api_view(["POST"])
-# @permission_classes([AllowAny])
-# def test_mail(request):
-
-#     {
-#         "subject_letter":"Моя тема",
-#         "text_letter": "Qwerty&ksdghkgsghlak",
-#         "template":"add_dashboard",
-#         "addres_mail": "rubtsov1978@gmail.com"
-#     }
-
-
-#     {
-#         "subject_letter":"Моя тема",
-#         "text_letter": "Тестовое сообщение для проверки функционала.",
-#         "addres_mail": "rubtsov1978@gmail.com"
-#     }
-
-#     request = request.data
-
-#     if request:
-#         print('views test_mail>>>', request)
-#         message = PreparingMessage(
-#             subject_letter = request.get('subject_letter', ''),
-#             text_letter = request.get('text_letter', ''),
-#             template = request.get('template', '')
-#         )
-
-#         send = SendMessage(
-#             letter = message.get_message,
-#             addres_mail = [request['addres_mail']]
-#         )
-
-#         send.get_send_email
-#         # send.get_write_to_file
-#         # send.get_output_to_console
-
-#         return Response(True)
-
-#     return Response(status=status.HTTP_404_NOT_FOUND)
-
-
-# from django.core.mail import EmailMultiAlternatives, get_connection
-# from django.template.loader import render_to_string
-
-# @api_view(["GET"])
-# @permission_classes([AllowAny])
-# def test_mail(request):
-
-#     subject = 'Тестовая отправка через EmailMultiAlternatives класс'
-
-#     text_content  = 'Данная отправка произведена через встроенный в Django EmailMultiAlternatives класс.'
-
-#     html_content  = render_to_string('mail_template.html', {'data': text_content })
-
-#     settings.EMAIL_BACKEND = settings.METHOD['smtp']
-
-#     connection = get_connection()
-#     connection.open()
-
-#     email = EmailMultiAlternatives(
-#         subject,
-#         text_content ,
-#         from_email = settings.EMAIL_HOST_USER,
-#         to=['rubtsov1978@gmail.com'],
-#         )
-#     email.attach_alternative(html_content,"text/html")
-#     email.send()
-
-#     connection.close()
-
-#     return Response(True, status=status.HTTP_200_OK)
