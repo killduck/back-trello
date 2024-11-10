@@ -750,14 +750,48 @@ def card_user_delete(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def dashboard_user(request):
+    # dashboard_id = request.data["dashboardId"]
+    #
+    # if request.data["dashboardId"].isdigit():
+    #
+    #     users = DashboardUserRole.objects.values('user').filter(dashboard=dashboard_id)
+    #     queryset = User.objects.filter(id__in=users)
+    #     serializer = UserSerializer(queryset, many=True)
+    #     return Response(serializer.data)
+    #
+    # return Response(False, status=status.HTTP_404_NOT_FOUND)
     dashboard_id = request.data["dashboardId"]
 
     if request.data["dashboardId"].isdigit():
-
+        # получаем всех юзеров в дашборде
         users = DashboardUserRole.objects.values('user').filter(dashboard=dashboard_id)
         queryset = User.objects.filter(id__in=users)
-        serializer = UserSerializer(queryset, many=True)
-        return Response(serializer.data)
+        dashboard_users_data = UserSerializer(queryset, many=True).data
+
+        # получаем всех изеров для каждой карточки в дашборде
+        dashboard = get_object_or_404(Dashboard, id=dashboard_id)
+        dashboard_data = DashboardSerializer(dashboard, many=False).data
+        dashboard_cards_and_users = []
+        for column in dashboard_data['column']:
+            for card in column['cards']:
+                card_users = CardUser.objects.values('user').filter(card_id=card['id'])
+                card_users_data = User.objects.filter(id__in=card_users)
+                serializer_card_users_data = UserSerializer(card_users_data, many=True).data
+
+                dashboard_cards_and_users.append(
+                    {
+                        'card_id': card['id'],
+                        'card_name': card['name'],
+                        'card_users': serializer_card_users_data,
+                    }
+                )
+        # print('770', dashboard_cards_and_users)
+        return Response(
+            {
+                'dashboard_users_data': dashboard_users_data,
+                'dashboard_cards_and_users': dashboard_cards_and_users,
+            }
+        )
 
     return Response(False, status=status.HTTP_404_NOT_FOUND)
 
