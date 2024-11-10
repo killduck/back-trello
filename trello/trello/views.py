@@ -750,16 +750,6 @@ def card_user_delete(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def dashboard_user(request):
-    # dashboard_id = request.data["dashboardId"]
-    #
-    # if request.data["dashboardId"].isdigit():
-    #
-    #     users = DashboardUserRole.objects.values('user').filter(dashboard=dashboard_id)
-    #     queryset = User.objects.filter(id__in=users)
-    #     serializer = UserSerializer(queryset, many=True)
-    #     return Response(serializer.data)
-    #
-    # return Response(False, status=status.HTTP_404_NOT_FOUND)
     dashboard_id = request.data["dashboardId"]
 
     if request.data["dashboardId"].isdigit():
@@ -785,7 +775,6 @@ def dashboard_user(request):
                         'card_users': serializer_card_users_data,
                     }
                 )
-        # print('770', dashboard_cards_and_users)
         return Response(
             {
                 'dashboard_users_data': dashboard_users_data,
