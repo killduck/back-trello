@@ -20,7 +20,7 @@ Host github.com-back-31
 - Команда для клонирования репы с GitHub
 
 ```
-git clone git@github.com-back-31:Ilya616/back-group31.git
+git clone git@github.com:killduck/back-trello.git
 ```
 
 - Волшебные команды для подтягивания и обновления веток репы на локальном компе
